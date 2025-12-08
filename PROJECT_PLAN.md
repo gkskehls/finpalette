@@ -1,0 +1,80 @@
+# Finpalette 프로젝트 개발 계획서
+
+## 1. 프로젝트 목표 (Mission)
+
+- **핵심 목표:** 사용자가 자신의 수입과 지출을 '팔레트의 색을 고르듯' 쉽고 직관적으로 분류하고, 한눈에 파악할 수 있는 가계부 웹앱을 제공한다.
+- **차별점:**
+    - **직관적인 카테고리화:** 'Palette' 컨셉을 살려 사용자가 직접 카테고리별 색상을 지정하고 시각적으로 지출 내역을 인지할 수 있도록 한다.
+    - **단순함:** 복잡한 재무 분석보다는, 매일의 소비를 기록하고 월별 흐름을 파악하는 데 집중한다.
+    - **빠른 반응성:** React와 최신 웹 기술을 활용하여 데스크탑과 모바일 웹에서 쾌적한 사용자 경험을 제공한다.
+
+ ---
+
+## 2. 기술 스택 및 아키텍처
+
+- **Frontend:** **React (with Vite)**
+    - 역할: 사용자 인터페이스(UI) 전체를 구축합니다.
+- **Database:** **Supabase**
+    - 역할: 모든 사용자 데이터(가계부 내역, 카테고리, 사용자 정보 등)를 저장하고 관리합니다.
+    - 주요 활용 기능: Database, Authentication, Row Level Security (RLS)
+- **Hosting & CI/CD:** **Firebase Hosting & GitHub Actions**
+    - 역할: 개발된 웹앱을 배포하고, GitHub과 연동하여 자동 배포 파이프라인을 구축합니다.
+- **IDE:** **IntelliJ**
+- **Version Control:** **GitHub**
+
+ ---
+
+## 3. 데이터베이스 설계 (Supabase)
+
+### 3.1. `transactions` (거래 내역) 테이블
+
+| 컬럼명 | 타입 | 설명 | 비고 |
+ |---|---|---|---|
+| `id` | `uuid` | 고유 식별자 (Primary Key) | `uuid_generate_v4()` |
+| `user_id` | `uuid` | 사용자 ID (Foreign Key) | `auth.users.id` 참조 |
+| `created_at` | `timestamptz` | 생성 시각 | `now()` |
+| `date` | `date` | 실제 거래 날짜 | |
+| `type` | `text` | '수입' 또는 '지출' | |
+| `amount` | `integer` | 금액 | |
+| `category_id` | `uuid` | 카테고리 ID (Foreign Key) | `categories.id` 참조 |
+| `description` | `text` | 거래 내용 메모 | |
+
+### 3.2. `categories` (카테고리) 테이블
+
+| 컬럼명 | 타입 | 설명 | 비고 |
+ |---|---|---|---|
+| `id` | `uuid` | 고유 식별자 (Primary Key) | `uuid_generate_v4()` |
+| `user_id` | `uuid` | 사용자 ID (Foreign Key) | `auth.users.id` 참조 |
+| `name` | `text` | 카테고리 이름 | |
+| `color_code` | `text` | 카테고리 대표 색상 | 예: `#FFD700` |
+
+> **⚠️ 중요:** 모든 테이블에 **Row Level Security (RLS)**를 활성화하여, 사용자는 자신의 데이터만 접근할 수 있도록 정책을 설정해야 합니다.
+ 
+---
+
+## 4. 개발 로드맵 (단계별 기능 구현)
+
+### Phase 1: MVP (Minimum Viable Product) - 핵심 기능 구현
+
+- **목표:** 가장 기본적인 가계부 기능이 동작하는 최소 버전 완성
+- **세부 작업:**
+    1. React-Supabase 연동 및 클라이언트 설정
+    2. Supabase Auth를 이용한 회원가입/로그인 기능 구현
+    3. 거래 내역 CRUD (Create, Read, Update, Delete) 기능 구현
+    4. 월별 거래 내역 목록 대시보드 구현
+
+### Phase 2: 고도화 - 'Palette' 컨셉 강화 및 시각화
+
+- **목표:** Finpalette만의 차별점을 부각하고 사용자 경험 향상
+- **세부 작업:**
+    1. 사용자 정의 카테고리 (색상 지정 포함) CRUD 기능 구현
+    2. 카테고리별 지출 비율 원형 차트 시각화
+    3. 월별 총수입/총지출 막대그래프 시각화
+
+### Phase 3: 확장 - 편의 기능 추가
+
+- **목표:** 사용자를 위한 편의 기능 추가 및 완성도 향상
+- **세부 작업:**
+    1. 내용/카테고리 기반 거래 내역 검색 기능
+    2. 반복 내역(고정 지출/수입) 자동 등록 기능
+    3. 반응형 디자인 개선 및 최적화

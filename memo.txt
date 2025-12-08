@@ -1,14 +1,29 @@
-# Git 저장소로 초기화
-git init -b main
+이 프로젝트의 모든 답변은 한글로 해줘.
+아직은 프로젝트 방향성을 잡고, 어떻게 개발할지만 논의 하고 문서로 정리하고 싶어.
+그 후에 개발을 진행하도록 할께.
 
-# 모든 파일을 Staging Area에 추가
-git add .
+가게부 앱처럼 동작하는 웹앱을 만들고 싶어.
+프로젝트 명 : Finpalette (핀팔레트):
+'Finance‘와 'Palette’의 합성어입니다. 다양한 카테고리(식비, 교통비 등)를 팔레트의 색상처럼 분류하고 관리한다는 의미를 담고 있습니다
 
-# 첫 번째 커밋 메시지 작성
-git commit -m "Initial commit: Setup React project with Vite"
+리액트 기반으로 만들고 싶어.
+파이어베이스로 호스팅을 하고 데이터베이스는 supabase를 이용하고 싶어.
+코드 에디터는 인텔리제이를 사용할거야.
+girhub랑 연동할거야.
+
+파이어베이스 연동했어.
+girhub 연동했어.
+인텔리제이를 연동했어.
+supabase 는 아직 프로젝트 생성만 했어.
+
+
 
 # GitHub 저장소를 원격(remote)으로 추가 (YOUR_USERNAME을 실제 GitHub 아이디로 변경)
-git remote add origin https://github.com/YOUR_USERNAME/finpalette.git
+# git remote add origin https://github.com/gkskehls/finpalette.git
+git add .
+git commit -m "docs(project): 프로젝트 계획 및 개발 가이드 문서 정의"
+git push origin main
 
-# main 브랜치를 origin(GitHub)으로 푸시
-git push -u origin main
+npm run build
+firebase deploy
+
