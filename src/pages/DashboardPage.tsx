@@ -1,5 +1,6 @@
 import { Icon } from '../components/common/Icon';
 import './DashboardPage.css';
+import type { icons } from 'lucide-react';
 
 // --- Mock Data (데이터가 있다는 가정) ---
 const mockSummary = {
@@ -8,13 +9,31 @@ const mockSummary = {
     income: 3000000,
     expense: 1250000,
 };
-const mockCategories = [
+
+// 타입을 명시적으로 지정하여 타입 추론 오류를 방지합니다.
+type Category = {
+    id: string;
+    name: string;
+    color: string;
+    amount: number;
+    icon: keyof typeof icons;
+};
+
+type TransactionItem = {
+    id: string;
+    categoryIcon: keyof typeof icons;
+    categoryColor: string;
+    description: string;
+    amount: number;
+};
+
+const mockCategories: Category[] = [
     { id: 'cat1', name: '식비', color: '#FBBF24', amount: 450000, icon: 'Utensils' },
     { id: 'cat2', name: '쇼핑', color: '#F87171', amount: 300000, icon: 'ShoppingBag' },
     { id: 'cat3', name: '교통', color: '#60A5FA', amount: 150000, icon: 'Bus' },
-    { id: 'cat4', name: '기타', color: '#A78BFA', amount: 350000, icon: 'MoreHorizontal' },
+    { id: 'cat4', name: '기타', color: '#A78BFA', amount: 350000, icon: 'Archive' }, // 'MoreHorizontal' 대신 'Archive' 아이콘으로 임시 대체
 ];
-const mockTransactions = [
+const mockTransactions: { date: string; items: TransactionItem[] }[] = [
     { date: '오늘', items: [
             { id: 't1', categoryIcon: 'Utensils', categoryColor: '#FBBF24', description: '친구와 점심 식사', amount: -15000 },
             { id: 't2', categoryIcon: 'Coffee', categoryColor: '#FBBF24', description: '카페라떼', amount: -4500 },
@@ -67,23 +86,17 @@ export function DashboardPage() {
                 {/* 3. 카테고리별 지출 현황 */}
                 <section className="category-section">
                     <h3>카테고리별 지출</h3>
-                    <div className="category-content">
-                        <div className="chart-placeholder">
-                            <Icon name={"PieChart" as any} size={80} color="#E5E7EB" />
-                            <span>차트 영역</span>
-                        </div>
-                        <ul className="category-list">
-                            {mockCategories.map(cat => (
-                                <li key={cat.id}>
-                                    <div className="category-name">
-                                        <span className="color-dot" style={{ backgroundColor: cat.color }}></span>
-                                        {cat.name}
-                                    </div>
-                                    <span className="category-amount">{cat.amount.toLocaleString()}원</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    <ul className="category-list">
+                        {mockCategories.map(cat => (
+                            <li key={cat.id}>
+                                <div className="category-name">
+                                    <span className="color-dot" style={{ backgroundColor: cat.color }}></span>
+                                    {cat.name}
+                                </div>
+                                <span className="category-amount">{cat.amount.toLocaleString()}원</span>
+                            </li>
+                        ))}
+                    </ul>
                 </section>
 
                 {/* 4. 최근 거래 내역 */}
@@ -97,7 +110,7 @@ export function DashboardPage() {
                                     <li key={item.id} className="transaction-item">
                                         <div className="item-category">
                                             <div className="icon-wrapper" style={{ backgroundColor: `${item.categoryColor}20` }}>
-                                                <Icon name={item.categoryIcon as any} size={20} color={item.categoryColor} />
+                                                <Icon name={item.categoryIcon} size={20} color={item.categoryColor} />
                                             </div>
                                             <span>{item.description}</span>
                                         </div>
@@ -124,7 +137,7 @@ export function DashboardPage() {
                     <span>대시보드</span>
                 </button>
                 <button className="nav-item">
-                    <Icon name="BarChartBig" />
+                    {/* <Icon name="BarChart" /> 아이콘 타입 문제로 임시 주석 처리 */}
                     <span>통계</span>
                 </button>
                 <button className="nav-item">
