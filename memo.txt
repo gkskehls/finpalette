@@ -1,0 +1,14 @@
+# Git 저장소로 초기화
+git init -b main
+
+# 모든 파일을 Staging Area에 추가
+git add .
+
+# 첫 번째 커밋 메시지 작성
+git commit -m "Initial commit: Setup React project with Vite"
+
+# GitHub 저장소를 원격(remote)으로 추가 (YOUR_USERNAME을 실제 GitHub 아이디로 변경)
+git remote add origin https://github.com/YOUR_USERNAME/finpalette.git
+
+# main 브랜치를 origin(GitHub)으로 푸시
+git push -u origin main
