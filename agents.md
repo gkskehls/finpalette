@@ -155,6 +155,17 @@ export function Chip({ label, color }: ChipProps) {
 
 프로젝트 전반에서 사용되는 데이터 타입(예: `Transaction`, `Category`)은 `src/types` 폴더 내의 파일에서 중앙 관리합니다. 이를 통해 데이터 구조의 일관성을 보장하고, API 변경 시 수정 범위를 명확하게 할 수 있습니다.
 
+### 4.4. 아키텍처 패턴: Container/Presentational Pattern
+
+컴포넌트를 역할에 따라 두 가지로 명확히 구분하여 개발합니다.
+
+- **Container 컴포넌트 (Smart):**
+  - **역할:** 데이터 fetching, 상태 관리 등 '어떻게 동작할지'에 대한 로직을 담당합니다.
+  - **구현:** 주로 `pages` 폴더에 위치하며, 커스텀 훅(`useTransactions`)을 사용하여 데이터를 가져오고 상태를 관리합니다.
+- **Presentational 컴포넌트 (Dumb):**
+  - **역할:** 데이터를 `props`로 받아 '어떻게 보일지'에 대한 UI 렌더링만 담당합니다. 자체적으로 상태를 거의 갖지 않습니다.
+  - **구현:** 주로 `components` 폴더에 위치하며, 순수하게 UI 표현에만 집중합니다.
+
 ---
 
 ## 5. 보안 가이드라인 (Security)
@@ -175,6 +186,102 @@ export function Chip({ label, color }: ChipProps) {
 
 - **협업을 위한 안내**:
   - 다른 개발자가 프로젝트를 쉽게 설정할 수 있도록, 실제 키 값을 제외한 템플릿 파일인 **`.env.example`** 파일을 만들어 커밋하는 것을 권장합니다.
+
+---
+
+## 6. 테스트 전략
+
+- **원칙:** 새로운 기능을 추가하거나 기존 코드를 수정할 때는 반드시 관련 테스트 코드를 함께 작성하거나 업데이트합니다.
+- **단위 테스트:** 모든 재사용 컴포넌트와 핵심 로직 함수는 단위 테스트를 작성하는 것을 원칙으로 합니다.
+- **실행:** Pull Request 생성 전, `npm test` 명령을 통해 모든 테스트가 통과하는지 확인해야 합니다.
+
+---
+
+## 7. 엄격한 코드 구현 원칙 (Strict Code Implementation Principles)
+
+불필요한 코드 변경을 방지하고, 프로젝트의 모든 코드가 예측 가능한 동일한 구조를 갖도록 다음 원칙을 반드시 준수합니다. 기존에 잘 동작하는 코드는 명시적인 기능 추가나 버그 수정 요청이 없는 한, 임의로 구조를 변경하지 않습니다.
+
+### 7.1. 컴포넌트 구조 템플릿
+
+모든 React 컴포넌트는 다음 구조를 따릅니다.
+
+- **import 순서**: `react` -> 외부 라이브러리 -> 내부 컴포넌트/훅 -> 타입 -> 스타일 순으로 그룹화합니다.
+- **Props 타입 정의**: 컴포넌트 바로 위에 `interface`로 정의하며, 이름은 `[컴포넌트명]Props`로 명명합니다.
+- **컴포넌트 선언**: `export function` 키워드를 사용한 명명 함수로 선언합니다.
+- **스타일링**: CSS Modules(`.module.css`) 사용을 원칙으로 하며, `styles` 라는 이름으로 import 합니다.
+
+**예시: `src/components/common/Button.tsx`**
+```tsx
+import React from 'react';
+
+// 외부 라이브러리 (예: clsx)
+import clsx from 'clsx';
+
+// 내부 컴포넌트, 훅 등
+import { useSomething } from '@/hooks/useSomething';
+
+// 타입
+import type { ButtonVariant } from './Button.types';
+
+// 스타일
+import styles from './Button.module.css';
+
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+  variant?: ButtonVariant;
+  isDisabled?: boolean;
+}
+
+export function Button({ label, onClick, variant = 'primary', isDisabled = false }: ButtonProps) {
+  const buttonClassName = clsx(styles.button, styles[variant], {
+    [styles.disabled]: isDisabled,
+  });
+
+  return (
+    <button className={buttonClassName} onClick={onClick} disabled={isDisabled}>
+      {label}
+    </button>
+  );
+}
+```
+
+### 7.2. 커스텀 훅 구조 템플릿
+
+모든 커스텀 훅은 상태, 핸들러/함수, 이펙트, 반환 값의 순서와 구조를 통일합니다.
+
+- **상태 (State)**: 훅의 가장 상단에 `useState`를 모아서 선언합니다.
+- **메모이제이션 (Memoization)**: `useCallback`, `useMemo`를 사용하여 불필요한 리렌더링을 방지하는 로직을 상태 선언부 다음에 작성합니다.
+- **핸들러/함수 (Handlers/Functions)**: 상태를 변경하거나 특정 로직을 수행하는 내부 함수를 선언합니다.
+- **이펙트 (Effect)**: `useEffect`를 사용하여 외부 요인(props, API 등)에 반응하는 로직을 작성합니다.
+- **반환 (Return)**: 훅의 가장 마지막에 위치하며, 배열 또는 객체 형태로 상태와 핸들러를 명시적으로 반환합니다.
+
+**예시: `src/hooks/useToggle.ts`**
+```ts
+import { useState, useCallback } from 'react';
+
+export function useToggle(initialState = false): [boolean, () => void] {
+  const [isOn, setIsOn] = useState(initialState);
+
+  const toggle = useCallback(() => {
+    setIsOn(prev => !prev);
+  }, []);
+
+  return [isOn, toggle];
+}
+```
+
+### 7.3. 스타일링 방식 통일
+
+- **CSS Modules 원칙**: 전역 CSS 오염을 방지하고 컴포넌트 단위 스타일링을 위해 `.module.css` 파일 사용을 기본으로 합니다.
+- **클래스 네이밍**: CSS 클래스명은 `kebab-case`를 사용하고, JavaScript에서 접근할 때는 `camelCase` (e.g., `styles.buttonContainer`)를 사용합니다.
+- **전역 스타일**: 앱 전체에 적용되어야 하는 최소한의 스타일(폰트, 리셋 CSS 등)은 `src/styles/global.css`에서 관리합니다.
+
+### 7.4. 작업 원칙 합의
+
+1.  **명시적 요청 기반 수정**: 기능 개발, 버그 수정 등 명확한 목표가 제시된 경우에만 코드를 수정합니다. 임의로 기존 코드의 구조를 변경하지 않습니다.
+2.  **합의된 패턴 준수**: 새로운 코드를 작성할 때는 반드시 상기된 템플릿과 패턴을 100% 준수합니다.
+3.  **리팩토링 사전 동의**: 기존 코드의 구조 변경이 불가피하다고 판단될 경우, 변경 이유와 대안을 먼저 설명하고 동의를 얻은 후에만 작업을 진행합니다.
 
 ---
 

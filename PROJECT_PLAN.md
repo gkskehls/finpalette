@@ -24,15 +24,31 @@
 - **Version Control:** **GitHub**
 
  ---
-
+ 
 ## 3. 데이터베이스 설계 (Supabase)
+
+> **v2 설계 (공유 기능 포함)**: 모든 데이터는 `user_id`가 아닌 `palette_id`에 종속됩니다.
+
+### 3.1. `palettes` (공유 공간) 테이블
+| 컬럼명 | 타입 | 설명 |
+|---|---|---|
+| `id` | `uuid` | 팔레트 고유 식별자 (PK) |
+| `name` | `text` | 팔레트 이름 (예: "우리 가족 가계부") |
+| `owner_id` | `uuid` | 팔레트 소유자 ID (`auth.users.id` 참조) |
+
+### 3.2. `palette_members` (팔레트 멤버) 테이블
+| 컬럼명 | 타입 | 설명 |
+|---|---|---|
+| `palette_id` | `uuid` | 팔레트 ID (FK, `palettes.id` 참조) |
+| `user_id` | `uuid` | 사용자 ID (FK, `auth.users.id` 참조) |
+| `role` | `text` | 역할 (예: 'owner', 'member') |
 
 ### 3.1. `transactions` (거래 내역) 테이블
 
 | 컬럼명 | 타입 | 설명 | 비고 |
  |---|---|---|---|
 | `id` | `uuid` | 고유 식별자 (Primary Key) | `uuid_generate_v4()` |
-| `user_id` | `uuid` | 사용자 ID (Foreign Key) | `auth.users.id` 참조 |
+| `palette_id` | `uuid` | 팔레트 ID (Foreign Key) | `palettes.id` 참조 |
 | `created_at` | `timestamptz` | 생성 시각 | `now()` |
 | `date` | `date` | 실제 거래 날짜 | |
 | `type` | `text` | '수입' 또는 '지출' | |
@@ -45,7 +61,7 @@
 | 컬럼명 | 타입 | 설명 | 비고 |
  |---|---|---|---|
 | `id` | `uuid` | 고유 식별자 (Primary Key) | `uuid_generate_v4()` |
-| `user_id` | `uuid` | 사용자 ID (Foreign Key) | `auth.users.id` 참조 |
+| `palette_id` | `uuid` | 팔레트 ID (Foreign Key) | `palettes.id` 참조 |
 | `name` | `text` | 카테고리 이름 | |
 | `color_code` | `text` | 카테고리 대표 색상 | 예: `#FFD700` |
 
@@ -57,16 +73,18 @@
 
 ### Phase 1: MVP (Minimum Viable Product) - 핵심 기능 구현
 
-- **목표:** 가장 기본적인 가계부 기능이 동작하는 최소 버전 완성
+- **목표:** 로그인 없이도 즉시 사용할 수 있는 핵심 가계부 기능 완성
 - **세부 작업:**
-    1. React-Supabase 연동 및 클라이언트 설정
+    1. **로컬 스토리지 기반 데이터 관리 기능 구현 (Guest Mode)**: 로그인하지 않은 사용자의 데이터를 브라우저(Local Storage)에 저장하고 관리합니다.
     2. **기본 레이아웃 구현**: 앱 전체의 헤더, 하단 탭 네비게이션 등 기본 구조를 구현합니다.
-    3. **대시보드 페이지 (첫 페이지) 구현**:
+    3. **대시보드 페이지 구현**:
         - **월별 요약 카드**: 총수입, 총지출, 합계를 표시합니다.
-        - **카테고리별 지출 현황**: 원형 차트(placeholder)와 카테고리별 지출 목록을 표시합니다.
+        - **카테고리별 지출 현황**: 카테고리별 지출 목록을 표시합니다.
         - **최근 거래 내역**: 날짜별로 그룹화된 거래 내역 목록을 표시합니다.
     4. **빠른 내역 추가 기능**: 화면에 항상 떠 있는 '+' 버튼(FAB)과 내역 입력 폼을 구현합니다. (Create)
-    5. Supabase Auth를 이용한 회원가입/로그인 페이지를 구현합니다.
+    5. **선택적 회원가입 및 데이터 동기화**:
+        - Supabase Auth를 이용한 회원가입/로그인 기능을 구현합니다.
+        - 회원가입 시, 로컬 스토리지에 있던 데이터를 Supabase DB로 이전(migration)하는 기능을 구현합니다.
 
 ### Phase 2: 고도화 - 'Palette' 컨셉 강화 및 시각화
 
@@ -82,5 +100,8 @@
 - **세부 작업:**
     1. 내용/카테고리 기반 거래 내역 검색 기능
     2. 반복 내역(고정 지출/수입) 자동 등록 기능
-    3. **PWA(Progressive Web App) 적용**: 홈 화면에 앱 설치, 오프라인 지원 등 네이티브 앱 경험 강화
-    4. 데스크탑 화면 최적화
+    3. **공유 가계부(팔레트) 기능**:
+        - 여러 사용자가 함께 사용하는 '팔레트' 생성 및 초대 기능
+        - 팔레트 간 전환 UI 구현
+    4. **PWA(Progressive Web App) 적용**: 홈 화면에 앱 설치, 오프라인 지원 등 네이티브 앱 경험 강화
+    5. 데스크탑 화면 최적화

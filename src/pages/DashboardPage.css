@@ -1,7 +1,7 @@
 .dashboard-container {
     max-width: 480px; /* 모바일 화면 너비 제한 */
     margin: 0 auto;
-    background-color: #f9fafb;
+    background-color: var(--background-primary);
     min-height: 100vh;
     padding-bottom: 80px; /* 하단 네비게이션 공간 확보 */
     position: relative;
@@ -12,7 +12,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    background-color: white;
+    background-color: var(--background-secondary);
 }
 
 .dashboard-header h2 {
@@ -28,7 +28,7 @@
 }
 
 .summary-card {
-    background-color: white;
+    background-color: var(--background-secondary);
     border-radius: 12px;
     padding: 16px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -57,18 +57,18 @@
 
 .label {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .amount {
     font-weight: bold;
 }
 
-.income { color: #2563eb; }
-.expense { color: #dc2626; }
+.income { color: var(--income-color); }
+.expense { color: var(--expense-color); }
 
 .summary-total {
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--border-color);
     padding-top: 12px;
     display: flex;
     justify-content: space-between;
@@ -80,7 +80,7 @@
 }
 
 .category-section, .transactions-section {
-    background-color: white;
+    background-color: var(--background-secondary);
     border-radius: 12px;
     padding: 16px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -124,10 +124,10 @@
 
 .transaction-date {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 8px;
     padding-bottom: 4px;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .transaction-item {
@@ -159,7 +159,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background-color: #4f46e5;
+    background-color: var(--accent-color);
     color: white;
     border: none;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -177,8 +177,8 @@
     width: 100%;
     max-width: 480px;
     height: 64px;
-    background-color: white;
-    border-top: 1px solid #e5e7eb;
+    background-color: var(--background-secondary);
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -190,12 +190,12 @@
     align-items: center;
     gap: 4px;
     font-size: 12px;
-    color: #6b7280;
+    color: var(--text-secondary);
     background: none;
     border: none;
     cursor: pointer;
 }
 
 .nav-item.active {
-    color: #4f46e5;
+    color: var(--accent-color);
 }

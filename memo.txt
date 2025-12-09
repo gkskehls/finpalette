@@ -1,6 +1,7 @@
 이 프로젝트의 모든 답변은 한글로 해줘.
 아직은 프로젝트 방향성을 잡고, 어떻게 개발할지만 논의 하고 문서로 정리하고 싶어.
 그 후에 개발을 진행하도록 할께.
+PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md 꼭 지속적으로 참조해줘.
 
 가게부 앱처럼 동작하는 웹앱을 만들고 싶어.
 프로젝트 명 : Finpalette (핀팔레트):
@@ -21,7 +22,7 @@ supabase 는 아직 프로젝트 생성만 했어.
 # GitHub 저장소를 원격(remote)으로 추가 (YOUR_USERNAME을 실제 GitHub 아이디로 변경)
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
-git commit -m "docs(project): 프로젝트 계획 및 개발 가이드 문서 정의"
+git commit -m "docs: 프로젝트 계획 및 개발 가이드 구체화"
 git push origin main
 
 npm run build
