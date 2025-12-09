@@ -277,7 +277,71 @@ export function useToggle(initialState = false): [boolean, () => void] {
 - **클래스 네이밍**: CSS 클래스명은 `kebab-case`를 사용하고, JavaScript에서 접근할 때는 `camelCase` (e.g., `styles.buttonContainer`)를 사용합니다.
 - **전역 스타일**: 앱 전체에 적용되어야 하는 최소한의 스타일(폰트, 리셋 CSS 등)은 `src/styles/global.css`에서 관리합니다.
 
-### 7.4. 작업 원칙 합의
+### 7.4. 페이지 구현 실전 가이드 (Page Implementation Guide)
+
+새로운 페이지를 만들거나 기존 페이지를 리팩토링할 때는 다음의 **관심사 분리(Separation of Concerns)** 절차를 따릅니다. 이는 `DashboardPage` 리팩토링 과정에서 수립된 모범 사례입니다.
+
+**목표:** `pages` 폴더의 컴포넌트는 각 페이지의 레이아웃과 데이터 흐름만 담당하는 **'컨테이너'** 역할을 하고, UI의 실제 표현은 `components` 폴더의 **'프레젠테이셔널'** 컴포넌트에게 위임합니다.
+
+**절차:**
+
+1.  **관심사 식별**: 페이지를 구성하는 UI 조각과 데이터, 타입을 식별합니다.
+    -   **UI 조각**: 재사용 가능한 공통 컴포넌트(예: Header, Button)와 특정 페이지에서만 쓰이는 컴포넌트(예: SummaryCard)로 나뉩니다.
+    -   **데이터**: 페이지에 표시될 데이터(예: `mockTransactions`)와 그 데이터의 형태를 정의하는 타입(예: `Transaction`)으로 나뉩니다.
+
+2.  **타입 분리 및 정의 (`/src/types`)**:
+    -   페이지에서 사용할 데이터 타입을 `src/types` 폴더에 명확하게 정의합니다.
+    -   예시: `src/types/transaction.ts` 파일에 `Transaction`, `Category` 등을 정의합니다.
+
+3.  **(임시) 데이터 분리 (`/src/data`)**:
+    -   API 연동 전, 프로토타이핑에 사용할 목업(mock) 데이터를 `src/data` 폴더에 분리합니다.
+    -   예시: `src/data/mockData.ts` 파일에 `mockTransactions`, `mockCategories` 등을 정의합니다.
+
+4.  **프레젠테이셔널 컴포넌트 생성 (`/src/components`)**:
+    -   식별된 UI 조각들을 `props`를 통해 데이터를 받아 화면에 그리는 역할만 하는 '멍청한(Dumb)' 컴포넌트로 만듭니다.
+    -   **공통 컴포넌트**: 여러 페이지에서 사용될 수 있는 범용 컴포넌트는 `src/components/common/` 에 생성합니다. (예: `Header.tsx`, `BottomNav.tsx`)
+    -   **페이지 전용 컴포넌트**: 특정 페이지에서만 사용되는 컴포넌트는 `src/components/[페이지명]/` 에 생성합니다. (예: `src/components/dashboard/SummaryCard.tsx`)
+
+5.  **컨테이너 컴포넌트 조립 (`/src/pages`)**:
+    -   `src/pages` 폴더의 페이지 컴포넌트에서는 분리된 데이터와 프레젠테이셔널 컴포넌트들을 가져와 조립합니다.
+    -   이 컴포넌트는 '어떻게 보일지'가 아닌, '무엇을 보여줄지'에만 집중합니다.
+    -   데이터 fetching, 상태 관리 로직은 주로 이 컨테이너 컴포넌트 또는 이 컴포넌트가 사용하는 커스텀 훅에 위치하게 됩니다.
+
+**`DashboardPage` 리팩토링 후 최종 구조:**
+
+```
+// src/pages/DashboardPage.tsx
+
+// 1. 공통/대시보드 컴포넌트 import
+import { Header } from '../components/common/Header';
+import { BottomNav } from '../components/common/BottomNav';
+import { SummaryCard } from '../components/dashboard/SummaryCard';
+// ...
+
+// 2. 데이터 import
+import { mockSummary, mockCategories, mockTransactions } from '../data/mockData';
+
+// 3. 스타일 import
+import './DashboardPage.css';
+
+// 4. 페이지 컴포넌트 (컨테이너)
+export function DashboardPage() {
+  return (
+    <div className="dashboard-container">
+      {/* 5. 컴포넌트 조립 및 데이터 전달 */}
+      <Header title="Finpalette" />
+      <main className="dashboard-main">
+        <SummaryCard {...mockSummary} />
+        <CategorySection categories={mockCategories} />
+        <TransactionSection transactionGroups={mockTransactions} />
+      </main>
+      {/* ... */}
+    </div>
+  );
+}
+```
+
+### 7.5. 작업 원칙 합의
 
 1.  **명시적 요청 기반 수정**: 기능 개발, 버그 수정 등 명확한 목표가 제시된 경우에만 코드를 수정합니다. 임의로 기존 코드의 구조를 변경하지 않습니다.
 2.  **합의된 패턴 준수**: 새로운 코드를 작성할 때는 반드시 상기된 템플릿과 패턴을 100% 준수합니다.
