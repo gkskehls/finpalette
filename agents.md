@@ -25,6 +25,7 @@
 커밋 메시지는 **Conventional Commits** 명세를 따릅니다. 이는 커밋 히스토리의 가독성을 높이고, 변경 사항을 쉽게 파악할 수 있게 도와줍니다.
 
 **형식:**
+
 ```
 <타입>(<스코프>): <제목>
 
@@ -34,6 +35,7 @@
 ```
 
 **주요 타입:**
+
 - **`feat`**: 새로운 기능 추가
 - **`fix`**: 버그 수정
 - **`docs`**: 문서 수정 (README.md, agents.md 등)
@@ -43,12 +45,14 @@
 - **`chore`**: 빌드 관련 파일 수정, 패키지 매니저 설정 변경 등 (프로덕션 코드 변경 없음)
 
 **예시:**
+
 ```
 feat(auth): 로그인 페이지 UI 구현
 
 - 이메일, 비밀번호 입력 필드 추가
 - 로그인 버튼 컴포넌트 생성
 ```
+
 ```
 fix(header): 모바일에서 로고가 깨지는 문제 수정
 
@@ -60,6 +64,7 @@ fix(header): 모바일에서 로고가 깨지는 문제 수정
 ## 2. 코딩 스타일 및 컨벤션
 
 ### 일반 원칙
+
 - **ESLint & Prettier**: 프로젝트에 설정된 ESLint와 Prettier 규칙을 반드시 따릅니다. 커밋 전에는 항상 포맷팅을 실행해주세요.
 - **네이밍**:
   - 컴포넌트, 인터페이스, 타입: `PascalCase` (예: `TransactionList`, `IUser`)
@@ -111,6 +116,7 @@ fix(header): 모바일에서 로고가 깨지는 문제 수정
 여러 컴포넌트에서 반복되는 데이터 fetching, 상태 관리 로직은 커스텀 훅으로 분리하여 재사용합니다. 이를 통해 컴포넌트는 UI 표시에만 집중할 수 있습니다.
 
 **예시: `useTransactions` 훅**
+
 ```typescript
 // src/hooks/useTransactions.ts
 import { useEffect, useState } from 'react';
@@ -139,6 +145,7 @@ export function useTransactions() {
 버튼, 입력창, 칩, 카드 등 반복적으로 사용되는 UI 요소는 `props`를 통해 제어되는 범용 컴포넌트로 분리합니다. 이를 통해 디자인의 일관성을 유지하고, 스타일 변경 시 한 곳만 수정하면 됩니다.
 
 **예시: `Chip` 컴포넌트**
+
 ```tsx
 // src/components/common/Chip.tsx
 interface ChipProps {
@@ -179,6 +186,7 @@ export function Chip({ label, color }: ChipProps) {
   - 이 파일은 `.gitignore`에 반드시 포함되어 있어 원격 저장소에 절대로 업로드되지 않도록 해야 합니다.
 
 - **환경 변수 파일 예시 (`.env.local`):**
+
   ```
   VITE_SUPABASE_URL=YOUR_SUPABASE_URL
   VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
@@ -211,6 +219,7 @@ export function Chip({ label, color }: ChipProps) {
 - **스타일링**: CSS Modules(`.module.css`) 사용을 원칙으로 하며, `styles` 라는 이름으로 import 합니다.
 
 **예시: `src/components/common/Button.tsx`**
+
 ```tsx
 import React from 'react';
 
@@ -233,7 +242,12 @@ interface ButtonProps {
   isDisabled?: boolean;
 }
 
-export function Button({ label, onClick, variant = 'primary', isDisabled = false }: ButtonProps) {
+export function Button({
+  label,
+  onClick,
+  variant = 'primary',
+  isDisabled = false,
+}: ButtonProps) {
   const buttonClassName = clsx(styles.button, styles[variant], {
     [styles.disabled]: isDisabled,
   });
@@ -257,6 +271,7 @@ export function Button({ label, onClick, variant = 'primary', isDisabled = false
 - **반환 (Return)**: 훅의 가장 마지막에 위치하며, 배열 또는 객체 형태로 상태와 핸들러를 명시적으로 반환합니다.
 
 **예시: `src/hooks/useToggle.ts`**
+
 ```ts
 import { useState, useCallback } from 'react';
 
@@ -264,7 +279,7 @@ export function useToggle(initialState = false): [boolean, () => void] {
   const [isOn, setIsOn] = useState(initialState);
 
   const toggle = useCallback(() => {
-    setIsOn(prev => !prev);
+    setIsOn((prev) => !prev);
   }, []);
 
   return [isOn, toggle];
@@ -286,26 +301,26 @@ export function useToggle(initialState = false): [boolean, () => void] {
 **절차:**
 
 1.  **관심사 식별**: 페이지를 구성하는 UI 조각과 데이터, 타입을 식별합니다.
-    -   **UI 조각**: 재사용 가능한 공통 컴포넌트(예: Header, Button)와 특정 페이지에서만 쓰이는 컴포넌트(예: SummaryCard)로 나뉩니다.
-    -   **데이터**: 페이지에 표시될 데이터(예: `mockTransactions`)와 그 데이터의 형태를 정의하는 타입(예: `Transaction`)으로 나뉩니다.
+    - **UI 조각**: 재사용 가능한 공통 컴포넌트(예: Header, Button)와 특정 페이지에서만 쓰이는 컴포넌트(예: SummaryCard)로 나뉩니다.
+    - **데이터**: 페이지에 표시될 데이터(예: `mockTransactions`)와 그 데이터의 형태를 정의하는 타입(예: `Transaction`)으로 나뉩니다.
 
 2.  **타입 분리 및 정의 (`/src/types`)**:
-    -   페이지에서 사용할 데이터 타입을 `src/types` 폴더에 명확하게 정의합니다.
-    -   예시: `src/types/transaction.ts` 파일에 `Transaction`, `Category` 등을 정의합니다.
+    - 페이지에서 사용할 데이터 타입을 `src/types` 폴더에 명확하게 정의합니다.
+    - 예시: `src/types/transaction.ts` 파일에 `Transaction`, `Category` 등을 정의합니다.
 
 3.  **(임시) 데이터 분리 (`/src/data`)**:
-    -   API 연동 전, 프로토타이핑에 사용할 목업(mock) 데이터를 `src/data` 폴더에 분리합니다.
-    -   예시: `src/data/mockData.ts` 파일에 `mockTransactions`, `mockCategories` 등을 정의합니다.
+    - API 연동 전, 프로토타이핑에 사용할 목업(mock) 데이터를 `src/data` 폴더에 분리합니다.
+    - 예시: `src/data/mockData.ts` 파일에 `mockTransactions`, `mockCategories` 등을 정의합니다.
 
 4.  **프레젠테이셔널 컴포넌트 생성 (`/src/components`)**:
-    -   식별된 UI 조각들을 `props`를 통해 데이터를 받아 화면에 그리는 역할만 하는 '멍청한(Dumb)' 컴포넌트로 만듭니다.
-    -   **공통 컴포넌트**: 여러 페이지에서 사용될 수 있는 범용 컴포넌트는 `src/components/common/` 에 생성합니다. (예: `Header.tsx`, `BottomNav.tsx`)
-    -   **페이지 전용 컴포넌트**: 특정 페이지에서만 사용되는 컴포넌트는 `src/components/[페이지명]/` 에 생성합니다. (예: `src/components/dashboard/SummaryCard.tsx`)
+    - 식별된 UI 조각들을 `props`를 통해 데이터를 받아 화면에 그리는 역할만 하는 '멍청한(Dumb)' 컴포넌트로 만듭니다.
+    - **공통 컴포넌트**: 여러 페이지에서 사용될 수 있는 범용 컴포넌트는 `src/components/common/` 에 생성합니다. (예: `Header.tsx`, `BottomNav.tsx`)
+    - **페이지 전용 컴포넌트**: 특정 페이지에서만 사용되는 컴포넌트는 `src/components/[페이지명]/` 에 생성합니다. (예: `src/components/dashboard/SummaryCard.tsx`)
 
 5.  **컨테이너 컴포넌트 조립 (`/src/pages`)**:
-    -   `src/pages` 폴더의 페이지 컴포넌트에서는 분리된 데이터와 프레젠테이셔널 컴포넌트들을 가져와 조립합니다.
-    -   이 컴포넌트는 '어떻게 보일지'가 아닌, '무엇을 보여줄지'에만 집중합니다.
-    -   데이터 fetching, 상태 관리 로직은 주로 이 컨테이너 컴포넌트 또는 이 컴포넌트가 사용하는 커스텀 훅에 위치하게 됩니다.
+    - `src/pages` 폴더의 페이지 컴포넌트에서는 분리된 데이터와 프레젠테이셔널 컴포넌트들을 가져와 조립합니다.
+    - 이 컴포넌트는 '어떻게 보일지'가 아닌, '무엇을 보여줄지'에만 집중합니다.
+    - 데이터 fetching, 상태 관리 로직은 주로 이 컨테이너 컴포넌트 또는 이 컴포넌트가 사용하는 커스텀 훅에 위치하게 됩니다.
 
 **`DashboardPage` 리팩토링 후 최종 구조:**
 
@@ -349,8 +364,7 @@ export function DashboardPage() {
 
 ---
 
-이 문서는 살아있는 문서입니다. 프로젝트가 진행됨에 따라 더 좋은 아이디어가 있다면 언제든지 논의를 통해 업데이트할 수 있습니다.
----
+## 이 문서는 살아있는 문서입니다. 프로젝트가 진행됨에 따라 더 좋은 아이디어가 있다면 언제든지 논의를 통해 업데이트할 수 있습니다.
 
 ## 8. 에러 처리 전략 (Error Handling Strategy)
 
@@ -365,65 +379,69 @@ export function DashboardPage() {
 ### 8.2. 처리 원칙
 
 1.  **사용자에게 친화적인 피드백 제공**:
-    -   에러가 발생했음을 명확히 알리되, 기술적인 에러 코드를 그대로 노출하지 않습니다.
-    -   "입력하신 정보가 올바르지 않습니다.", "데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요." 와 같이 이해하기 쉬운 메시지를 사용합니다.
-    -   필요 시, 사용자가 다음에 취할 수 있는 행동(예: '다시 시도' 버튼)을 안내합니다.
+    - 에러가 발생했음을 명확히 알리되, 기술적인 에러 코드를 그대로 노출하지 않습니다.
+    - "입력하신 정보가 올바르지 않습니다.", "데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요." 와 같이 이해하기 쉬운 메시지를 사용합니다.
+    - 필요 시, 사용자가 다음에 취할 수 있는 행동(예: '다시 시도' 버튼)을 안내합니다.
 
 2.  **개발자를 위한 명확한 로깅**:
-    -   사용자에게는 간단한 메시지를 보여주더라도, 개발 환경의 콘솔에는 에러의 원인을 파악할 수 있는 상세한 정보(에러 객체, 발생 위치 등)를 반드시 출력합니다.
-    -   프로덕션 환경에서는 Sentry, LogRocket과 같은 에러 모니터링 도구를 연동하여 에러를 수집하고 분석합니다.
+    - 사용자에게는 간단한 메시지를 보여주더라도, 개발 환경의 콘솔에는 에러의 원인을 파악할 수 있는 상세한 정보(에러 객체, 발생 위치 등)를 반드시 출력합니다.
+    - 프로덕션 환경에서는 Sentry, LogRocket과 같은 에러 모니터링 도구를 연동하여 에러를 수집하고 분석합니다.
 
 ### 8.3. 구현 패턴
 
--   **UI 에러 처리**:
-    -   폼(Form) 유효성 검사 에러는 각 입력 필드 하단에 메시지를 표시합니다.
-    -   `react-hook-form`과 같은 라이브러리를 활용하여 선언적으로 유효성 검사를 관리하는 것을 권장합니다.
+- **UI 에러 처리**:
+  - 폼(Form) 유효성 검사 에러는 각 입력 필드 하단에 메시지를 표시합니다.
+  - `react-hook-form`과 같은 라이브러리를 활용하여 선언적으로 유효성 검사를 관리하는 것을 권장합니다.
 
--   **API 에러 처리 (in Custom Hooks)**:
-    -   데이터 fetching 로직을 담고 있는 커스텀 훅(`useTransactions` 등)은 `data`, `loading` 상태와 더불어 `error` 상태를 함께 반환해야 합니다.
-    -   `try...catch` 구문을 사용하여 API 요청 실패를 감지하고, `error` 상태에 에러 객체를 저장합니다.
+- **API 에러 처리 (in Custom Hooks)**:
+  - 데이터 fetching 로직을 담고 있는 커스텀 훅(`useTransactions` 등)은 `data`, `loading` 상태와 더불어 `error` 상태를 함께 반환해야 합니다.
+  - `try...catch` 구문을 사용하여 API 요청 실패를 감지하고, `error` 상태에 에러 객체를 저장합니다.
 
-    **예시: `useTransactions` 훅 개선**
-    ```typescript
-    // src/hooks/useTransactions.ts
-    import { useEffect, useState } from 'react';
-    import { supabase } from '../lib/supabaseClient';
-    import type { Transaction } from '../types/database';
+  **예시: `useTransactions` 훅 개선**
 
-    export function useTransactions() {
-      const [transactions, setTransactions] = useState<Transaction[]>([]);
-      const [loading, setLoading] = useState(true);
-      const [error, setError] = useState<Error | null>(null); // 에러 상태 추가
+  ```typescript
+  // src/hooks/useTransactions.ts
+  import { useEffect, useState } from 'react';
+  import { supabase } from '../lib/supabaseClient';
+  import type { Transaction } from '../types/database';
 
-      useEffect(() => {
-        const fetchTransactions = async () => {
-          try {
-            setLoading(true);
-            setError(null); // 요청 시작 시 에러 초기화
-            const { data, error: dbError } = await supabase.from('transactions').select('*');
-            
-            if (dbError) {
-              throw dbError; // Supabase 에러를 throw
-            }
+  export function useTransactions() {
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null); // 에러 상태 추가
 
-            setTransactions(data || []);
-          } catch (err) {
-            console.error('Failed to fetch transactions:', err); // 개발자용 로깅
-            setError(err as Error); // 에러 상태 업데이트
-          } finally {
-            setLoading(false);
+    useEffect(() => {
+      const fetchTransactions = async () => {
+        try {
+          setLoading(true);
+          setError(null); // 요청 시작 시 에러 초기화
+          const { data, error: dbError } = await supabase
+            .from('transactions')
+            .select('*');
+
+          if (dbError) {
+            throw dbError; // Supabase 에러를 throw
           }
-        };
-        fetchTransactions();
-      }, []);
 
-      return { transactions, loading, error }; // error 반환
-    }
-    ```
+          setTransactions(data || []);
+        } catch (err) {
+          console.error('Failed to fetch transactions:', err); // 개발자용 로깅
+          setError(err as Error); // 에러 상태 업데이트
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchTransactions();
+    }, []);
 
--   **전역 에러 처리 (Error Boundary)**:
-    -   React의 **Error Boundary** 컴포넌트를 사용하여, 특정 컴포넌트 트리에서 발생하는 렌더링 에러가 전체 애플리케이션을 중단시키는 것을 방지합니다.
-    -   `src/components/common/ErrorBoundary.tsx` 와 같은 공통 컴포넌트를 생성하고, 최상위 레이아웃(`App.tsx` 또는 라우터 설정)에 적용하여 예상치 못한 에러 발생 시 대체 UI를 보여줍니다.
+    return { transactions, loading, error }; // error 반환
+  }
+  ```
+
+- **전역 에러 처리 (Error Boundary)**:
+  - React의 **Error Boundary** 컴포넌트를 사용하여, 특정 컴포넌트 트리에서 발생하는 렌더링 에러가 전체 애플리케이션을 중단시키는 것을 방지합니다.
+  - `src/components/common/ErrorBoundary.tsx` 와 같은 공통 컴포넌트를 생성하고, 최상위 레이아웃(`App.tsx` 또는 라우터 설정)에 적용하여 예상치 못한 에러 발생 시 대체 UI를 보여줍니다.
+
 ---
 
 ## 9. API 연동 가이드라인 (API Integration Guide)
@@ -453,6 +471,7 @@ export function DashboardPage() {
   - 예시: `src/hooks/queries/useTransactionsQuery.ts`, `src/hooks/queries/useCategoriesQuery.ts`
 
 **예시: `useTransactionsQuery` 훅**
+
 ```typescript
 // src/hooks/queries/useTransactionsQuery.ts
 import { useQuery } from '@tanstack/react-query';
@@ -486,6 +505,7 @@ export function useTransactionsQuery() {
 - **`onSuccess` 콜백 활용**: 데이터 변경 성공 후, 관련된 쿼리를 무효화(invalidate)하여 자동으로 데이터를 다시 불러오도록 설정합니다. 이를 통해 UI가 항상 최신 상태를 반영하게 합니다.
 
 **예시: `useAddTransactionMutation` 훅**
+
 ```typescript
 // src/hooks/queries/useTransactionsMutation.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -525,6 +545,7 @@ export function useAddTransactionMutation() {
 
 - **Supabase 타입 자동 생성 활용**: `supabase gen types typescript` 명령어를 사용하여 데이터베이스 스키마로부터 타입을 자동으로 생성하고, 이를 `src/types/supabase.ts` 파일에 저장하여 관리합니다.
 - **중앙화된 타입 사용**: API 요청 및 응답 데이터 타입은 자동 생성된 타입을 기반으로 `src/types` 폴더에서 조합하거나 확장하여 사용합니다. 이를 통해 백엔드와 프론트엔드 간의 데이터 구조 불일치 문제를 방지합니다.
+
 ---
 
 ## 10. 성능 최적화 가이드라인 (Performance Optimization Guide)
@@ -584,6 +605,7 @@ export function useAddTransactionMutation() {
 - **WebP 포맷 사용**: 가능한 경우, 이미지 포맷은 `jpg`나 `png` 대신 압축률이 더 좋은 `WebP`를 우선적으로 사용합니다.
 - **이미지 리사이징**: 실제 화면에 표시되는 크기보다 과도하게 큰 원본 이미지를 사용하지 않습니다. 서버에서 리사이징하거나, 빌드 시점에 이미지 크기를 최적화하는 도구를 사용합니다.
 - **Lazy Loading (지연 로딩)**: 사용자가 스크롤하여 뷰포트에 들어오기 전까지는 이미지를 로드하지 않도록 지연 로딩을 적용합니다. 이는 초기 페이지 로딩 성능을 크게 향상시킵니다.
+
 ---
 
 ## 11. 코드 일관성 및 표준 강제
@@ -603,6 +625,7 @@ export function useAddTransactionMutation() {
   4. `package.json`에 `lint-staged` 설정을 추가하여, 특정 확장자 파일에 대해 `ESLint`와 `Prettier`가 순차적으로 실행되고 자동으로 수정되도록 구성합니다.
 
   **`package.json` 내 `lint-staged` 설정 예시:**
+
   ```json
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -614,6 +637,7 @@ export function useAddTransactionMutation() {
     ]
   }
   ```
+
 - **동작 흐름**:
   1. 개발자가 `git commit` 명령을 실행합니다.
   2. `husky`가 `pre-commit` 훅을 트리거합니다.
@@ -638,3 +662,62 @@ export function useAddTransactionMutation() {
   2. GitHub Actions가 `ci.yml` 워크플로우를 자동으로 실행합니다.
   3. 모든 검증 단계가 성공적으로 통과해야만 Pull Request를 병합할 수 있도록 브랜치 보호 규칙(Branch Protection Rule)을 설정합니다.
   4. 만약 어느 한 단계라도 실패하면, 해당 PR은 병합이 차단되며 개발자는 문제를 수정해야 합니다.
+
+---
+
+## 12. 가이드라인 적용 방법 및 단계
+
+이 문서는 Finpalette 프로젝트의 코드 퀄리티와 개발 효율성을 높이기 위한 가이드라인을 제시합니다. 다음 단계에 따라 프로젝트에 가이드라인을 적용할 수 있습니다.
+
+### 1단계: 코드 스타일 및 일관성 강제 시스템 구축 (가장 먼저!)
+
+모든 팀원이 동일한 코드 스타일을 유지하도록 만드는 가장 기본적이고 중요한 과정입니다.
+
+1.  **ESLint, Prettier 설치 및 설정**:
+    - `npm` 이나 `yarn`을 사용해 `eslint`, `prettier` 및 관련 플러그인들을 개발 의존성(`-D`)으로 설치합니다.
+    - 프로젝트 루트에 `.eslintrc.js`, `.prettierrc` 같은 설정 파일을 만들고, `agents.md`에 명시된 코딩 스타일(들여쓰기, 따옴표, 세미콜론 등) 규칙을 정의합니다.
+
+2.  **커밋 자동 검사 (Husky + lint-staged) 설정**:
+    - `husky`와 `lint-staged`를 설치합니다.
+    - `package.json`에 `lint-staged` 설정을 추가하여, 커밋하려는 파일(`.js`, `.tsx` 등)에 대해 자동으로 `eslint --fix`와 `prettier --write`가 실행되도록 설정합니다.
+    - 이렇게 하면, 규칙에 맞지 않는 코드는 커밋 시점에 자동으로 수정되거나, 수정이 불가능하면 커밋이 실패하여 지저분한 코드가 저장소에 들어오는 것을 원천 차단합니다.
+
+3.  **CI/CD 파이프라인 (GitHub Actions) 설정**:
+    - `.github/workflows/ci.yml` 파일을 생성합니다.
+    - Pull Request가 생성될 때마다 자동으로 **① 린트/포맷 검사, ② 타입 체크, ③ 테스트, ④ 빌드**가 실행되도록 설정합니다.
+    - GitHub 저장소의 'Branch protection rule'을 설정하여, 이 검증 과정이 모두 통과해야만 `main` 브랜치에 병합할 수 있도록 막습니다.
+
+### 2단계: API 레이어 리팩토링 (TanStack Query 적용)
+
+`useState`와 `useEffect`로 구현된 기존 데이터 fetching 로직을 `TanStack Query`로 전환합니다.
+
+1.  **TanStack Query 설치 및 설정**:
+    - `@tanstack/react-query`를 설치합니다.
+    - 앱의 최상단(예: `App.tsx` 또는 `main.tsx`)을 `QueryClientProvider`로 감싸줍니다.
+
+2.  **기존 API 호출 로직 리팩토링**:
+    - `agents.md`의 예시처럼, API를 호출하는 함수를 먼저 만듭니다.
+    - 데이터를 가져오는 컴포넌트에서 `useEffect` 대신 `useQuery`를 사용하도록 코드를 수정합니다.
+    - 데이터를 생성/수정/삭제하는 로직은 `useMutation`을 사용하도록 변경하고, `onSuccess` 콜백에서 관련 쿼리를 무효화(`invalidateQueries`)하여 데이터가 자동으로 새로고침되도록 합니다.
+
+### 3단계: 에러 처리 시스템 구축
+
+애플리케이션 전반에 걸쳐 일관된 에러 처리를 적용합니다.
+
+1.  **Error Boundary 컴포넌트 생성 및 적용**:
+    - `agents.md`에서 논의한 대로, 렌더링 에러를 처리할 `ErrorBoundary.tsx` 컴포넌트를 하나 만듭니다.
+    - 이 컴포넌트를 라우터나 앱의 주요 레이아웃에 감싸서, 일부 UI의 에러가 전체 앱을 중단시키지 않도록 합니다.
+
+2.  **API 훅에 에러 상태 반영**:
+    - `useQuery`나 `useMutation`을 사용하는 커스텀 훅에서 반환하는 `error` 객체를 활용하여, 컴포넌트에서 API 에러 발생 시 사용자에게 적절한 피드백(예: "데이터 로딩 실패")을 보여주도록 UI를 수정합니다.
+
+### 4단계: 성능 최적화 적용
+
+초기 로딩 속도와 렌더링 성능을 개선합니다.
+
+1.  **Code Splitting (라우트 단위)**:
+    - `React.lazy`와 `Suspense`를 사용하여 각 페이지 컴포넌트를 동적으로 `import` 하도록 라우터 설정을 수정합니다. 이렇게 하면 첫 페이지 진입 속도가 매우 빨라집니다.
+
+2.  **렌더링 최적화 (필요시)**:
+    - `React DevTools Profiler`를 사용해 앱의 렌더링 성능을 측정해 봅니다.
+    - 불필요한 리렌더링이 자주 발생하는 컴포넌트를 발견하면, `React.memo`, `useCallback`, `useMemo`를 `agents.md` 가이드에 따라 신중하게 적용합니다.
