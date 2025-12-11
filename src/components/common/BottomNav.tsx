@@ -8,7 +8,7 @@ export function BottomNav() {
         <span>대시보드</span>
       </button>
       <button className="nav-item">
-        <Icon name="BarChart2" />
+        <Icon name="ChartBarBig" />
         <span>통계</span>
       </button>
       <button className="nav-item">

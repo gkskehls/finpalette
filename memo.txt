@@ -22,11 +22,9 @@ supabase 는 아직 프로젝트 생성만 했어.
 # GitHub 저장소를 원격(remote)으로 추가 (YOUR_USERNAME을 실제 GitHub 아이디로 변경)
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
-git commit -m "feat(dashboard): MVP 대시보드 UI 구현" -m "
-- `agents.md`의 페이지 구현 가이드에 따라 대시보드 페이지를 구현함.
-- `SummaryCard`, `CategorySection`, `TransactionSection` 등 프레젠테이셔널 컴포넌트를 생성하고, `DashboardPage`에서 이를 조립.
-- `types/transaction.ts`에 데이터 타입을 중앙화하고, `data/mockData.ts`에 목업 데이터를 정의하여 UI 개발에 활용.
-- `PROJECT_PLAN.md`에 현재 진행 상황을 체크 표시하여 업데이트함.
+git commit -m "fix(build): ESLint 및 아이콘 타입 오류 수정" -m "
+- pre-commit 훅에서 발생한 'React is not defined' 오류를 해결하기 위해 React import 구문을 추가합니다.
+- lucide-react 아이콘 이름을 올바른 PascalCase로 통일하여 타입스크립트 빌드 오류를 수정합니다.
 "
 git push origin main
 
