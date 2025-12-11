@@ -22,14 +22,15 @@ supabase 는 아직 프로젝트 생성만 했어.
 # GitHub 저장소를 원격(remote)으로 추가 (YOUR_USERNAME을 실제 GitHub 아이디로 변경)
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
-git commit -m "chore(env): 초기 개발 환경 및 CI/CD 설정" -m "
-- ESLint, Prettier, Husky, lint-staged를 설정하여 코드 일관성 강제
-- 커밋 시 자동으로 코드 스타일 검사 및 교정 (pre-commit hook)
-- GitHub Actions를 사용한 CI 파이프라인 구축
-- PR 시 자동으로 코드 품질(린트, 타입, 테스트, 빌드) 검증
+git commit -m "feat(dashboard): MVP 대시보드 UI 구현" -m "
+- `agents.md`의 페이지 구현 가이드에 따라 대시보드 페이지를 구현함.
+- `SummaryCard`, `CategorySection`, `TransactionSection` 등 프레젠테이셔널 컴포넌트를 생성하고, `DashboardPage`에서 이를 조립.
+- `types/transaction.ts`에 데이터 타입을 중앙화하고, `data/mockData.ts`에 목업 데이터를 정의하여 UI 개발에 활용.
+- `PROJECT_PLAN.md`에 현재 진행 상황을 체크 표시하여 업데이트함.
 "
 git push origin main
 
 npm run build
 firebase deploy
 
+npm run dev

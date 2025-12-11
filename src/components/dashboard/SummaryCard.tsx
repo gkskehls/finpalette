@@ -1,36 +1,38 @@
-import { Icon } from '../common/Icon';
+import type { SummaryData } from '../../types/transaction';
+import styles from './SummaryCard.module.css';
 
-interface SummaryCardProps {
-  year: number;
-  month: number;
-  income: number;
-  expense: number;
-}
+interface SummaryCardProps extends SummaryData {}
 
-export function SummaryCard({ year, month, income, expense }: SummaryCardProps) {
-  const total = income - expense;
+const formatCurrency = (amount: number) => {
+  return `${amount.toLocaleString()}원`;
+};
 
+export function SummaryCard({
+  totalIncome,
+  totalExpense,
+  balance,
+}: SummaryCardProps) {
   return (
-    <section className="summary-card">
-      <div className="month-selector">
-        <Icon name="ChevronLeft" size={20} />
-        <span>{year}년 {month}월</span>
-        <Icon name="ChevronRight" size={20} />
+    <div className={styles.card}>
+      <div className={styles.row}>
+        <span className={styles.label}>총수입</span>
+        <span className={`${styles.amount} ${styles.income}`}>
+          {formatCurrency(totalIncome)}
+        </span>
       </div>
-      <div className="summary-details">
-        <div>
-          <span className="label">수입</span>
-          <span className="amount income">+{income.toLocaleString()}</span>
-        </div>
-        <div>
-          <span className="label">지출</span>
-          <span className="amount expense">-{expense.toLocaleString()}</span>
-        </div>
+      <div className={styles.row}>
+        <span className={styles.label}>총지출</span>
+        <span className={`${styles.amount} ${styles.expense}`}>
+          {formatCurrency(totalExpense)}
+        </span>
       </div>
-      <div className="summary-total">
-        <span className="label">합계</span>
-        <span className="amount total">{total.toLocaleString()}원</span>
+      <div className={styles.divider}></div>
+      <div className={styles.row}>
+        <span className={styles.label}>합계</span>
+        <span className={`${styles.amount} ${styles.balance}`}>
+          {formatCurrency(balance)}
+        </span>
       </div>
-    </section>
+    </div>
   );
 }

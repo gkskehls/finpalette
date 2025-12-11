@@ -1,0 +1,76 @@
+.section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+}
+
+.group {
+  margin-bottom: 20px;
+}
+
+.dateHeader {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 12px;
+}
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.itemInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconContainer {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.description {
+  font-size: 14px;
+  color: #374151;
+}
+
+.amount {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.income {
+  color: #2563eb;
+}
+
+.expense {
+  color: #dc2626;
+}

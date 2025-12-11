@@ -1,0 +1,43 @@
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.label {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.amount {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.income {
+  color: #2563eb;
+}
+
+.expense {
+  color: #dc2626;
+}
+
+.balance {
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 12px 0;
+}

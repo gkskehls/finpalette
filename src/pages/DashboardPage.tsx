@@ -1,32 +1,40 @@
-import { Header } from '../components/common/Header';
-import { BottomNav } from '../components/common/BottomNav';
-import { FloatingActionButton } from '../components/common/FloatingActionButton';
+// import { Header } from '../components/common/Header';
+// import { BottomNav } from '../components/common/BottomNav';
+// import { FloatingActionButton } from '../components/common/FloatingActionButton';
 import { SummaryCard } from '../components/dashboard/SummaryCard';
 import { CategorySection } from '../components/dashboard/CategorySection';
 import { TransactionSection } from '../components/dashboard/TransactionSection';
 
-import { mockSummary, mockCategories, mockTransactions } from '../data/mockData';
+import {
+  mockSummary,
+  mockCategories,
+  mockTransactions,
+  mockTransactionGroups,
+} from '../data/mockData';
 
 import './DashboardPage.css';
 
 export function DashboardPage() {
   return (
     <div className="dashboard-container">
-      <Header title="Finpalette" />
+      {/* <Header title="Finpalette" /> */}
+      <h1 style={{ textAlign: 'center', margin: '20px 0' }}>Finpalette</h1>
 
       <main className="dashboard-main">
         <SummaryCard
-          year={mockSummary.year}
-          month={mockSummary.month}
-          income={mockSummary.income}
-          expense={mockSummary.expense}
+          totalIncome={mockSummary.totalIncome}
+          totalExpense={mockSummary.totalExpense}
+          balance={mockSummary.balance}
         />
-        <CategorySection categories={mockCategories} />
-        <TransactionSection transactionGroups={mockTransactions} />
+        <CategorySection
+          categories={mockCategories}
+          transactions={mockTransactions}
+        />
+        <TransactionSection transactionGroups={mockTransactionGroups} />
       </main>
 
-      <FloatingActionButton />
-      <BottomNav />
+      {/* <FloatingActionButton /> */}
+      {/* <BottomNav /> */}
     </div>
   );
 }

@@ -1,34 +1,59 @@
-import { Icon } from '../common/Icon';
+import React from 'react';
+import * as Lucide from 'lucide-react';
 import type { TransactionGroup } from '../../types/transaction';
+import styles from './TransactionSection.module.css';
 
 interface TransactionSectionProps {
   transactionGroups: TransactionGroup[];
 }
 
-export function TransactionSection({ transactionGroups }: TransactionSectionProps) {
+const formatCurrency = (amount: number) => {
+  return amount.toLocaleString();
+};
+
+export function TransactionSection({
+  transactionGroups,
+}: TransactionSectionProps) {
   return (
-    <section className="transactions-section">
-      <h3>최근 내역</h3>
-      {transactionGroups.map(group => (
-        <div key={group.date} className="transaction-group">
-          <h4 className="transaction-date">{group.date}</h4>
-          <ul>
-            {group.items.map(item => (
-              <li key={item.id} className="transaction-item">
-                <div className="item-category">
-                  <div className="icon-wrapper" style={{ backgroundColor: `${item.categoryColor}20` }}>
-                    <Icon name={item.categoryIcon} size={20} color={item.categoryColor} />
+    <div className={styles.section}>
+      <h2 className={styles.title}>최근 내역</h2>
+      {transactionGroups.map((group) => (
+        <div key={group.date} className={styles.group}>
+          <h3 className={styles.dateHeader}>{group.date}</h3>
+          <div className={styles.itemList}>
+            {group.transactions.map((item) => {
+              const Icon = Lucide[item.category.icon] as React.ElementType;
+              const isIncome = item.type === 'income';
+              return (
+                <div key={item.id} className={styles.item}>
+                  <div className={styles.itemInfo}>
+                    <div
+                      className={styles.iconContainer}
+                      style={{ backgroundColor: `${item.category.color}20` }}
+                    >
+                      <Icon
+                        className={styles.icon}
+                        style={{ color: item.category.color }}
+                      />
+                    </div>
+                    <span className={styles.description}>
+                      {item.description}
+                    </span>
                   </div>
-                  <span>{item.description}</span>
+                  <span
+                    className={`${styles.amount} ${
+                      isIncome ? styles.income : styles.expense
+                    }`}
+                  >
+                    {isIncome ? '+' : '-'}
+                    {formatCurrency(item.amount)}원
+                  </span>
                 </div>
-                <span className={`item-amount ${item.amount > 0 ? 'income' : 'expense'}`}>
-                  {item.amount.toLocaleString()}원
-                </span>
-              </li>
-            ))}
-          </ul>
+              );
+            })}
+          </div>
         </div>
       ))}
-    </section>
+    </div>
   );
 }
