@@ -1,12 +1,13 @@
-이 프로젝트의 모든 답변은 한글로 해줘.
-이번엔 뭘할지 논의를 하고 나서 그 후에 개발을 진행하도록 할께.
-PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md 꼭 지속적으로 참조해줘.
-매번 소스 수정을 할때마 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md 이 문서들을 업데이트 해줘.
-
-
 가게부 앱처럼 동작하는 웹앱을 만들고 싶어.
 프로젝트 명 : Finpalette (핀팔레트):
 'Finance‘와 'Palette’의 합성어입니다. 다양한 카테고리(식비, 교통비 등)를 팔레트의 색상처럼 분류하고 관리한다는 의미를 담고 있습니다
+
+이 프로젝트의 모든 답변은 한글로 해줘.
+PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md 꼭 지속적으로 참조해줘.
+매번 소스 수정을 할때마 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md 이 문서들을 업데이트 해줘.
+이문서들을 읽어보고 이번엔 뭘할지 논의를 하고 나서 그 후에 개발을 진행하도록 할께.
+
+지금 프로젝트에 오류가 엄청 많이 생겼는데 이거 다 확인좀 해줘
 
 리액트 기반으로 만들고 싶어.
 파이어베이스로 호스팅을 하고 데이터베이스는 supabase를 이용하고 싶어.
