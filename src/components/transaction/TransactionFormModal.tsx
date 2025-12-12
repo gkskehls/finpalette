@@ -25,7 +25,7 @@ export function TransactionFormModal({
     <div className={styles.modalBackdrop}>
       <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
-          <h2>Add Transaction</h2>
+          <h2>내역 추가</h2>
           <button onClick={onClose} className={styles.closeButton}>
             <X size={24} />
           </button>
@@ -37,33 +37,33 @@ export function TransactionFormModal({
               className={`${styles.typeButton} ${type === 'expense' ? styles.active : ''}`}
               onClick={() => setType('expense')}
             >
-              Expense
+              지출
             </button>
             <button
               type="button"
               className={`${styles.typeButton} ${type === 'income' ? styles.active : ''}`}
               onClick={() => setType('income')}
             >
-              Income
+              수입
             </button>
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="amount">Amount</label>
+            <label htmlFor="amount">금액</label>
             <input type="number" id="amount" required />
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="category">Category</label>
+            <label htmlFor="category">카테고리</label>
             <select id="category" required>
               {/* Categories will be populated here */}
-              <option value="food">Food</option>
-              <option value="transport">Transport</option>
+              <option value="food">식비</option>
+              <option value="transport">교통</option>
             </select>
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="date">Date</label>
+            <label htmlFor="date">날짜</label>
             <input
               type="date"
               id="date"
@@ -73,7 +73,7 @@ export function TransactionFormModal({
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="description">Description</label>
+            <label htmlFor="description">내용</label>
             <input type="text" id="description" />
           </div>
 
@@ -83,10 +83,10 @@ export function TransactionFormModal({
               className={styles.cancelButton}
               onClick={onClose}
             >
-              Cancel
+              취소
             </button>
             <button type="submit" className={styles.submitButton}>
-              Save
+              저장
             </button>
           </div>
         </form>

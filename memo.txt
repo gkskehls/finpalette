@@ -24,11 +24,12 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(theme): 다크 모드 테마 적용 오류 수정
+feat(i18n): UI 텍스트 한글화 적용
 
-- 대시보드의 `SummaryCard`, `CategorySection`, `TransactionSection` 컴포넌트들이 다크 모드에서 배경색과 텍스트 색상이 변경되지 않는 문제를 해결했습니다.
-- 각 컴포넌트의 CSS 모듈 파일에 하드코딩되어 있던 색상 값들을 `index.css`에 정의된 전역 테마 변수(e.g., `var(--background-secondary)`, `var(--text-primary)`)로 교체했습니다.
-- 이를 통해 라이트/다크 모드 전환 시 UI가 일관된 디자인을 유지하도록 수정했습니다.
+- Finpalette를 제외한 모든 UI 텍스트를 한글로 표시하도록 수정했습니다.
+- `TransactionFormModal` 컴포넌트의 제목, 버튼, 라벨 등의 텍스트를 모두 한글로 변경했습니다.
+- `FloatingActionButton` 컴포넌트의 접근성을 위한 `aria-label`을 한글로 수정했습니다.
+- `SummaryCard`, `CategorySection` 등 다른 대시보드 컴포넌트들은 이미 한글화가 적용되어 있음을 확인했습니다.
 "
 git push origin main
 
