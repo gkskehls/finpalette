@@ -25,11 +25,21 @@
 
   ***
 
-## 3. 데이터베이스 설계 (Supabase)
+## 3. 데이터베이스 및 데이터 구조 설계
 
 > **v2 설계 (공유 기능 포함)**: 모든 데이터는 `user_id`가 아닌 `palette_id`에 종속됩니다.
 
-### 3.1. `palettes` (공유 공간) 테이블
+### 3.1. 데이터 ID 관리 전략
+
+- **`id` (서버 ID)**: `uuid` 타입. 데이터베이스에 저장된 데이터의 고유 식별자입니다. 로컬에서 새로 생성된 데이터는 이 값을 `null`로 가집니다. 서버 동기화 여부를 판별하는 기준으로 사용됩니다.
+- **`localId` (클라이언트 ID)**: `string` 타입. 로컬에서 데이터 생성 시 `uuid` 라이브러리로 즉시 부여하는 임시 ID입니다. React의 `key` 값으로 사용되며, 서버에는 저장되지 않습니다.
+
+### 3.2. 데이터 코드 시스템
+
+- 핵심 데이터(`type`, `category` 등)는 `inc`, `c01`과 같이 사전에 정의된 **고유 코드(최대 3자리)**를 사용하여 DB에 저장합니다.
+- 코드와 실제 표시될 이름(예: "수입", "식비")의 매핑 정보는 프론트엔드 프로젝트 내의 `constants.json` 파일에서 중앙 관리합니다.
+
+### 3.3. `palettes` (공유 공간) 테이블
 
 | 컬럼명     | 타입   | 설명                                    |
 | ---------- | ------ | --------------------------------------- |
@@ -37,7 +47,7 @@
 | `name`     | `text` | 팔레트 이름 (예: "우리 가족 가계부")    |
 | `owner_id` | `uuid` | 팔레트 소유자 ID (`auth.users.id` 참조) |
 
-### 3.2. `palette_members` (팔레트 멤버) 테이블
+### 3.4. `palette_members` (팔레트 멤버) 테이블
 
 | 컬럼명       | 타입   | 설명                                 |
 | ------------ | ------ | ------------------------------------ |
@@ -45,27 +55,28 @@
 | `user_id`    | `uuid` | 사용자 ID (FK, `auth.users.id` 참조) |
 | `role`       | `text` | 역할 (예: 'owner', 'member')         |
 
-### 3.1. `transactions` (거래 내역) 테이블
+### 3.5. `transactions` (거래 내역) 테이블
 
-| 컬럼명        | 타입          | 설명                      | 비고                 |
-| ------------- | ------------- | ------------------------- | -------------------- |
-| `id`          | `uuid`        | 고유 식별자 (Primary Key) | `uuid_generate_v4()` |
-| `palette_id`  | `uuid`        | 팔레트 ID (Foreign Key)   | `palettes.id` 참조   |
-| `created_at`  | `timestamptz` | 생성 시각                 | `now()`              |
-| `date`        | `date`        | 실제 거래 날짜            |                      |
-| `type`        | `text`        | '수입' 또는 '지출'        |                      |
-| `amount`      | `integer`     | 금액                      |                      |
-| `category_id` | `uuid`        | 카테고리 ID (Foreign Key) | `categories.id` 참조 |
-| `description` | `text`        | 거래 내용 메모            |                      |
+| 컬럼명          | 타입          | 설명                              | 비고                   |
+| --------------- | ------------- | --------------------------------- | ---------------------- |
+| `id`            | `uuid`        | 고유 식별자 (Primary Key)         | `uuid_generate_v4()`   |
+| `palette_id`    | `uuid`        | 팔레트 ID (Foreign Key)           | `palettes.id` 참조     |
+| `created_at`    | `timestamptz` | 생성 시각                         | `now()`                |
+| `date`          | `date`        | 실제 거래 날짜                    |                        |
+| `type`          | `text`        | 거래 타입 코드 (예: 'inc', 'exp') |                        |
+| `amount`        | `integer`     | 금액                              |                        |
+| `category_code` | `text`        | 카테고리 코드 (Foreign Key)       | `categories.code` 참조 |
+| `description`   | `text`        | 거래 내용 메모                    |                        |
 
-### 3.2. `categories` (카테고리) 테이블
+### 3.6. `categories` (카테고리) 테이블
 
-| 컬럼명       | 타입   | 설명                      | 비고                 |
-| ------------ | ------ | ------------------------- | -------------------- |
-| `id`         | `uuid` | 고유 식별자 (Primary Key) | `uuid_generate_v4()` |
-| `palette_id` | `uuid` | 팔레트 ID (Foreign Key)   | `palettes.id` 참조   |
-| `name`       | `text` | 카테고리 이름             |                      |
-| `color_code` | `text` | 카테고리 대표 색상        | 예: `#FFD700`        |
+| 컬럼명       | 타입   | 설명                       | 비고               |
+| ------------ | ------ | -------------------------- | ------------------ |
+| `code`       | `text` | 카테고리 고유 코드 (PK)    | 예: 'c01', 'c02'   |
+| `palette_id` | `uuid` | 팔레트 ID (Foreign Key)    | `palettes.id` 참조 |
+| `name`       | `text` | 카테고리 이름 (예: "식비") |                    |
+| `color`      | `text` | 카테고리 대표 색상         | 예: `#FFD700`      |
+| `icon`       | `text` | `lucide-react` 아이콘 이름 | 예: 'Utensils'     |
 
 > **⚠️ 중요:** 모든 테이블에 **Row Level Security (RLS)**를 활성화하여, 사용자는 자신의 데이터만 접근할 수 있도록 정책을 설정해야 합니다.
 

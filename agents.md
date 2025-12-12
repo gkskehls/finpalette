@@ -75,6 +75,7 @@ fix(header): 모바일에서 로고가 깨지는 문제 수정
   - `src/hooks`: 커스텀 훅
   - `src/lib`: 외부 라이브러리 설정 (예: `supabaseClient.ts`)
   - `src/types`: 전역 타입 정의
+  - `src/config`: 상수, 설정 파일
 
 ### React & TypeScript
 
@@ -158,9 +159,46 @@ export function Chip({ label, color }: ChipProps) {
 }
 ```
 
-### 4.3. 타입 중앙화: Single Source of Truth
+### 4.3. 타입 및 상수 중앙화 (Single Source of Truth)
+
+#### 4.3.1. 타입 중앙화
 
 프로젝트 전반에서 사용되는 데이터 타입(예: `Transaction`, `Category`)은 `src/types` 폴더 내의 파일에서 중앙 관리합니다. 이를 통해 데이터 구조의 일관성을 보장하고, API 변경 시 수정 범위를 명확하게 할 수 있습니다.
+
+**핵심 데이터 타입 구조 (`src/types/transaction.ts`):**
+
+```typescript
+export interface Transaction {
+  localId: string; // 클라이언트 전용 임시 ID (React key 용)
+  id: string | null; // 서버 DB ID (동기화 상태 확인용)
+  date: string; // "YYYY-MM-DD"
+  type: string; // 거래 타입 코드 (예: 'inc', 'exp')
+  amount: number;
+  category_code: string; // 카테고리 코드 (Category.code 참조)
+  description: string;
+}
+```
+
+- **`localId`**: React의 `key` 값으로 사용하기 위한 클라이언트 전용 ID입니다. 서버와는 무관합니다.
+- **`id`**: 서버 데이터베이스의 ID입니다. 이 값이 `null`이면 아직 서버에 동기화되지 않은 로컬 데이터임을 의미합니다.
+
+#### 4.3.2. 상수 중앙화
+
+데이터베이스에 저장되는 코드 값(예: 'inc')과 화면에 표시될 텍스트(예: "수입")의 매핑 정보는 `src/config/constants.json` 파일에서 중앙 관리합니다. 코드에 매직 넘버나 문자열을 직접 사용하지 않도록 합니다.
+
+**예시 (`src/config/constants.json`):**
+
+```json
+{
+  "transactionTypes": {
+    "inc": { "label": "수입" },
+    "exp": { "label": "지출" }
+  },
+  "categories": [
+    { "code": "c01", "name": "식비", "color": "#FFD700", "icon": "Utensils" }
+  ]
+}
+```
 
 ### 4.4. 아키텍처 패턴: Container/Presentational Pattern
 
@@ -314,7 +352,7 @@ export function useToggle(initialState = false): [boolean, () => void] {
 
 4.  **프레젠테이셔널 컴포넌트 생성 (`/src/components`)**:
     - 식별된 UI 조각들을 `props`를 통해 데이터를 받아 화면에 그리는 역할만 하는 '멍청한(Dumb)' 컴포넌트로 만듭니다.
-    - **공통 컴포넌트**: 여러 페이지에서 사용될 수 있는 범용 컴포넌트는 `src/components/common/` 에 생성합니다. (예: `Header.tsx`, `BottomNav.tsx`)
+    - **공통 컴по넌트**: 여러 페이지에서 사용될 수 있는 범용 컴포넌트는 `src/components/common/` 에 생성합니다. (예: `Header.tsx`, `BottomNav.tsx`)
     - **페이지 전용 컴포넌트**: 특정 페이지에서만 사용되는 컴포넌트는 `src/components/[페이지명]/` 에 생성합니다. (예: `src/components/dashboard/SummaryCard.tsx`)
 
 5.  **컨테이너 컴포넌트 조립 (`/src/pages`)**:

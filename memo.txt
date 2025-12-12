@@ -24,12 +24,12 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(i18n): UI 텍스트 한글화 적용
+docs(system): 데이터 구조 및 코드 시스템 설계 정의
 
-- Finpalette를 제외한 모든 UI 텍스트를 한글로 표시하도록 수정했습니다.
-- `TransactionFormModal` 컴포넌트의 제목, 버튼, 라벨 등의 텍스트를 모두 한글로 변경했습니다.
-- `FloatingActionButton` 컴포넌트의 접근성을 위한 `aria-label`을 한글로 수정했습니다.
-- `SummaryCard`, `CategorySection` 등 다른 대시보드 컴포넌트들은 이미 한글화가 적용되어 있음을 확인했습니다.
+- 데이터베이스 스키마와 프론트엔드 타입을 포함한 전반적인 데이터 구조 설계를 확정하고 'PROJECT_PLAN.md'에 반영했습니다.
+- 서버 동기화 상태 관리를 위해 'id'(서버)와 'localId'(클라이언트)를 분리하는 ID 관리 전략을 도입했습니다.
+- 데이터의 일관성과 확장성을 위해 'type', 'category' 등을 고유 코드로 관리하는 코드 시스템을 정의했습니다.
+- 'agents.md'에 새로운 타입 구조와 상수 관리('constants.json') 규칙을 추가하여, 모든 개발자가 일관된 패턴으로 개발할 수 있도록 가이드라인을 보강했습니다.
 "
 git push origin main
 
