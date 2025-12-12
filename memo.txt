@@ -23,14 +23,11 @@ supabase 는 아직 프로젝트 생성만 했어.
 # GitHub 저장소를 원격(remote)으로 추가 (YOUR_USERNAME을 실제 GitHub 아이디로 변경)
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
-git commit -m "refactor(dashboard, common-components): 대시보드 페이지 리팩토링 및 공통 레이아웃 통합
+git commit -m "feat(transaction): 거래 내역 추가 UI 구현
 
-               - DashboardPage에서 테마 전환 로직을 Header 컴포넌트로 이동하고 로컬 스토리지 연동.
-               - Header, BottomNav, FloatingActionButton 컴포넌트를 DashboardPage에 활성화 및 통합.
-               - 공통 컴포넌트(Header, BottomNav, FloatingActionButton)를 위한 CSS Modules 파일 생성 및 적용.
-               - BottomNav.tsx 및 FloatingActionButton.tsx에서 lucide-react 아이콘 및 CSS Modules 사용하도록 개선.
-               - PROJECT_PLAN.md 및 agents.md 문서 업데이트.
-               - DashboardPage.tsx에서 mock.balance 오타를 mockSummary.balance로 수정.
+               - 화면 우하단에 거래 내역 추가를 위한 플로팅 액션 버튼(FAB) 컴포넌트를 생성하고 대시보드에 적용했습니다.
+               - FAB 클릭 시 표시되는 '거래 내역 입력 모달(TransactionFormModal)' 컴포넌트의 기본 UI를 구현했습니다.
+               - 모달과 FAB의 CSS 색상 변수를 전역 스타일(index.css)에 정의된 값으로 수정하여, 라이트/다크 테마 전환 시에도 디자인이 깨지지 않도록 수정했습니다.
 "
 git push origin main
 

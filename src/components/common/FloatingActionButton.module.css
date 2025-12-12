@@ -1,25 +1,24 @@
 .fab {
   position: fixed;
-  bottom: 80px; /* BottomNav height + margin */
+  bottom: 80px; /* Adjust based on BottomNav height */
   right: 20px;
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background-color: var(--color-primary);
-  color: var(--color-background);
+  background-color: var(--accent-color); /* 수정 */
+  color: white;
   border: none;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
   transition:
-    background-color 0.2s,
-    transform 0.2s;
-  z-index: 20;
+    background-color 0.3s ease,
+    filter 0.3s ease; /* transition 추가 */
+  z-index: 1000;
 }
 
 .fab:hover {
-  background-color: var(--color-primary-dark);
-  transform: scale(1.05);
+  filter: brightness(0.9); /* 수정 */
 }
