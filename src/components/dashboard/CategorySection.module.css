@@ -1,5 +1,5 @@
 .section {
-  background-color: #ffffff;
+  background-color: var(--background-secondary);
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -9,7 +9,7 @@
 .title {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 12px;
 }
 
@@ -47,11 +47,11 @@
 
 .name {
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .amount {
   font-size: 14px;
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text-primary);
 }

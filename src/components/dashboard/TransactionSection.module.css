@@ -1,5 +1,5 @@
 .section {
-  background-color: #ffffff;
+  background-color: var(--background-secondary);
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -8,7 +8,7 @@
 .title {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
@@ -19,9 +19,9 @@
 .dateHeader {
   font-size: 12px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-secondary);
   padding-bottom: 8px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border-color);
   margin-bottom: 12px;
 }
 
@@ -59,7 +59,7 @@
 
 .description {
   font-size: 14px;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .amount {
@@ -68,9 +68,9 @@
 }
 
 .income {
-  color: #2563eb;
+  color: var(--income-color);
 }
 
 .expense {
-  color: #dc2626;
+  color: var(--expense-color);
 }
