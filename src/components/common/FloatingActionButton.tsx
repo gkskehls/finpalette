@@ -1,9 +1,10 @@
-import { Icon } from './Icon';
+import { Plus } from 'lucide-react';
+import styles from './FloatingActionButton.module.css';
 
 export function FloatingActionButton() {
   return (
-    <button className="fab">
-      <Icon name="Plus" size={32} />
+    <button className={styles.fab}>
+      <Plus size={32} />
     </button>
   );
 }

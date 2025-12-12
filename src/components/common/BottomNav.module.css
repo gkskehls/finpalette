@@ -1,0 +1,39 @@
+.bottomNav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: var(--color-background);
+  border-top: 1px solid var(--color-border);
+  z-index: 10;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.navItem:hover {
+  background-color: var(--color-background-muted);
+}
+
+.navItem.active {
+  color: var(--color-primary);
+}

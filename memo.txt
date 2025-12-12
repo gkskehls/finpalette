@@ -23,11 +23,14 @@ supabase 는 아직 프로젝트 생성만 했어.
 # GitHub 저장소를 원격(remote)으로 추가 (YOUR_USERNAME을 실제 GitHub 아이디로 변경)
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
-git commit -m "feat(ui): 테마 전환 기능 구현 및 대시보드 레이아웃 수정" -m "
-- data-theme 속성을 이용한 라이트/다크 모드 테마 전환 기능 추가
-- 테마 전환 버튼과 헤더 타이틀이 겹치는 문제 해결
-- 모바일 화면에서 좌우 여백이 과도하게 표시되는 문제 수정
-- body 및 #root 스타일을 조정하여 전체 너비가 올바르게 적용되도록 수정
+git commit -m "refactor(dashboard, common-components): 대시보드 페이지 리팩토링 및 공통 레이아웃 통합
+
+               - DashboardPage에서 테마 전환 로직을 Header 컴포넌트로 이동하고 로컬 스토리지 연동.
+               - Header, BottomNav, FloatingActionButton 컴포넌트를 DashboardPage에 활성화 및 통합.
+               - 공통 컴포넌트(Header, BottomNav, FloatingActionButton)를 위한 CSS Modules 파일 생성 및 적용.
+               - BottomNav.tsx 및 FloatingActionButton.tsx에서 lucide-react 아이콘 및 CSS Modules 사용하도록 개선.
+               - PROJECT_PLAN.md 및 agents.md 문서 업데이트.
+               - DashboardPage.tsx에서 mock.balance 오타를 mockSummary.balance로 수정.
 "
 git push origin main
 
