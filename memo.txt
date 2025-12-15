@@ -25,11 +25,7 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(build): 빌드 오류 및 Icon 컴포넌트 타입 안정성 개선
-
-
-- tsconfig.node.json에서 요구하는 @types/node 패키지를 devDependencies에 추가하여 tsc -b 실행 시 발생하던 빌드 오류(TS2688)를 해결했습니다.
-- Icon.tsx 컴포넌트의 IconProps 타입을 lucide-react의 LucideProps를 직접 확장하는 대신, 필요한 속성을 명시적으로 정의하는 방식으로 리팩토링하여 타입 안정성을 높이고 외부 라이브러리 변경에 대한 의존도를 낮췄습니다.
+file_list.md: 파일추가
 "
 git push origin main
 
