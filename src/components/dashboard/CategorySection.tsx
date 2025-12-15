@@ -1,7 +1,25 @@
 import React from 'react';
-import * as Lucide from 'lucide-react';
-import type { Category, Transaction } from '../../types/transaction';
+import {
+  Utensils,
+  Bus,
+  ShoppingBag,
+  Landmark,
+  Archive,
+  HelpCircle,
+} from 'lucide-react';
+import type { Transaction } from '../../types/transaction';
+import type { Category } from '../../types/category';
+import type { IconName } from '../../types/icon';
 import styles from './CategorySection.module.css';
+
+const icons: Record<IconName, React.ElementType> = {
+  Utensils,
+  Bus,
+  ShoppingBag,
+  Landmark,
+  Archive,
+  HelpCircle,
+};
 
 interface CategorySectionProps {
   categories: Category[];
@@ -16,14 +34,14 @@ export function CategorySection({
   categories,
   transactions,
 }: CategorySectionProps) {
-  const expenseTransactions = transactions.filter((t) => t.type === 'expense');
+  const expenseTransactions = transactions.filter((t) => t.type === 'exp');
 
-  const amountByCategoryId = expenseTransactions.reduce(
+  const amountByCategoryCode = expenseTransactions.reduce(
     (acc, transaction) => {
-      if (!acc[transaction.category_id]) {
-        acc[transaction.category_id] = 0;
+      if (!acc[transaction.category_code]) {
+        acc[transaction.category_code] = 0;
       }
-      acc[transaction.category_id] += transaction.amount;
+      acc[transaction.category_code] += transaction.amount;
       return acc;
     },
     {} as Record<string, number>
@@ -32,7 +50,7 @@ export function CategorySection({
   const categoriesWithAmount = categories
     .map((category) => ({
       ...category,
-      amount: amountByCategoryId[category.id] || 0,
+      amount: amountByCategoryCode[category.code] || 0,
     }))
     .filter((category) => category.amount > 0)
     .sort((a, b) => b.amount - a.amount);
@@ -42,9 +60,9 @@ export function CategorySection({
       <h2 className={styles.title}>카테고리별 지출</h2>
       <div className={styles.list}>
         {categoriesWithAmount.map((category) => {
-          const Icon = Lucide[category.icon] as React.ElementType;
+          const Icon = icons[category.icon];
           return (
-            <div key={category.id} className={styles.item}>
+            <div key={category.code} className={styles.item}>
               <div className={styles.categoryInfo}>
                 <div
                   className={styles.iconContainer}

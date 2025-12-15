@@ -1,4 +1,4 @@
-import type { SummaryData } from '../../types/transaction';
+import type { SummaryData } from '../../types/ui';
 import styles from './SummaryCard.module.css';
 
 interface SummaryCardProps extends SummaryData {}

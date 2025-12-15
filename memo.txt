@@ -25,12 +25,14 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-docs(system): 데이터 구조 및 코드 시스템 설계 정의
+refactor(core): 데이터 레이어 리팩토링 및 타입 시스템 안정화
 
-- 데이터베이스 스키마와 프론트엔드 타입을 포함한 전반적인 데이터 구조 설계를 확정하고 'PROJECT_PLAN.md'에 반영했습니다.
-- 서버 동기화 상태 관리를 위해 'id'(서버)와 'localId'(클라이언트)를 분리하는 ID 관리 전략을 도입했습니다.
-- 데이터의 일관성과 확장성을 위해 'type', 'category' 등을 고유 코드로 관리하는 코드 시스템을 정의했습니다.
-- 'agents.md'에 새로운 타입 구조와 상수 관리('constants.json') 규칙을 추가하여, 모든 개발자가 일관된 패턴으로 개발할 수 있도록 가이드라인을 보강했습니다.
+- TanStack Query를 도입하고 로컬 스토리지 기반의 데이터 CRUD 훅(useTransactionsQuery, useAddTransactionMutation)을 구현했습니다.
+- 기존 목업 데이터를 사용하던 DashboardPage를 TanStack Query 훅을 사용하도록 리팩토링하여, 실제 데이터가 연동되도록 변경했습니다.
+- Category 및 UI 관련 타입을 별도의 파일(types/category.ts, types/ui.ts)로 분리하여 타입 관리 구조를 개선했습니다.
+- 타입 분리에 따라 발생한 전역적인 타입 오류(CategorySection, TransactionSection 등)를 해결하고, 컴포넌트 간 데이터 전달 방식을 명확히 했습니다.
+- lucide-react 아이콘 동적 로딩 시 발생하는 타입 오류를 IconName 타입을 정의하여 타입-안전한 방식으로 해결했습니다.
+- 의존성 문제를 해결하기 위해 누락되었던 @types/react, @vitejs/plugin-react 등의 패키지를 package.json에 다시 추가했습니다.
 "
 git push origin main
 

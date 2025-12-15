@@ -1,55 +1,9 @@
-import type { icons } from 'lucide-react';
-
-export type IconName = keyof typeof icons;
-
-/**
- * @description 데이터베이스 `categories` 테이블과 일치하는 타입
- */
-export type Category = {
-  id: string; // uuid
-  name: string;
-  color: string;
-  icon: IconName;
-};
-
-/**
- * @description 데이터베이스 `transactions` 테이블과 일치하는 타입
- */
-export type Transaction = {
-  id: string; // uuid
-  created_at?: string; // timestamptz
-  date: string; // date
-  type: 'income' | 'expense';
+export interface Transaction {
+  localId: string; // 클라이언트 전용 임시 ID (React key 용)
+  id: string | null; // 서버 DB ID (동기화 상태 확인용)
+  date: string; // "YYYY-MM-DD"
+  type: string; // 거래 타입 코드 (예: 'inc', 'exp')
   amount: number;
-  category_id: string; // uuid
+  category_code: string; // 카테고리 코드 (Category.code 참조)
   description: string;
-};
-
-/**
- * @description 대시보드 월별 요약 카드 데이터 타입
- */
-export type SummaryData = {
-  totalIncome: number;
-  totalExpense: number;
-  balance: number;
-};
-
-/**
- * @description UI 표시에 사용될 거래 내역 아이템 타입 (Transaction + Category 정보 조합)
- */
-export type TransactionItem = {
-  id: string;
-  description: string;
-  amount: number;
-  date: string;
-  type: 'income' | 'expense';
-  category: Category;
-};
-
-/**
- * @description 날짜별로 그룹화된 거래 내역 목록 타입
- */
-export type TransactionGroup = {
-  date: string;
-  transactions: TransactionItem[];
-};
+}
