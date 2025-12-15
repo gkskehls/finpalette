@@ -25,18 +25,9 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(local-data): 로컬 데이터 기반 가계부 기능 강화 및 타입 오류 수정
+docs(project): Phase 1 완료 상태 반영
 
-- PROJECT_PLAN.md 로드맵 업데이트: 로컬 기능 강화에 집중하도록 Phase 1 재정의, 데이터 시각화 및 Supabase 연동은 Phase 2로 이동.
-- 카테고리 시스템 확장: `src/config/constants.ts`에 수입/지출 카테고리 및 아이콘/색상 정보 중앙화. `src/types/icon.ts`에 `IconName` 타입 확장.
-- 동적 아이콘 표시: `src/components/common/Icon.tsx` 리팩토링 및 `src/components/dashboard/TransactionSection.tsx`에 적용.
-- 내역 입력 폼 개선: `src/components/transaction/TransactionFormModal.tsx`에서 `constants.ts` 카테고리 사용 및 타입 전환 시 기본값 설정.
-- 대시보드 데이터 연동: `src/pages/DashboardPage.tsx`에서 `constants.ts` 카테고리 사용 및 `SummaryCard`, `CategorySection`에 현재 월 데이터 필터링 적용. `src/components/dashboard/CategorySection.tsx` 개선.
-- 타입스크립트 오류 해결:
-  - `TS6133` (`React` import): `CategorySection.tsx`, `TransactionSection.tsx`에서 불필요한 `React` import 제거.
-  - `TS1484` (타입 전용 import): `constants.ts`, `Icon.tsx`에서 `import type` 적용.
-  - `TS2322` (타입 불일치): `mockData.ts`에서 아이콘 이름 수정.
-- agents.md 업데이트: React import 및 타입 전용 import 가이드라인 추가.
+- 개발 로드맵의 Phase 1 세부 작업 항목들이 모두 완료되었음을 확인하고, 각 항목에 완료(✅) 표시를 추가함.
 "
 git push origin main
 
