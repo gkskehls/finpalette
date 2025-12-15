@@ -1,25 +1,7 @@
-import React from 'react';
-import {
-  Utensils,
-  Bus,
-  ShoppingBag,
-  Landmark,
-  Archive,
-  HelpCircle,
-} from 'lucide-react';
 import type { Transaction } from '../../types/transaction';
 import type { Category } from '../../types/category';
-import type { IconName } from '../../types/icon';
 import styles from './CategorySection.module.css';
-
-const icons: Record<IconName, React.ElementType> = {
-  Utensils,
-  Bus,
-  ShoppingBag,
-  Landmark,
-  Archive,
-  HelpCircle,
-};
+import { Icon } from '../common/Icon';
 
 interface CategorySectionProps {
   categories: Category[];
@@ -48,6 +30,7 @@ export function CategorySection({
   );
 
   const categoriesWithAmount = categories
+    .filter((category) => category.code.startsWith('c'))
     .map((category) => ({
       ...category,
       amount: amountByCategoryCode[category.code] || 0,
@@ -58,10 +41,9 @@ export function CategorySection({
   return (
     <div className={styles.section}>
       <h2 className={styles.title}>카테고리별 지출</h2>
-      <div className={styles.list}>
-        {categoriesWithAmount.map((category) => {
-          const Icon = icons[category.icon];
-          return (
+      {categoriesWithAmount.length > 0 ? (
+        <div className={styles.list}>
+          {categoriesWithAmount.map((category) => (
             <div key={category.code} className={styles.item}>
               <div className={styles.categoryInfo}>
                 <div
@@ -69,6 +51,7 @@ export function CategorySection({
                   style={{ backgroundColor: `${category.color}20` }}
                 >
                   <Icon
+                    name={category.icon}
                     className={styles.icon}
                     style={{ color: category.color }}
                   />
@@ -79,9 +62,11 @@ export function CategorySection({
                 {formatCurrency(category.amount)}
               </span>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p className={styles.emptyMessage}>이번 달 지출 내역이 없습니다.</p>
+      )}
     </div>
   );
 }

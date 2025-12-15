@@ -80,6 +80,17 @@ fix(header): 모바일에서 로고가 깨지는 문제 수정
 ### React & TypeScript
 
 - **컴포넌트**: 함수형 컴포넌트와 훅(Hook) 사용을 원칙으로 합니다.
+- **React Import**: React 17 이상 버전의 새로운 JSX Transform이 적용되어 있으므로, JSX를 사용하는 파일 상단에 `import React from 'react'` 구문을 추가하지 **않습니다**.
+- **타입 Import**: TypeScript의 `verbatimModuleSyntax` 설정에 따라, 타입(type, interface)은 반드시 `import type` 구문을 사용하여 가져옵니다.
+
+  ```typescript
+  // 좋은 예
+  import type { Transaction } from '../types';
+
+  // 나쁜 예
+  import { Transaction } from '../types';
+  ```
+
 - **타입 정의**:
   - 컴포넌트의 `props` 타입은 항상 정의합니다.
   - API 응답 데이터 등 객체 형태가 명확한 경우 `interface`를 우선적으로 사용합니다.

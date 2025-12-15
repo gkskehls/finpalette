@@ -1,24 +1,6 @@
-import React from 'react';
-import {
-  Utensils,
-  Bus,
-  ShoppingBag,
-  Landmark,
-  Archive,
-  HelpCircle,
-} from 'lucide-react';
 import type { TransactionGroup } from '../../types/ui';
-import type { IconName } from '../../types/icon';
 import styles from './TransactionSection.module.css';
-
-const icons: Record<IconName, React.ElementType> = {
-  Utensils,
-  Bus,
-  ShoppingBag,
-  Landmark,
-  Archive,
-  HelpCircle,
-};
+import { Icon } from '../common/Icon';
 
 interface TransactionSectionProps {
   transactionGroups: TransactionGroup[];
@@ -39,7 +21,6 @@ export function TransactionSection({
           <h3 className={styles.dateHeader}>{group.date}</h3>
           <div className={styles.itemList}>
             {group.transactions.map((item) => {
-              const Icon = icons[item.category.icon];
               const isIncome = item.type === 'inc';
               return (
                 <div key={item.localId} className={styles.item}>
@@ -49,6 +30,7 @@ export function TransactionSection({
                       style={{ backgroundColor: `${item.category.color}20` }}
                     >
                       <Icon
+                        name={item.category.icon}
                         className={styles.icon}
                         style={{ color: item.category.color }}
                       />

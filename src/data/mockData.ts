@@ -7,7 +7,7 @@ export const mockCategories: Category[] = [
   { code: 'c02', name: '교통', color: '#60A5FA', icon: 'Bus' },
   { code: 'c03', name: '쇼핑', color: '#F87171', icon: 'ShoppingBag' },
   { code: 'c04', name: '급여', color: '#818CF8', icon: 'Landmark' },
-  { code: 'c05', name: '기타', color: '#A78BFA', icon: 'Archive' },
+  { code: 'c05', name: '기타', color: '#A78BFA', icon: 'PlusSquare' }, // 'Archive' -> 'PlusSquare'
 ];
 
 // 2. 거래 내역 원본 목업 데이터 (DB `transactions` 테이블 역할)

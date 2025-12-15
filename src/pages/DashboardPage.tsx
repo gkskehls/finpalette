@@ -8,16 +8,14 @@ import { TransactionSection } from '../components/dashboard/TransactionSection';
 import { TransactionFormModal } from '../components/transaction/TransactionFormModal';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { useAddTransactionMutation } from '../hooks/queries/useTransactionsMutation';
-import { mockCategories } from '../data/mockData'; // Categories are still mocked for now
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
 import type { Transaction } from '../types/transaction';
 import type { TransactionItem } from '../types/ui';
 
 import './DashboardPage.css';
 
-// Helper function to group transactions by date
 const groupTransactionsByDate = (transactions: TransactionItem[]) => {
   if (!transactions) return [];
-
   const grouped = transactions.reduce(
     (acc, curr) => {
       const date = curr.date;
@@ -29,14 +27,17 @@ const groupTransactionsByDate = (transactions: TransactionItem[]) => {
     },
     {} as Record<string, TransactionItem[]>
   );
-
   return Object.entries(grouped)
     .map(([date, transactions]) => ({ date, transactions }))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
 
+const allCategories = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
+
 export function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // TODO: 월 이동 기능을 위해 현재 날짜 상태 관리 필요
+  const [currentDate] = useState(new Date());
 
   const { data: transactions = [], isLoading, error } = useTransactionsQuery();
   const addTransactionMutation = useAddTransactionMutation();
@@ -49,9 +50,8 @@ export function DashboardPage() {
     handleCloseModal();
   };
 
-  // Memoize processed data to avoid re-calculation on every render
   const categoryMap = useMemo(() => {
-    return new Map(mockCategories.map((cat) => [cat.code, cat]));
+    return new Map(allCategories.map((cat) => [cat.code, cat]));
   }, []);
 
   const enrichedTransactions: TransactionItem[] = useMemo(() => {
@@ -66,8 +66,22 @@ export function DashboardPage() {
     }));
   }, [transactions, categoryMap]);
 
+  // '이번 달' 거래 내역만 필터링
+  const monthlyTransactions = useMemo(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    return transactions.filter((t) => {
+      const transactionDate = new Date(t.date);
+      return (
+        transactionDate.getFullYear() === year &&
+        transactionDate.getMonth() === month
+      );
+    });
+  }, [transactions, currentDate]);
+
+  // '이번 달' 요약 정보 계산
   const summary = useMemo(() => {
-    return transactions.reduce(
+    return monthlyTransactions.reduce(
       (acc, t) => {
         if (t.type === 'inc') acc.totalIncome += t.amount;
         if (t.type === 'exp') acc.totalExpense += t.amount;
@@ -76,20 +90,15 @@ export function DashboardPage() {
       },
       { totalIncome: 0, totalExpense: 0, balance: 0 }
     );
-  }, [transactions]);
+  }, [monthlyTransactions]);
 
   const transactionGroups = useMemo(
     () => groupTransactionsByDate(enrichedTransactions),
     [enrichedTransactions]
   );
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className="dashboard-container">
@@ -98,8 +107,8 @@ export function DashboardPage() {
       <main className="dashboard-main">
         <SummaryCard {...summary} />
         <CategorySection
-          categories={mockCategories}
-          transactions={transactions}
+          categories={allCategories}
+          transactions={monthlyTransactions} // 이번 달 데이터 전달
         />
         <TransactionSection transactionGroups={transactionGroups} />
       </main>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from './TransactionFormModal.module.css';
 import { X } from 'lucide-react';
-import { mockCategories } from '../../data/mockData';
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../../config/constants';
 import type { Transaction } from '../../types/transaction';
 
 type NewTransactionData = Omit<Transaction, 'localId' | 'id'>;
@@ -9,7 +9,7 @@ type NewTransactionData = Omit<Transaction, 'localId' | 'id'>;
 interface TransactionFormModalProps {
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
-  onSubmit: (data: NewTransactionData) => void;
+  onSubmit: (_data: NewTransactionData) => void;
 }
 
 export function TransactionFormModal({
@@ -18,14 +18,25 @@ export function TransactionFormModal({
 }: TransactionFormModalProps) {
   const [type, setType] = useState('exp');
   const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState(
-    mockCategories.find((c) => c.code.startsWith('c'))?.code || ''
-  );
+  const [category, setCategory] = useState(EXPENSE_CATEGORIES[0]?.code || '');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
 
+  const handleTypeChange = (newType: 'inc' | 'exp') => {
+    setType(newType);
+    if (newType === 'inc') {
+      setCategory(INCOME_CATEGORIES[0]?.code || '');
+    } else {
+      setCategory(EXPENSE_CATEGORIES[0]?.code || '');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!category) {
+      alert('카테고리를 선택해주세요.');
+      return;
+    }
     onSubmit({
       type,
       amount: Number(amount),
@@ -35,15 +46,8 @@ export function TransactionFormModal({
     });
   };
 
-  const incomeCategories = mockCategories.filter(
-    (c) => c.code.startsWith('inc') || c.code === 'c04'
-  );
-  const expenseCategories = mockCategories.filter(
-    (c) => !c.code.startsWith('inc') && c.code !== 'c04'
-  );
-
   const currentCategories =
-    type === 'inc' ? incomeCategories : expenseCategories;
+    type === 'inc' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
   return (
     <div className={styles.modalBackdrop}>
@@ -59,14 +63,14 @@ export function TransactionFormModal({
             <button
               type="button"
               className={`${styles.typeButton} ${type === 'exp' ? styles.active : ''}`}
-              onClick={() => setType('exp')}
+              onClick={() => handleTypeChange('exp')}
             >
               지출
             </button>
             <button
               type="button"
               className={`${styles.typeButton} ${type === 'inc' ? styles.active : ''}`}
-              onClick={() => setType('inc')}
+              onClick={() => handleTypeChange('inc')}
             >
               수입
             </button>
@@ -79,6 +83,7 @@ export function TransactionFormModal({
               id="amount"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
+              placeholder="0"
               required
             />
           </div>
@@ -91,6 +96,9 @@ export function TransactionFormModal({
               onChange={(e) => setCategory(e.target.value)}
               required
             >
+              <option value="" disabled>
+                카테고리 선택
+              </option>
               {currentCategories.map((cat) => (
                 <option key={cat.code} value={cat.code}>
                   {cat.name}
@@ -117,6 +125,7 @@ export function TransactionFormModal({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              placeholder="내용을 입력하세요"
             />
           </div>
 

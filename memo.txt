@@ -3,8 +3,8 @@
 'Finance‘와 'Palette’의 합성어입니다. 다양한 카테고리(식비, 교통비 등)를 팔레트의 색상처럼 분류하고 관리한다는 의미를 담고 있습니다
 
 이 프로젝트의 모든 답변은 한글로 해줘.
-PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md 꼭 지속적으로 참조해줘.
-매번 소스 수정을 할때마 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md 이 문서들을 업데이트 해줘.
+PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md 꼭 지속적으로 참조해줘.
+매번 소스 수정을 할때마 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md 이 문서들을 업데이트 해줘.
 이문서들을 읽어보고 이번엔 뭘할지 논의를 하고 나서 그 후에 개발을 진행하도록 할께.
 
 지금 프로젝트에 오류가 엄청 많이 생겼는데 이거 다 확인좀 해줘
@@ -25,7 +25,18 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-file_list.md: 파일추가
+feat(local-data): 로컬 데이터 기반 가계부 기능 강화 및 타입 오류 수정
+
+- PROJECT_PLAN.md 로드맵 업데이트: 로컬 기능 강화에 집중하도록 Phase 1 재정의, 데이터 시각화 및 Supabase 연동은 Phase 2로 이동.
+- 카테고리 시스템 확장: `src/config/constants.ts`에 수입/지출 카테고리 및 아이콘/색상 정보 중앙화. `src/types/icon.ts`에 `IconName` 타입 확장.
+- 동적 아이콘 표시: `src/components/common/Icon.tsx` 리팩토링 및 `src/components/dashboard/TransactionSection.tsx`에 적용.
+- 내역 입력 폼 개선: `src/components/transaction/TransactionFormModal.tsx`에서 `constants.ts` 카테고리 사용 및 타입 전환 시 기본값 설정.
+- 대시보드 데이터 연동: `src/pages/DashboardPage.tsx`에서 `constants.ts` 카테고리 사용 및 `SummaryCard`, `CategorySection`에 현재 월 데이터 필터링 적용. `src/components/dashboard/CategorySection.tsx` 개선.
+- 타입스크립트 오류 해결:
+  - `TS6133` (`React` import): `CategorySection.tsx`, `TransactionSection.tsx`에서 불필요한 `React` import 제거.
+  - `TS1484` (타입 전용 import): `constants.ts`, `Icon.tsx`에서 `import type` 적용.
+  - `TS2322` (타입 불일치): `mockData.ts`에서 아이콘 이름 수정.
+- agents.md 업데이트: React import 및 타입 전용 import 가이드라인 추가.
 "
 git push origin main
 
