@@ -25,9 +25,15 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-docs(project): Phase 1 완료 상태 반영
+feat(stats): 통계 페이지 및 월별 지출 파이 차트 구현
 
-- 개발 로드맵의 Phase 1 세부 작업 항목들이 모두 완료되었음을 확인하고, 각 항목에 완료(✅) 표시를 추가함.
+- recharts 라이브러리를 도입하여 데이터 시각화 기능의 기반을 마련함.
+- 하단 네비게이션과 연동되는 '통계' 페이지(StatsPage.tsx)를 신설함.
+- App.tsx에 페이지 전환 로직을 구현하고, BottomNav가 현재 페이지 상태를 알 수 있도록 props 전달 구조를 개선함.
+- 통계 페이지에 현재 월의 카테고리별 지출 내역을 분석하여 보여주는 원형 차트를 추가함.
+
+- PROJECT_PLAN.md: Phase 2의 '데이터 시각화 기능 구현' 항목을 완료로 표시함.
+- file_list.md: 새로 추가된 StatsPage.tsx 파일 정보를 반영함.
 "
 git push origin main
 

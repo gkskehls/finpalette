@@ -11,8 +11,15 @@ import { useAddTransactionMutation } from '../hooks/queries/useTransactionsMutat
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
 import type { Transaction } from '../types/transaction';
 import type { TransactionItem } from '../types/ui';
+import type { Page } from '../App';
 
 import './DashboardPage.css';
+
+interface DashboardPageProps {
+  activePage: Page;
+  // eslint-disable-next-line no-unused-vars
+  onPageChange: (_page: Page) => void;
+}
 
 const groupTransactionsByDate = (transactions: TransactionItem[]) => {
   if (!transactions) return [];
@@ -34,7 +41,10 @@ const groupTransactionsByDate = (transactions: TransactionItem[]) => {
 
 const allCategories = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
-export function DashboardPage() {
+export function DashboardPage({
+  activePage,
+  onPageChange,
+}: DashboardPageProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // TODO: 월 이동 기능을 위해 현재 날짜 상태 관리 필요
   const [currentDate] = useState(new Date());
@@ -114,7 +124,7 @@ export function DashboardPage() {
       </main>
 
       <FloatingActionButton onClick={handleOpenModal} />
-      <BottomNav />
+      <BottomNav activePage={activePage} onPageChange={onPageChange} />
 
       {isModalOpen && (
         <TransactionFormModal

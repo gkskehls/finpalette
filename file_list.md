@@ -89,7 +89,9 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 
 #### 📁 config/
 
-애플리케이션의 설정 관련 코드를 담는 폴더입니다. (현재 비어있음)
+애플리케이션의 설정 관련 코드를 담는 폴더입니다.
+
+- **📄 constants.ts**: 카테고리, 거래 유형 등 앱 전반에서 사용되는 상수 값을 정의하는 파일입니다.
 
 #### 📁 data/
 
@@ -111,6 +113,7 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 
 - **📄 DashboardPage.css**: `DashboardPage` 컴포넌트에 적용되는 CSS 스타일 파일입니다.
 - **📄 DashboardPage.tsx**: 대시보드 페이지의 메인 컴포넌트입니다.
+- **📄 StatsPage.tsx**: 통계 페이지의 메인 컴포넌트입니다.
 
 #### 📁 types/
 
