@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { DashboardPage } from './pages/DashboardPage';
 import { StatsPage } from './pages/StatsPage';
 import TransactionListPage from './pages/TransactionListPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { BottomNav } from './components/common/BottomNav';
 import { Header } from './components/common/Header';
 import { FloatingActionButton } from './components/common/FloatingActionButton';
@@ -23,8 +24,7 @@ function App() {
       case 'transactions':
         return <TransactionListPage />;
       case 'profile':
-        // TODO: ProfilePage 구현 후 교체
-        return <div>프로필 페이지</div>;
+        return <ProfilePage />;
       default:
         return <DashboardPage />;
     }

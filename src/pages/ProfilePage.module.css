@@ -1,0 +1,127 @@
+.profileContainer {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  color: var(--text-color); /* 전역 텍스트 색상 변수 사용 */
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.authSection {
+  background-color: var(--card-background); /* 카드 배경색 변수 사용 */
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow); /* 카드 그림자 변수 사용 */
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.authSection p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.authButton {
+  background-color: var(--primary-color); /* 기본 버튼 색상 변수 사용 */
+  color: var(--button-text-color); /* 버튼 텍스트 색상 변수 사용 */
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.authButton:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.storageSection {
+  background-color: var(--card-background);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 1.5rem;
+}
+
+.storageMessage {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.progressBarBackground {
+  width: 100%;
+  height: 10px;
+  background-color: var(--progress-bar-bg); /* 진행바 배경색 변수 사용 */
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 5px;
+  transition:
+    width 0.3s ease-in-out,
+    background-color 0.3s ease-in-out;
+}
+
+.storageDetails {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--secondary-text-color); /* 보조 텍스트 색상 변수 사용 */
+}
+
+.percentageText {
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.warningIcon {
+  margin-left: 0.5rem;
+}
+
+.ctaButton {
+  width: 100%;
+  background-color: var(--accent-color); /* 강조 색상 변수 사용 */
+  color: var(--button-text-color);
+  border: none;
+  padding: 0.8rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.ctaButton:hover {
+  background-color: var(--accent-color-dark);
+}
+
+.menuItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--card-background);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.menuItem:hover {
+  background-color: var(--hover-background); /* 호버 배경색 변수 사용 */
+}

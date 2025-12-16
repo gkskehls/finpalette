@@ -2,9 +2,17 @@
 [data-theme='light'] {
   --background-primary: #ffffff;
   --background-secondary: #f9f9f9;
-  --text-primary: #213547;
-  --text-secondary: #888;
-  --accent-color: #646cff;
+  --text-color: #213547; /* text-primary 대신 사용 */
+  --secondary-text-color: #888; /* text-secondary 대신 사용 */
+  --card-background: #ffffff;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --primary-color: #646cff; /* accent-color 대신 사용 */
+  --primary-color-dark: #535bf2;
+  --button-text-color: #ffffff;
+  --progress-bar-bg: #e0e0e0;
+  --accent-color: #28a745; /* 강조 색상 (CTA 버튼 등) */
+  --accent-color-dark: #218838;
+  --hover-background: #f0f0f0;
   --income-color: #28a745;
   --expense-color: #dc3545;
   --border-color: #eee;
@@ -14,7 +22,7 @@
   font-weight: 400;
 
   color-scheme: light;
-  color: var(--text-primary);
+  color: var(--text-color);
   background-color: var(--background-primary);
 
   font-synthesis: none;
@@ -26,9 +34,17 @@
 [data-theme='dark'] {
   --background-primary: #242424;
   --background-secondary: #1a1a1a;
-  --text-primary: rgba(255, 255, 255, 0.87);
-  --text-secondary: #888;
-  --accent-color: #747bff;
+  --text-color: rgba(255, 255, 255, 0.87); /* text-primary 대신 사용 */
+  --secondary-text-color: #aaaaaa; /* text-secondary 대신 사용 */
+  --card-background: #333333;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --primary-color: #747bff; /* accent-color 대신 사용 */
+  --primary-color-dark: #646cff;
+  --button-text-color: #ffffff;
+  --progress-bar-bg: #555555;
+  --accent-color: #28a745; /* 강조 색상 (CTA 버튼 등) */
+  --accent-color-dark: #218838;
+  --hover-background: #444444;
   --income-color: #28a745;
   --expense-color: #dc3545;
   --border-color: #333;
@@ -38,17 +54,15 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--primary-color);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--primary-color-dark);
 }
 
 body {
   margin: 0;
-  /* display: flex; 제거 */
-  /* place-items: center; 제거 */
   min-width: 320px;
   min-height: 100vh;
 }
@@ -65,18 +79,15 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #f9f9f9;
+  background-color: var(--background-secondary); /* 기본 버튼 배경색 변경 */
+  color: var(--text-color); /* 기본 버튼 텍스트 색상 변경 */
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--primary-color);
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-[data-theme='dark'] button {
-  background-color: #1a1a1a;
 }
