@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Header } from '../components/common/Header';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import type { Transaction } from '../types/transaction';
 import {
@@ -17,7 +16,7 @@ const ALL_CATEGORIES = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
 interface TransactionItemProps {
   transaction: Transaction;
-  onEdit: (_item: Transaction) => void; // 파라미터 이름 앞에 밑줄(_) 추가
+  onEdit: (_item: Transaction) => void;
 }
 
 const TransactionItem = (props: TransactionItemProps) => {
@@ -116,9 +115,8 @@ const TransactionListPage = () => {
   };
 
   return (
-    <div>
-      <Header title="전체 내역" />
-      <main className={styles.container}>{renderContent()}</main>
+    <div className={styles.container}>
+      {renderContent()}
       {isModalOpen && (
         <TransactionFormModal
           onClose={handleCloseModal}

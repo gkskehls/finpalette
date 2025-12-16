@@ -1,23 +1,12 @@
-import { useState, useMemo } from 'react';
-import { Header } from '../components/common/Header';
-import { BottomNav } from '../components/common/BottomNav';
-import { FloatingActionButton } from '../components/common/FloatingActionButton';
+import { useMemo, useState } from 'react';
 import { SummaryCard } from '../components/dashboard/SummaryCard';
 import { CategorySection } from '../components/dashboard/CategorySection';
 import { TransactionSection } from '../components/dashboard/TransactionSection';
-import { TransactionFormModal } from '../components/transaction/TransactionFormModal';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
 import type { TransactionItem } from '../types/ui';
-import type { Page } from '../App';
 
 import './DashboardPage.css';
-
-interface DashboardPageProps {
-  activePage: Page;
-
-  onPageChange: (_page: Page) => void;
-}
 
 const groupTransactionsByDate = (transactions: TransactionItem[]) => {
   if (!transactions) return [];
@@ -39,18 +28,11 @@ const groupTransactionsByDate = (transactions: TransactionItem[]) => {
 
 const allCategories = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
-export function DashboardPage({
-  activePage,
-  onPageChange,
-}: DashboardPageProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export function DashboardPage() {
   // TODO: 월 이동 기능을 위해 현재 날짜 상태 관리 필요
   const [currentDate] = useState(new Date());
 
   const { data: transactions = [], isLoading, error } = useTransactionsQuery();
-
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
 
   const categoryMap = useMemo(() => {
     return new Map(allCategories.map((cat) => [cat.code, cat]));
@@ -103,22 +85,13 @@ export function DashboardPage({
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="dashboard-container">
-      <Header title="Finpalette" />
-
-      <main className="dashboard-main">
-        <SummaryCard {...summary} />
-        <CategorySection
-          categories={allCategories}
-          transactions={monthlyTransactions} // 이번 달 데이터 전달
-        />
-        <TransactionSection transactionGroups={transactionGroups} />
-      </main>
-
-      <FloatingActionButton onClick={handleOpenModal} />
-      <BottomNav activePage={activePage} onPageChange={onPageChange} />
-
-      {isModalOpen && <TransactionFormModal onClose={handleCloseModal} />}
-    </div>
+    <>
+      <SummaryCard {...summary} />
+      <CategorySection
+        categories={allCategories}
+        transactions={monthlyTransactions} // 이번 달 데이터 전달
+      />
+      <TransactionSection transactionGroups={transactionGroups} />
+    </>
   );
 }

@@ -26,7 +26,7 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-docs(spec): 게스트 저장 공간 관리 기능 명세 추가" -m "- 마이페이지에 게스트 전용 '저장 공간 관리' 섹션 기획안을 추가합니다." -m "- 사용량에 따라 UI가 동적으로 변화하는 3단계(기본, 경고, 위험) 인터랙션을 상세히 정의합니다." -m "- PROJECT_PLAN.md의 Phase 2 로드맵에 해당 기능 구현을 세부 작업으로 포함합니다.
+fix(layout): 모든 페이지에 공통 레이아웃 적용" -m "- App.tsx에 Header, BottomNav 등 공통 레이아웃 컴포넌트를 배치하여 중앙에서 제어하도록 구조를 변경합니다." -m "- 개별 페이지(Dashboard, Stats, TransactionList)에 중복으로 포함되어 있던 레이아웃 관련 코드를 제거합니다." -m "- 이 수정으로 전체 내역 및 마이페이지에서도 하단 네비게이션 바가 정상적으로 표시됩니다.
 "
 git push origin main
 
