@@ -6,6 +6,7 @@
 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md 꼭 지속적으로 참조해줘.
 매번 소스 수정을 할때마 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md 이 문서들을 업데이트 해줘.
 이문서들을 읽어보고 이번엔 뭘할지 논의를 하고 나서 그 후에 개발을 진행하도록 할께.
+지금은 소스 수정은 안할꺼야. 의견부터 나누고 싶어.
 
 지금 프로젝트에 오류가 엄청 많이 생겼는데 이거 다 확인좀 해줘
 
@@ -25,15 +26,12 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(stats): 통계 페이지 및 월별 지출 파이 차트 구현
+feat(stats): 통계 페이지 기간 선택 및 막대그래프 구현
 
-- recharts 라이브러리를 도입하여 데이터 시각화 기능의 기반을 마련함.
-- 하단 네비게이션과 연동되는 '통계' 페이지(StatsPage.tsx)를 신설함.
-- App.tsx에 페이지 전환 로직을 구현하고, BottomNav가 현재 페이지 상태를 알 수 있도록 props 전달 구조를 개선함.
-- 통계 페이지에 현재 월의 카테고리별 지출 내역을 분석하여 보여주는 원형 차트를 추가함.
-
-- PROJECT_PLAN.md: Phase 2의 '데이터 시각화 기능 구현' 항목을 완료로 표시함.
-- file_list.md: 새로 추가된 StatsPage.tsx 파일 정보를 반영함.
+- 통계 페이지에 월별 기간 선택 기능 추가 (이전/다음 달 이동)
+- 선택된 기간에 따라 원형 차트 데이터 동적 업데이트
+- 월별 수입/지출을 보여주는 막대그래프 추가 (Recharts 사용)
+- PROJECT_PLAN.md 업데이트 (Phase 2 - 데이터 시각화 기능 완료)
 "
 git push origin main
 
