@@ -11,15 +11,15 @@
 - **📄 .firebaserc**: Firebase 프로젝트 설정을 위한 파일입니다. 어떤 Firebase 프로젝트를 사용할지 지정합니다.
 - **📄 .gitignore**: Git 버전 관리에서 제외할 파일 및 폴더를 지정하는 파일입니다.
 - **📄 .prettierrc**: 코드 포맷터인 Prettier의 설정을 담고 있는 파일입니다. 일관된 코드 스타일을 유지하는 데 사용됩니다.
-- **📄 agents.md**: (추정) AI 에이전트 또는 관련 기능에 대한 설명을 담은 마크다운 파일입니다.
-- **📄 APP_SPECIFICATION.md**: (추정) 애플리케이션의 기능 명세나 요구사항을 정리한 마크다운 파일입니다.
+- **📄 agents.md**: 프로젝트의 코딩 스타일, Git 컨벤션 등 개발 가이드라인을 정의한 문서입니다.
+- **📄 APP_SPECIFICATION.md**: 애플리케이션의 상세 기능 명세와 요구사항을 정리한 문서입니다.
 - **📄 eslint.config.js**: ESLint 설정을 위한 파일입니다. 코드의 잠재적인 오류나 스타일 문제를 검사합니다.
 - **📄 firebase.json**: Firebase 호스팅, 데이터베이스 규칙 등 Firebase 서비스에 대한 상세 설정을 정의하는 파일입니다.
 - **📄 index.html**: 웹 애플리케이션의 진입점이 되는 메인 HTML 파일입니다.
-- **📄 memo.txt**: (추정) 프로젝트 관련 간단한 메모를 위한 텍스트 파일입니다.
+- **📄 memo.txt**: 프로젝트 관련 간단한 메모를 위한 텍스트 파일입니다.
 - **📄 package.json**: 프로젝트의 이름, 버전, 의존성 라이브러리 목록, 실행 스크립트 등을 정의하는 Node.js 프로젝트의 핵심 파일입니다.
 - **📄 package-lock.json**: `package.json`을 바탕으로 설치된 의존성 라이브러리들의 정확한 버전과 의존성 트리를 기록하는 파일입니다.
-- **📄 PROJECT_PLAN.md**: (추정) 프로젝트의 계획, 일정, 마일스톤 등을 기록한 마크다운 파일입니다.
+- **📄 PROJECT_PLAN.md**: 프로젝트의 목표, 기술 스택, 개발 로드맵 등을 기록한 문서입니다.
 - **📄 README.md**: 프로젝트에 대한 전반적인 소개, 설치 방법, 사용법 등을 안내하는 파일입니다.
 - **📄 tsconfig.json**: TypeScript 컴파일러의 전역 설정을 담고 있는 파일입니다.
 - **📄 tsconfig.app.json**: 애플리케이션 코드에 대한 TypeScript 설정을 담고 있습니다.
@@ -114,6 +114,8 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 - **📄 DashboardPage.css**: `DashboardPage` 컴포넌트에 적용되는 CSS 스타일 파일입니다.
 - **📄 DashboardPage.tsx**: 대시보드 페이지의 메인 컴포넌트입니다.
 - **📄 StatsPage.tsx**: 통계 페이지의 메인 컴포넌트입니다.
+- **📄 TransactionListPage.module.css**: `TransactionListPage` 컴포넌트의 전용 CSS 모듈 파일입니다.
+- **📄 TransactionListPage.tsx**: 전체 거래 내역을 조회, 수정, 삭제하는 페이지의 메인 컴포넌트입니다.
 
 #### 📁 types/
 

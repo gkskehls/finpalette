@@ -1,10 +1,10 @@
-import { LayoutDashboard, ChartBarBig, User } from 'lucide-react';
+import { LayoutDashboard, ChartBarBig, User, List } from 'lucide-react'; // List 추가
 import styles from './BottomNav.module.css';
 import type { Page } from '../../App';
 
 interface BottomNavProps {
   activePage: Page;
-  // eslint-disable-next-line no-unused-vars
+
   onPageChange: (_page: Page) => void;
 }
 
@@ -17,6 +17,14 @@ export function BottomNav({ activePage, onPageChange }: BottomNavProps) {
       >
         <LayoutDashboard size={24} />
         <span>대시보드</span>
+      </button>
+      {/* 추가된 '전체 내역' 버튼 */}
+      <button
+        className={`${styles.navItem} ${activePage === 'transactions' ? styles.active : ''}`}
+        onClick={() => onPageChange('transactions')}
+      >
+        <List size={24} />
+        <span>전체 내역</span>
       </button>
       <button
         className={`${styles.navItem} ${activePage === 'stats' ? styles.active : ''}`}

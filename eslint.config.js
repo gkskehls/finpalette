@@ -33,6 +33,18 @@ export default [
       ...reactHooks.configs.recommended.rules,
       ...prettierConfig.rules,
       'react-refresh/only-export-components': 'warn',
+      // 추가된 규칙
+      'no-unused-vars': [
+        'error',
+        {
+          args: 'after-used',
+          caughtErrors: 'none',
+          ignoreRestSiblings: true,
+          vars: 'all',
+          argsIgnorePattern: '^_', // 밑줄로 시작하는 인자는 무시
+          varsIgnorePattern: '^_', // 밑줄로 시작하는 변수는 무시
+        },
+      ],
     },
   },
 ];

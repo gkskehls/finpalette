@@ -1,0 +1,67 @@
+.container {
+  padding: 16px;
+}
+
+.transactionItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.categoryIcon {
+  margin-right: 16px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.transactionDetails {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.description {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.categoryName {
+  font-size: 14px;
+  color: #888;
+}
+
+.transactionAmount {
+  font-size: 16px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.amountAndButton {
+  /* 추가 */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deleteButton {
+  /* 추가 */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteButton:hover {
+  color: #f00;
+}

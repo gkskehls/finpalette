@@ -7,9 +7,7 @@ import { CategorySection } from '../components/dashboard/CategorySection';
 import { TransactionSection } from '../components/dashboard/TransactionSection';
 import { TransactionFormModal } from '../components/transaction/TransactionFormModal';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
-import { useAddTransactionMutation } from '../hooks/queries/useTransactionsMutation';
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
-import type { Transaction } from '../types/transaction';
 import type { TransactionItem } from '../types/ui';
 import type { Page } from '../App';
 
@@ -17,7 +15,7 @@ import './DashboardPage.css';
 
 interface DashboardPageProps {
   activePage: Page;
-  // eslint-disable-next-line no-unused-vars
+
   onPageChange: (_page: Page) => void;
 }
 
@@ -50,15 +48,9 @@ export function DashboardPage({
   const [currentDate] = useState(new Date());
 
   const { data: transactions = [], isLoading, error } = useTransactionsQuery();
-  const addTransactionMutation = useAddTransactionMutation();
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-
-  const handleAddTransaction = (data: Omit<Transaction, 'localId' | 'id'>) => {
-    addTransactionMutation.mutate(data);
-    handleCloseModal();
-  };
 
   const categoryMap = useMemo(() => {
     return new Map(allCategories.map((cat) => [cat.code, cat]));
@@ -126,12 +118,7 @@ export function DashboardPage({
       <FloatingActionButton onClick={handleOpenModal} />
       <BottomNav activePage={activePage} onPageChange={onPageChange} />
 
-      {isModalOpen && (
-        <TransactionFormModal
-          onClose={handleCloseModal}
-          onSubmit={handleAddTransaction}
-        />
-      )}
+      {isModalOpen && <TransactionFormModal onClose={handleCloseModal} />}
     </div>
   );
 }

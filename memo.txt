@@ -26,12 +26,21 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-Docs(plan): DB 연결 및 인증 계획 추가, 로드맵 진행 상태 업데이트
+feat(transaction): 거래 내역 관리 페이지 구현 및 오류 수정
 
-- 데이터베이스 연결 및 인증 상세 계획 섹션 (5장)을 추가했습니다.
-  - 구글 로그인만 허용하는 인증 방식 및 Supabase 클라이언트 초기화 방안을 명시했습니다.
-- 개발 로드맵(4장)의 진행 상태 표시를 [O] (완료) 및 [X] (미완료) 형식으로 업데이트하여 가독성을 높였습니다.
+주요 변경 사항:
+- 모든 거래 내역을 조회, 수정, 삭제할 수 있는 '전체 내역' 페이지를 구현했습니다.
+- 하단 네비게이션에 '전체 내역' 탭을 추가하고 라우팅을 설정했습니다.
+- 각 거래 내역 아이템을 클릭하면 수정 모달이 열리고, 삭제 버튼으로 내역을 삭제할 수 있습니다.
 
+리팩토링 및 오류 수정:
+- TransactionFormModal이 자체적으로 데이터 추가/수정 로직을 처리하도록 리팩토링했습니다.
+- DashboardPage에서 더 이상 사용하지 않는 데이터 처리 로직과 타입을 제거했습니다.
+- import 방식(default vs named, import vs import type)이 올바르지 않아 발생했던 여러 빌드 오류를 수정했습니다.
+- constants.ts의 데이터 구조를 개선하여 타입 관련 오류를 해결했습니다.
+
+문서:
+- PROJECT_PLAN.md와 file_list.md를 최신 상태로 업데이트했습니다.
 "
 git push origin main
 

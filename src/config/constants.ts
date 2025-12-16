@@ -29,7 +29,9 @@ export const EXPENSE_CATEGORIES: Category[] = [
   { code: 'c99', name: '기타', icon: 'PlusSquare', color: '#BDBDBD' },
 ];
 
-export const TRANSACTION_TYPES = {
-  INCOME: 'inc',
-  EXPENSE: 'exp',
+export const TRANSACTION_TYPES: {
+  [key: string]: { name: string; sign: string };
+} = {
+  inc: { name: '수입', sign: '+' },
+  exp: { name: '지출', sign: '-' },
 };

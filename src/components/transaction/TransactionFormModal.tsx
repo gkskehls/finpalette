@@ -3,31 +3,52 @@ import styles from './TransactionFormModal.module.css';
 import { X } from 'lucide-react';
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../../config/constants';
 import type { Transaction } from '../../types/transaction';
+import {
+  useAddTransactionMutation,
+  useUpdateTransactionMutation,
+} from '../../hooks/queries/useTransactionsMutation';
+import type { UpdateTransactionPayload } from '../../hooks/queries/useTransactionsMutation';
 
 type NewTransactionData = Omit<Transaction, 'localId' | 'id'>;
 
 interface TransactionFormModalProps {
   onClose: () => void;
-  // eslint-disable-next-line no-unused-vars
-  onSubmit: (_data: NewTransactionData) => void;
+  transactionToEdit?: Transaction; // 수정할 데이터 (선택적)
 }
 
 export function TransactionFormModal({
   onClose,
-  onSubmit,
+  transactionToEdit,
 }: TransactionFormModalProps) {
-  const [type, setType] = useState('exp');
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState(EXPENSE_CATEGORIES[0]?.code || '');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [description, setDescription] = useState('');
+  const isEditMode = !!transactionToEdit;
+
+  // useEffect를 제거하고, useState에서 직접 초기값 설정
+  const [type, setType] = useState(transactionToEdit?.type || 'exp');
+  const [amount, setAmount] = useState(
+    transactionToEdit?.amount.toString() || ''
+  );
+  const [category, setCategory] = useState(
+    transactionToEdit?.category_code || EXPENSE_CATEGORIES[0]?.code || ''
+  );
+  const [date, setDate] = useState(
+    transactionToEdit?.date || new Date().toISOString().split('T')[0]
+  );
+  const [description, setDescription] = useState(
+    transactionToEdit?.description || ''
+  );
+
+  const addMutation = useAddTransactionMutation();
+  const updateMutation = useUpdateTransactionMutation();
 
   const handleTypeChange = (newType: 'inc' | 'exp') => {
     setType(newType);
-    if (newType === 'inc') {
-      setCategory(INCOME_CATEGORIES[0]?.code || '');
-    } else {
-      setCategory(EXPENSE_CATEGORIES[0]?.code || '');
+    // 타입 변경 시, 수정 모드가 아닐 때만 카테고리를 기본값으로 변경
+    if (!isEditMode) {
+      if (newType === 'inc') {
+        setCategory(INCOME_CATEGORIES[0]?.code || '');
+      } else {
+        setCategory(EXPENSE_CATEGORIES[0]?.code || '');
+      }
     }
   };
 
@@ -37,13 +58,28 @@ export function TransactionFormModal({
       alert('카테고리를 선택해주세요.');
       return;
     }
-    onSubmit({
+
+    const formData: NewTransactionData = {
       type,
       amount: Number(amount),
       category_code: category,
       date,
       description,
-    });
+    };
+
+    if (isEditMode && transactionToEdit) {
+      const payload: UpdateTransactionPayload = {
+        localId: transactionToEdit.localId,
+        data: formData,
+      };
+      updateMutation.mutate(payload, {
+        onSuccess: onClose, // 성공 시 모달 닫기
+      });
+    } else {
+      addMutation.mutate(formData, {
+        onSuccess: onClose, // 성공 시 모달 닫기
+      });
+    }
   };
 
   const currentCategories =
@@ -53,7 +89,7 @@ export function TransactionFormModal({
     <div className={styles.modalBackdrop}>
       <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
-          <h2>내역 추가</h2>
+          <h2>{isEditMode ? '내역 수정' : '내역 추가'}</h2>
           <button onClick={onClose} className={styles.closeButton}>
             <X size={24} />
           </button>
@@ -137,8 +173,12 @@ export function TransactionFormModal({
             >
               취소
             </button>
-            <button type="submit" className={styles.submitButton}>
-              저장
+            <button
+              type="submit"
+              className={styles.submitButton}
+              disabled={addMutation.isPending || updateMutation.isPending}
+            >
+              {isEditMode ? '수정' : '저장'}
             </button>
           </div>
         </form>
