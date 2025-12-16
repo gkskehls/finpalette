@@ -132,3 +132,20 @@
      - 팔레트 간 전환 UI 구현
   4. **[X] PWA(Progressive Web App) 적용**: 홈 화면에 앱 설치, 오프라인 지원 등 네이티브 앱 경험 강화
   5. **[X] 데스크탑 화면 최적화**
+
+---
+
+## 5. 데이터베이스 연결 및 인증 상세 계획
+
+### 5.1. 인증 (Authentication)
+
+- **허용 방식:** 구글 로그인 (Google OAuth)만 허용합니다.
+  - Supabase 설정에서 구글 OAuth를 활성화하고, 다른 소셜 로그인 옵션은 비활성화합니다.
+- **세션 관리:** Supabase의 JWT 기반 세션 관리를 활용하며, 앱 내에서 사용자 인증 상태 변화를 감지하고 UI를 업데이트하는 방안을 고려합니다.
+- **사용자 프로필:** `auth.users` 테이블 외에 추가 사용자 정보(닉네임 등)를 위한 `profiles` 테이블 필요 여부 및 연결 방안을 논의합니다.
+
+### 5.2. Supabase 클라이언트 초기화 및 환경 변수 관리
+
+- **클라이언트 초기화 파일 위치:** `src/lib/supabase.ts` 또는 `src/config/supabaseClient.ts`와 같이 별도의 파일에서 Supabase 클라이언트를 초기화하고 내보냅니다.
+- **환경 변수 관리:** Supabase URL과 Anon Key는 `.env.local` 파일에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`와 같은 형태로 저장하여 보안을 강화하고 환경별 유연성을 확보합니다.
+- **클라이언트 객체 내보내기:** 초기화된 Supabase 클라이언트 객체는 다른 파일에서 쉽게 가져다 쓸 수 있도록 `export` 합니다.
