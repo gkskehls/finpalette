@@ -113,7 +113,7 @@ export function StatsPage() {
       });
   }, [transactions, selectedDate]);
 
-  const formattedMonth = `${selectedDate.getFullYear()}년 ${selectedDate.getMonth() + 1}월`;
+  const formattedMonth = `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}`;
 
   return (
     <div style={{ padding: '1rem' }}>
@@ -122,7 +122,7 @@ export function StatsPage() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '1rem',
+          marginBottom: '2rem',
         }}
       >
         <button
@@ -136,7 +136,9 @@ export function StatsPage() {
         >
           {'<'}
         </button>
-        <h2 style={{ margin: 0 }}>{formattedMonth} 지출 분석</h2>
+        <h2 style={{ margin: 0, fontSize: '1.2rem', color: 'currentColor' }}>
+          {formattedMonth}
+        </h2>
         <button
           onClick={handleNextMonth}
           style={{
@@ -149,6 +151,16 @@ export function StatsPage() {
           {'>'}
         </button>
       </div>
+      <h3
+        style={{
+          marginTop: 0,
+          marginBottom: '1rem',
+          textAlign: 'center',
+          color: 'currentColor',
+        }}
+      >
+        카테고리별 지출
+      </h3>
       <div style={{ width: '100%', height: 300, marginBottom: '2rem' }}>
         <ResponsiveContainer>
           <PieChart>
@@ -178,7 +190,15 @@ export function StatsPage() {
         </ResponsiveContainer>
       </div>
 
-      <h2 style={{ marginTop: '2rem' }}>월별 수입/지출</h2>
+      <h3
+        style={{
+          marginTop: '2rem',
+          textAlign: 'center',
+          color: 'currentColor',
+        }}
+      >
+        월별 수입/지출
+      </h3>
       <div style={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>
           <BarChart
