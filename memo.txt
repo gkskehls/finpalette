@@ -26,12 +26,11 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(stats): 통계 페이지 기간 선택 및 막대그래프 구현
+Docs(roadmap): 로드맵 진행 상태 표시 개선
 
-- 통계 페이지에 월별 기간 선택 기능 추가 (이전/다음 달 이동)
-- 선택된 기간에 따라 원형 차트 데이터 동적 업데이트
-- 월별 수입/지출을 보여주는 막대그래프 추가 (Recharts 사용)
-- PROJECT_PLAN.md 업데이트 (Phase 2 - 데이터 시각화 기능 완료)
+PROJECT_PLAN.md 파일의 로드맵 항목에 대해
+진행 상태 표시를 명확하게 [O] (완료) 및 [X] (미완료) 형식으로 업데이트했습니다.
+이를 통해 각 기능의 구현 여부를 한눈에 파악하기 용이해졌습니다.
 "
 git push origin main
 
