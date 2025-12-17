@@ -26,7 +26,15 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-문서 최신화
+fix(transaction-list): 전체 내역 페이지 카테고리 아이콘 색상 수정
+
+- TransactionListPage에서 카테고리 아이콘이 대시보드와 동일한 색상 및 배경 스타일로 표시되도록 수정했습니다.
+- TransactionListPage.module.css에서 고정된 배경색을 제거하고, TransactionListPage.tsx에서 Icon 컴포넌트에 size prop과 동적인 배경색을 적용했습니다.
+
+docs: 개발 현황에 맞춰 문서 업데이트
+- PROJECT_PLAN.md: Phase 2 '게스트 저장 공간 현황 UI 구현' 완료 표시
+- APP_SPECIFICATION.md: 마이페이지 '게스트 저장 공간 관리' 기능 완료 표시
+- file_list.md: ProfilePage 관련 파일 및 useAuth, storage 유틸리티 파일 목록에 추가
 "
 git push origin main
 

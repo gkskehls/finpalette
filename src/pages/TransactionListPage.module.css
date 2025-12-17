@@ -15,7 +15,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #f0f0f0;
+  /* background-color: #f0f0f0;  대시보드와 동일하게 동적 배경색을 위해 제거 */
   display: flex;
   justify-content: center;
   align-items: center;

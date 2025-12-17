@@ -43,8 +43,12 @@ const TransactionItem = (props: TransactionItemProps) => {
 
   return (
     <div className={styles.transactionItem} onClick={() => onEdit(transaction)}>
-      <div className={styles.categoryIcon}>
-        <Icon name={category.icon} />
+      <div
+        className={styles.categoryIcon}
+        style={{ backgroundColor: `${category.color}20` }} // 대시보드와 동일한 배경색 적용
+      >
+        <Icon name={category.icon} color={category.color} size={20} />{' '}
+        {/* 아이콘 크기 지정 */}
       </div>
       <div className={styles.transactionDetails}>
         <span className={styles.description}>{transaction.description}</span>
