@@ -103,6 +103,7 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 
 재사용 가능한 커스텀 React 훅을 모아두는 폴더입니다.
 
+- **📄 useAuth.ts**: 인증 관련 로직을 처리하는 커스텀 훅입니다.
 - **📁 queries/**: 데이터 페칭 및 상태 관리를 위한 React Query 관련 훅을 담는 폴더입니다.
   - **📄 useTransactionsQuery.ts**: 거래 내역을 조회하는(fetch) 커스텀 훅입니다.
   - **📄 useTransactionsMutation.ts**: 거래 내역을 생성, 수정, 삭제하는 커스텀 훅입니다.
@@ -113,6 +114,8 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 
 - **📄 DashboardPage.css**: `DashboardPage` 컴포넌트에 적용되는 CSS 스타일 파일입니다.
 - **📄 DashboardPage.tsx**: 대시보드 페이지의 메인 컴포넌트입니다.
+- **📄 ProfilePage.tsx**: 마이페이지의 메인 컴포넌트입니다.
+- **📄 ProfilePage.module.css**: `ProfilePage` 컴포넌트의 전용 CSS 모듈 파일입니다.
 - **📄 StatsPage.tsx**: 통계 페이지의 메인 컴포넌트입니다.
 - **📄 TransactionListPage.module.css**: `TransactionListPage` 컴포넌트의 전용 CSS 모듈 파일입니다.
 - **📄 TransactionListPage.tsx**: 전체 거래 내역을 조회, 수정, 삭제하는 페이지의 메인 컴포넌트입니다.
@@ -125,3 +128,9 @@ TypeScript에서 사용되는 타입 정의들을 모아두는 폴더입니다.
 - **📄 icon.ts**: 아이콘 관련 타입을 정의하는 파일입니다.
 - **📄 transaction.ts**: 거래 내역 관련 타입을 정의하는 파일입니다.
 - **📄 ui.ts**: UI 요소와 관련된 공통 타입을 정의하는 파일입니다.
+
+#### 📁 utils/
+
+애플리케이션 전반에서 사용되는 유틸리티 함수들을 모아두는 폴더입니다.
+
+- **📄 storage.ts**: 로컬 스토리지 관련 유틸리티 함수들을 정의하는 파일입니다.
