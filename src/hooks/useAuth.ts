@@ -1,53 +1,70 @@
 import { useState, useEffect } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-}
+import { supabase } from '../lib/supabase';
+import type { User } from '@supabase/supabase-js';
 
 interface AuthState {
   user: User | null;
   isLoading: boolean;
-  login: (_email: string) => void;
-  logout: () => void;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
-// 임시 인증 훅 (Supabase 연동 시 실제 구현으로 대체될 예정)
 export function useAuth(): AuthState {
-  const [user, setUser] = useState<User | null>(() => {
-    const storedUser = localStorage.getItem('mock_user');
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-  // 초기 상태를 true로 변경하여 첫 렌더링 시 로딩 상태가 되도록 함
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 실제 Supabase에서는 onAuthStateChange 리스너를 사용합니다.
-    // 여기서는 초기 로딩 상태를 흉내냅니다.
-    const timer = setTimeout(() => {
-      setIsLoading(false); // 0.5초 후 로딩 상태를 false로 변경
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []); // 의존성 배열이 비어 있으므로 컴포넌트 마운트 시 한 번만 실행됩니다.
-
-  const login = (email: string) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      const mockUser: User = { id: 'mock-user-id-123', email };
-      localStorage.setItem('mock_user', JSON.stringify(mockUser));
-      setUser(mockUser);
+    // 컴포넌트 마운트 시 현재 사용자 정보를 가져옵니다.
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error('Error fetching user:', error);
+      }
+      setUser(data?.user ?? null);
       setIsLoading(false);
-    }, 500);
+    };
+
+    fetchUser();
+
+    // 인증 상태 변경(로그인, 로그아웃)을 감지하는 리스너를 설정합니다.
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+        // 로그인/로그아웃 시에는 로딩 상태를 변경할 필요가 없습니다.
+        // 초기 로딩은 fetchUser에서 처리합니다.
+      }
+    );
+
+    // 컴포넌트 언마운트 시 리스너를 정리합니다.
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+      if (error) {
+        console.error('Error signing in with Google:', error);
+        // 사용자에게 에러를 알리는 로직을 추가할 수 있습니다 (예: toast 메시지)
+      }
+    } catch (error) {
+      console.error('Unexpected error during Google sign-in:', error);
+    }
   };
 
-  const logout = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      localStorage.removeItem('mock_user');
-      setUser(null);
-      setIsLoading(false);
-    }, 500);
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+      }
+    } catch (error) {
+      console.error('Unexpected error during sign-out:', error);
+    }
   };
 
-  return { user, isLoading, login, logout };
+  return { user, isLoading, signInWithGoogle, signOut };
 }

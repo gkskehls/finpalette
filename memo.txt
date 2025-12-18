@@ -26,12 +26,14 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-docs: Supabase 기준으로 기술 스택 및 문서 통일
+feat(auth): Supabase 클라이언트 연동 및 설정
 
-인증 시스템을 기존 계획대로 Supabase로 확정함에 따라, 프로젝트 관련 문서들을 전반적으로 업데이트합니다.
+Supabase 인증 기능 구현을 위한 기반을 마련합니다.
 
-- PROJECT_PLAN.md:
-  - 기술 스택의 'Database'와 'Auth'를 Supabase로 통합 명시
+- @supabase/supabase-js 라이브러리를 설치합니다.
+- .env.local 파일을 생성하여 Supabase URL 및 Anon Key를 환경 변수로 관리하도록 설정합니다.
+- src/lib/supabase.ts 파일에 Supabase 클라이언트를 초기화하고 export하는 로직을 구현합니다.
+- PROJECT_PLAN.md 등 관련 문서의 기술 스택 내용을 현재 아키텍처(인증: Supabase, 호스팅: Firebase)에 맞게 명확히 수정합니다.
 "
 git push origin main
 
@@ -42,3 +44,13 @@ npm run dev
 
 Redirect URL
 https://jxwqaohmhdsjovmpefge.supabase.co/auth/v1/callback
+
+ - Google Cloud Console
+클라이언트 ID
+966738966592-imov6ivih43f6t7cllbip60bm5p3ce0h.apps.googleusercontent.com
+클라이언트 보안 비밀번호
+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
+생성일
+2025년 12월 18일 PM 12시 34분 30초 GMT+9
+
+
