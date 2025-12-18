@@ -7,10 +7,10 @@ import {
   LOCAL_STORAGE_WARNING_THRESHOLD_BYTES,
   LOCAL_STORAGE_DANGER_THRESHOLD_BYTES,
 } from '../utils/storage';
-import styles from './ProfilePage.module.css'; // CSS 모듈 파일 생성 예정
+import styles from './ProfilePage.module.css';
 
 export function ProfilePage() {
-  const { user, isLoading, login, logout } = useAuth();
+  const { user, isLoading, signInWithGoogle, signOut } = useAuth();
   const [localStorageUsage, setLocalStorageUsage] = useState(0);
 
   useEffect(() => {
@@ -21,23 +21,19 @@ export function ProfilePage() {
 
     updateUsage(); // 초기 로드 시 한 번 실행
 
-    // 로컬 스토리지 변경을 감지하는 이벤트 리스너 (storage 이벤트는 다른 탭/창에서 변경될 때 발생)
-    // 현재 탭/창 내에서 변경되는 것은 직접 호출해야 함
     window.addEventListener('storage', updateUsage);
 
-    // 컴포넌트 언마운트 시 이벤트 리스너 제거
     return () => {
       window.removeEventListener('storage', updateUsage);
     };
   }, []);
 
-  // 로컬 스토리지 사용량에 따른 UI 상태 계산
   const storageStatus = useMemo(() => {
     const percentage = (localStorageUsage / LOCAL_STORAGE_MAX_BYTES) * 100;
     let message = '';
     let barColor = '#4A90E2'; // 기본: 파란색
     let showWarningIcon = false;
-    let showCTA = false; // Call to Action 버튼
+    let showCTA = false;
 
     if (localStorageUsage >= LOCAL_STORAGE_DANGER_THRESHOLD_BYTES) {
       message =
@@ -67,19 +63,16 @@ export function ProfilePage() {
       <h2 className={styles.sectionTitle}>계정 정보</h2>
       {user ? (
         <div className={styles.authSection}>
-          <p>환영합니다, {user.email}님!</p>
-          <button onClick={logout} className={styles.authButton}>
+          <p>환영합니다, {user.email ?? '사용자'}님!</p>
+          <button onClick={signOut} className={styles.authButton}>
             로그아웃
           </button>
         </div>
       ) : (
         <div className={styles.authSection}>
           <p>로그인하여 데이터를 안전하게 관리하세요.</p>
-          <button
-            onClick={() => login('guest@example.com')}
-            className={styles.authButton}
-          >
-            로그인 (게스트 데이터 연동)
+          <button onClick={signInWithGoogle} className={styles.authButton}>
+            Google로 로그인
           </button>
         </div>
       )}
@@ -110,10 +103,7 @@ export function ProfilePage() {
             )}
           </div>
           {storageStatus.showCTA && (
-            <button
-              onClick={() => login('guest@example.com')}
-              className={styles.ctaButton}
-            >
+            <button onClick={signInWithGoogle} className={styles.ctaButton}>
               무료로 계정 연동하고 데이터 백업하기
             </button>
           )}

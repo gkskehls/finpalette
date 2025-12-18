@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import type { User } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
+import { useQueryClient } from '@tanstack/react-query';
+import { migrateGuestData } from '../lib/migration';
 
 interface AuthState {
   user: User | null;
@@ -12,26 +14,43 @@ interface AuthState {
 export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const previousSession = useRef<Session | null>(null);
 
   useEffect(() => {
-    // 컴포넌트 마운트 시 현재 사용자 정보를 가져옵니다.
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
+    // 1. 컴포넌트 마운트 시 현재 세션 정보를 가져옵니다.
+    const fetchInitialSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
       if (error) {
-        console.error('Error fetching user:', error);
+        console.error('Error fetching initial session:', error);
       }
-      setUser(data?.user ?? null);
+      const session = data?.session ?? null;
+      previousSession.current = session;
+      setUser(session?.user ?? null);
       setIsLoading(false);
     };
 
-    fetchUser();
+    fetchInitialSession();
 
-    // 인증 상태 변경(로그인, 로그아웃)을 감지하는 리스너를 설정합니다.
+    // 2. 인증 상태 변경(로그인, 로그아웃)을 감지하는 리스너를 설정합니다.
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
+        // 3. 로그인 상태 변화 감지 (로그아웃 -> 로그인)
+        if (session && !previousSession.current) {
+          console.log('Detected login event. Starting migration check...');
+          const migrationOccurred = await migrateGuestData(session.user);
+          if (migrationOccurred) {
+            // 4. 마이그레이션이 발생했다면, 서버 데이터를 다시 불러오도록 쿼리를 무효화합니다.
+            console.log(
+              'Migration successful. Invalidating transactions query.'
+            );
+            await queryClient.invalidateQueries({ queryKey: ['transactions'] });
+          }
+        }
+
+        // 현재 세션 상태를 업데이트합니다.
         setUser(session?.user ?? null);
-        // 로그인/로그아웃 시에는 로딩 상태를 변경할 필요가 없습니다.
-        // 초기 로딩은 fetchUser에서 처리합니다.
+        previousSession.current = session;
       }
     );
 
@@ -39,7 +58,7 @@ export function useAuth(): AuthState {
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [queryClient]);
 
   const signInWithGoogle = async () => {
     try {
@@ -48,7 +67,6 @@ export function useAuth(): AuthState {
       });
       if (error) {
         console.error('Error signing in with Google:', error);
-        // 사용자에게 에러를 알리는 로직을 추가할 수 있습니다 (예: toast 메시지)
       }
     } catch (error) {
       console.error('Unexpected error during Google sign-in:', error);

@@ -1,126 +1,177 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { v4 as uuidv4 } from 'uuid';
 import type { Transaction } from '../../types/transaction';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../useAuth';
 
-// Omit 'localId' and 'id' as they will be generated
-type NewTransaction = Omit<Transaction, 'localId' | 'id'>;
+// --- 타입 정의 ---
 
-const addTransaction = async (
-  newTransactionData: NewTransaction
+export type NewTransaction = Omit<Transaction, 'localId' | 'id'>;
+export type UpdateTransactionPayload = {
+  id: string; // 로컬에서는 localId, 서버에서는 id
+  data: NewTransaction;
+};
+
+// --- 헬퍼 함수 ---
+
+// 사용자의 개인 팔레트를 가져오거나 생성 (migration.ts의 함수와 유사)
+async function getOrCreatePersonalPalette(userId: string): Promise<string> {
+  const { data: existing } = await supabase
+    .from('palettes')
+    .select('id')
+    .eq('owner_id', userId)
+    .limit(1);
+
+  if (existing && existing.length > 0) return existing[0].id;
+
+  const { data: newPalette } = await supabase
+    .from('palettes')
+    .insert({ name: 'My Palette', owner_id: userId })
+    .select('id')
+    .single();
+
+  if (!newPalette) throw new Error('Could not create or find palette.');
+
+  await supabase
+    .from('palette_members')
+    .insert({ palette_id: newPalette.id, user_id: userId, role: 'owner' });
+
+  return newPalette.id;
+}
+
+// --- API 함수들 ---
+
+// [서버] 데이터 추가
+const addTransactionToServer = async (
+  newTx: NewTransaction,
+  userId: string
 ): Promise<Transaction> => {
-  console.log('Adding transaction to localStorage...', newTransactionData);
-  const storedData = localStorage.getItem('transactions');
-  const currentTransactions = storedData ? JSON.parse(storedData) : [];
+  const paletteId = await getOrCreatePersonalPalette(userId);
+  const { data, error } = await supabase
+    .from('transactions')
+    .insert([{ ...newTx, palette_id: paletteId }])
+    .select()
+    .single();
 
+  if (error) throw error;
+  return { ...data, localId: data.id };
+};
+
+// [로컬] 데이터 추가
+const addTransactionToLocal = async (
+  newTx: NewTransaction
+): Promise<Transaction> => {
+  const current = JSON.parse(localStorage.getItem('transactions') || '[]');
   const newTransaction: Transaction = {
-    ...newTransactionData,
+    ...newTx,
     localId: uuidv4(),
-    id: null, // Represents data not yet synced to the server
+    id: null,
   };
-
-  const updatedTransactions = [...currentTransactions, newTransaction];
-  localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
-
+  localStorage.setItem(
+    'transactions',
+    JSON.stringify([...current, newTransaction])
+  );
   return newTransaction;
 };
 
-const deleteTransaction = async (localId: string): Promise<void> => {
-  console.log('Deleting transaction from localStorage...', localId);
-  const storedData = localStorage.getItem('transactions');
-  if (!storedData) {
-    return;
-  }
-  const currentTransactions: Transaction[] = JSON.parse(storedData);
-  const updatedTransactions = currentTransactions.filter(
-    (tx) => tx.localId !== localId
-  );
-  localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
-};
-
-// --- 추가된 부분 ---
-// 수정할 데이터의 타입 정의
-export type UpdateTransactionPayload = {
-  localId: string;
-  data: Omit<Transaction, 'localId' | 'id'>;
-};
-
-const updateTransaction = async ({
-  localId,
+// [서버] 데이터 수정
+const updateTransactionOnServer = async ({
+  id,
   data,
 }: UpdateTransactionPayload): Promise<Transaction> => {
-  console.log('Updating transaction in localStorage...', localId);
-  const storedData = localStorage.getItem('transactions');
-  if (!storedData) {
-    throw new Error('No transactions found in local storage.');
-  }
-  const currentTransactions: Transaction[] = JSON.parse(storedData);
+  const { data: updatedData, error } = await supabase
+    .from('transactions')
+    .update(data)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return { ...updatedData, localId: updatedData.id };
+};
 
-  let updatedTransaction: Transaction | undefined;
-
-  const updatedTransactions = currentTransactions.map((tx) => {
-    if (tx.localId === localId) {
-      updatedTransaction = {
-        ...tx, // 기존 id는 유지
-        ...data, // 새로운 데이터로 덮어쓰기
-      };
-      return updatedTransaction;
+// [로컬] 데이터 수정
+const updateTransactionInLocal = async ({
+  id,
+  data,
+}: UpdateTransactionPayload): Promise<Transaction> => {
+  const current: Transaction[] = JSON.parse(
+    localStorage.getItem('transactions') || '[]'
+  );
+  let updatedTx: Transaction | undefined;
+  const updated = current.map((tx) => {
+    if (tx.localId === id) {
+      updatedTx = { ...tx, ...data };
+      return updatedTx;
     }
     return tx;
   });
-
-  if (!updatedTransaction) {
-    throw new Error('Transaction to update not found.');
-  }
-
-  localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
-  return updatedTransaction;
+  if (!updatedTx) throw new Error('Transaction not found');
+  localStorage.setItem('transactions', JSON.stringify(updated));
+  return updatedTx;
 };
-// --- 여기까지 ---
+
+// [서버] 데이터 삭제
+const deleteTransactionFromServer = async (id: string): Promise<void> => {
+  const { error } = await supabase.from('transactions').delete().eq('id', id);
+  if (error) throw error;
+};
+
+// [로컬] 데이터 삭제
+const deleteTransactionFromLocal = async (localId: string): Promise<void> => {
+  const current: Transaction[] = JSON.parse(
+    localStorage.getItem('transactions') || '[]'
+  );
+  const updated = current.filter((tx) => tx.localId !== localId);
+  localStorage.setItem('transactions', JSON.stringify(updated));
+};
+
+// --- 커스텀 훅 ---
 
 export function useAddTransactionMutation() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation<Transaction, Error, NewTransaction>({
-    mutationFn: addTransaction,
+    mutationFn: (newTx) =>
+      user
+        ? addTransactionToServer(newTx, user.id)
+        : addTransactionToLocal(newTx),
     onSuccess: () => {
-      console.log('Transaction added, invalidating queries...');
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({
+        queryKey: ['transactions', user?.id ?? 'local'],
+      });
     },
-    onError: (error) => {
-      console.error('Failed to add transaction:', error);
+  });
+}
+
+export function useUpdateTransactionMutation() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation<Transaction, Error, UpdateTransactionPayload>({
+    mutationFn: (payload) =>
+      user
+        ? updateTransactionOnServer(payload)
+        : updateTransactionInLocal(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['transactions', user?.id ?? 'local'],
+      });
     },
   });
 }
 
 export function useDeleteTransactionMutation() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation<void, Error, string>({
-    // string은 localId의 타입
-    mutationFn: deleteTransaction,
+    mutationFn: (id) =>
+      user ? deleteTransactionFromServer(id) : deleteTransactionFromLocal(id),
     onSuccess: () => {
-      console.log('Transaction deleted, invalidating queries...');
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-    },
-    onError: (error) => {
-      console.error('Failed to delete transaction:', error);
+      queryClient.invalidateQueries({
+        queryKey: ['transactions', user?.id ?? 'local'],
+      });
     },
   });
 }
-
-// --- 추가된 부분 ---
-export function useUpdateTransactionMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation<Transaction, Error, UpdateTransactionPayload>({
-    mutationFn: updateTransaction,
-    onSuccess: () => {
-      console.log('Transaction updated, invalidating queries...');
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-    },
-    onError: (error) => {
-      console.error('Failed to update transaction:', error);
-    },
-  });
-}
-// --- 여기까지 ---
