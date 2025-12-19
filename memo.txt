@@ -26,16 +26,10 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(auth): Supabase 연동 및 게스트 데이터 마이그레이션 구현
+fix(build): 빌드 오류 수정 (트랜잭션 모달 및 마이그레이션)
 
-- Supabase 인증 및 데이터베이스 연동 설정
-- 게스트 모드(로컬 스토리지) 데이터를 로그인 시 서버로 자동 이관하는 마이그레이션 로직 구현
-  - 팔레트 생성 및 멤버십 등록 로직 강화 (멱등성 보장)
-  - 기본 카테고리 자동 생성 로직 추가
-- 데이터베이스 RLS(Row Level Security) 정책 설정 및 최적화
-  - 순환 참조 방지를 위한 정책 단순화
-- 인증 상태에 따른 데이터 조회 쿼리(useTransactionsQuery) 개선
-- 마이페이지 무한 로딩 문제 해결 (비동기 마이그레이션 처리)
+- TransactionFormModal: 내역 수정 시 payload에 'localId' 대신 'id'를 전달하도록 타입 오류 수정
+- migration: Supabase insert 메서드의 onConflict 옵션 타입 불일치 해결을 위해 upsert 메서드로 변경
 "
 git push origin main
 

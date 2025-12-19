@@ -20,13 +20,12 @@ async function ensureDefaultCategories(paletteId: string): Promise<void> {
     palette_id: paletteId,
   }));
 
-  // onConflict: 중복된 (palette_id, code) 쌍이 있으면 무시하고 넘어감
+  // onConflict 대신 upsert 사용
   const { error } = await supabase
     .from('categories')
-    .insert(categoriesToInsert, { onConflict: 'palette_id, code' });
+    .upsert(categoriesToInsert, { onConflict: 'palette_id, code' });
 
-  if (error && error.code !== '23505') {
-    // 23505는 unique_violation
+  if (error) {
     throw new Error('Error ensuring default categories: ' + error.message);
   } else {
     console.log('Default categories are ensured for the palette.');
@@ -69,15 +68,15 @@ async function getOrCreatePersonalPalette(user: User): Promise<string> {
     console.log(`New palette created: ${paletteId}`);
   }
 
-  // 3. 팔레트 멤버로 자신을 추가 (중복 시 무시)
+  // 3. 팔레트 멤버로 자신을 추가 (onConflict 대신 upsert 사용)
   const { error: memberInsertError } = await supabase
     .from('palette_members')
-    .insert(
+    .upsert(
       { palette_id: paletteId, user_id: user.id, role: 'owner' },
       { onConflict: 'palette_id, user_id' }
     );
 
-  if (memberInsertError && memberInsertError.code !== '23505') {
+  if (memberInsertError) {
     throw new Error(
       'Error ensuring user is a palette member: ' + memberInsertError.message
     );

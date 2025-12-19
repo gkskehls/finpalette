@@ -68,8 +68,9 @@ export function TransactionFormModal({
     };
 
     if (isEditMode && transactionToEdit) {
+      // localId를 id로 변경하여 전달
       const payload: UpdateTransactionPayload = {
-        localId: transactionToEdit.localId,
+        id: transactionToEdit.localId,
         data: formData,
       };
       updateMutation.mutate(payload, {
