@@ -26,10 +26,10 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(build): 빌드 오류 수정 (트랜잭션 모달 및 마이그레이션)
+fix(auth): 로그인 리다이렉트 URL 동적 설정
 
-- TransactionFormModal: 내역 수정 시 payload에 'localId' 대신 'id'를 전달하도록 타입 오류 수정
-- migration: Supabase insert 메서드의 onConflict 옵션 타입 불일치 해결을 위해 upsert 메서드로 변경
+- signInWithOAuth 호출 시 redirectTo 옵션에 window.location.origin을 전달하여,
+  로컬 개발 환경과 배포 환경 모두에서 올바른 주소로 리다이렉트되도록 수정
 "
 git push origin main
 
