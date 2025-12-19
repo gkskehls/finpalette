@@ -26,25 +26,16 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(auth): Supabase 인증 및 데이터 동기화 기능 구현
+feat(auth): Supabase 연동 및 게스트 데이터 마이그레이션 구현
 
-게스트 모드에서 온라인 계정으로 전환하는 핵심 기능인 인증 및 데이터 동기화를 구현합니다.
-
-- **인증 시스템 교체:**
-  - 기존의 모의(mock) 인증 훅(useAuth)을 실제 Supabase의 Google OAuth를 사용하도록 전면 수정했습니다.
-  - Supabase 클라이언트를 설정하고(src/lib/supabase.ts), 환경 변수를 통해 API 키를 안전하게 관리합니다.
-
-- **데이터 마이그레이션:**
-  - 사용자가 최초로 로그인할 때, 로컬 스토리지에 저장된 게스트 데이터를 Supabase DB로 안전하게 이전하는 마이그레이션 로직(src/lib/migration.ts)을 구현했습니다.
-  - useAuth 훅 내에서 로그인 이벤트를 감지하여 마이그레이션을 자동으로 트리거합니다.
-
-- **데이터 계층 분리:**
-  - useTransactionsQuery와 useTransactionsMutation 훅을 로그인 상태에 따라 분기 처리하도록 수정했습니다.
-  - **로그인 상태:** Supabase DB와 통신하여 데이터를 CRUD합니다.
-  - **로그아웃 상태:** 기존처럼 로컬 스토리지를 사용합니다.
-
-- **데이터베이스 스키마 및 RLS 설정:**
-  - Supabase 프로젝트에 palettes, palette_members, categories, transactions 테이블과 관련 RLS(행 수준 보안) 정책을 모두 설정하는 최종 SQL 스크립트를 완성했습니다.
+- Supabase 인증 및 데이터베이스 연동 설정
+- 게스트 모드(로컬 스토리지) 데이터를 로그인 시 서버로 자동 이관하는 마이그레이션 로직 구현
+  - 팔레트 생성 및 멤버십 등록 로직 강화 (멱등성 보장)
+  - 기본 카테고리 자동 생성 로직 추가
+- 데이터베이스 RLS(Row Level Security) 정책 설정 및 최적화
+  - 순환 참조 방지를 위한 정책 단순화
+- 인증 상태에 따른 데이터 조회 쿼리(useTransactionsQuery) 개선
+- 마이페이지 무한 로딩 문제 해결 (비동기 마이그레이션 처리)
 "
 git push origin main
 
@@ -52,3 +43,5 @@ npm run build
 firebase deploy
 
 npm run dev
+
+ReactQueryDevtools 삭제함. 이게 뭐임?

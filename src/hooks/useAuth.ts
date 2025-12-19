@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import type { Session, User } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 import { migrateGuestData } from '../lib/migration';
 
@@ -15,42 +15,34 @@ export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const queryClient = useQueryClient();
-  const previousSession = useRef<Session | null>(null);
 
   useEffect(() => {
-    // 1. 컴포넌트 마운트 시 현재 세션 정보를 가져옵니다.
-    const fetchInitialSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('Error fetching initial session:', error);
-      }
-      const session = data?.session ?? null;
-      previousSession.current = session;
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    };
-
-    fetchInitialSession();
-
-    // 2. 인증 상태 변경(로그인, 로그아웃)을 감지하는 리스너를 설정합니다.
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        // 3. 로그인 상태 변화 감지 (로그아웃 -> 로그인)
-        if (session && !previousSession.current) {
-          console.log('Detected login event. Starting migration check...');
-          const migrationOccurred = await migrateGuestData(session.user);
-          if (migrationOccurred) {
-            // 4. 마이그레이션이 발생했다면, 서버 데이터를 다시 불러오도록 쿼리를 무효화합니다.
+      (event, session) => {
+        // 'SIGNED_IN' 이벤트가 발생했을 때 데이터 마이그레이션을 백그라운드에서 실행합니다.
+        if (event === 'SIGNED_IN' && session) {
+          // 즉시 실행 함수(IIFE)로 감싸서 백그라운드에서 비동기 작업을 처리합니다.
+          // 이 함수를 'await'하지 않으므로 UI 렌더링을 차단하지 않습니다.
+          (async () => {
             console.log(
-              'Migration successful. Invalidating transactions query.'
+              'Detected SIGNED_IN event. Starting migration in background...'
             );
-            await queryClient.invalidateQueries({ queryKey: ['transactions'] });
-          }
+            const migrationOccurred = await migrateGuestData(session.user);
+            if (migrationOccurred) {
+              console.log(
+                'Migration successful. Invalidating transactions query.'
+              );
+              await queryClient.invalidateQueries({
+                queryKey: ['transactions'],
+              });
+            }
+          })();
         }
 
-        // 현재 세션 상태를 업데이트합니다.
+        // 세션 정보를 바탕으로 유저 상태를 즉시 업데이트합니다.
         setUser(session?.user ?? null);
-        previousSession.current = session;
+        // 인증 상태 확인이 완료되었으므로 로딩 상태를 즉시 해제합니다.
+        setIsLoading(false);
       }
     );
 
@@ -79,6 +71,8 @@ export function useAuth(): AuthState {
       if (error) {
         console.error('Error signing out:', error);
       }
+      // 로그아웃 후 데이터 재조회를 위해 쿼리 무효화
+      await queryClient.invalidateQueries({ queryKey: ['transactions'] });
     } catch (error) {
       console.error('Unexpected error during sign-out:', error);
     }

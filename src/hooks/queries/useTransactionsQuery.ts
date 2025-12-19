@@ -54,7 +54,7 @@ const getTransactionsFromLocal = async (): Promise<Transaction[]> => {
 // --- 커스텀 훅 ---
 
 export function useTransactionsQuery() {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
 
   return useQuery<Transaction[], Error>({
     // 사용자가 로그인하면 queryKey가 변경되어 데이터를 다시 불러옵니다.
@@ -68,7 +68,8 @@ export function useTransactionsQuery() {
         return getTransactionsFromLocal();
       }
     },
-    // `user` 상태가 바뀔 때마다 쿼리가 자동으로 다시 실행됩니다.
-    // enabled 옵션을 명시적으로 사용하여 `user`가 로드되기 전까지 쿼리 실행을 막을 수도 있습니다.
+    // 인증 상태 로딩이 끝날 때까지 쿼리 실행을 비활성화합니다.
+    // 이렇게 하면 불필요한 로컬 데이터 조회를 막아 화면 깜빡임을 방지할 수 있습니다.
+    enabled: !isAuthLoading,
   });
 }

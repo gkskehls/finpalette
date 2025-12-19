@@ -1,65 +1,94 @@
 import { supabase } from './supabase';
 import type { User } from '@supabase/supabase-js';
 import type { Transaction } from '../types/transaction';
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
 
 // 로컬 스토리지의 거래 내역 타입 (서버 ID가 없음)
 type LocalTransaction = Omit<Transaction, 'id'> & { id: null };
 
 /**
- * 사용자를 위한 개인 팔레트를 찾거나, 없으면 새로 생성합니다.
+ * 팔레트에 기본 카테고리들을 생성합니다. (멱등성 보장)
+ * @param paletteId - 카테고리를 추가할 팔레트의 ID
+ */
+async function ensureDefaultCategories(paletteId: string): Promise<void> {
+  const allCategories = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
+  const categoriesToInsert = allCategories.map((category) => ({
+    code: category.code,
+    name: category.name,
+    color: category.color,
+    icon: category.icon,
+    palette_id: paletteId,
+  }));
+
+  // onConflict: 중복된 (palette_id, code) 쌍이 있으면 무시하고 넘어감
+  const { error } = await supabase
+    .from('categories')
+    .insert(categoriesToInsert, { onConflict: 'palette_id, code' });
+
+  if (error && error.code !== '23505') {
+    // 23505는 unique_violation
+    throw new Error('Error ensuring default categories: ' + error.message);
+  } else {
+    console.log('Default categories are ensured for the palette.');
+  }
+}
+
+/**
+ * 사용자를 위한 개인 팔레트를 찾거나 생성하고, 멤버와 카테고리를 보장합니다.
  * @param user - 현재 로그인된 Supabase 사용자 객체
  * @returns 팔레트의 ID
  */
 async function getOrCreatePersonalPalette(user: User): Promise<string> {
-  // 1. 사용자가 소유한 개인 팔레트가 있는지 확인합니다.
-  const { data: existingPalettes, error: selectError } = await supabase
+  // 1. 기존 팔레트 확인
+  const { data: existingPalette } = await supabase
     .from('palettes')
     .select('id')
     .eq('owner_id', user.id)
-    .limit(1);
-
-  if (selectError) {
-    throw new Error('Error fetching user palette: ' + selectError.message);
-  }
-
-  // 2. 이미 팔레트가 있으면 해당 ID를 반환합니다.
-  if (existingPalettes && existingPalettes.length > 0) {
-    return existingPalettes[0].id;
-  }
-
-  // 3. 팔레트가 없으면 새로 생성합니다.
-  const { data: newPalette, error: insertError } = await supabase
-    .from('palettes')
-    .insert({
-      name: 'My Palette', // 기본 팔레트 이름
-      owner_id: user.id,
-    })
-    .select('id')
     .single();
 
-  if (insertError) {
-    throw new Error('Error creating personal palette: ' + insertError.message);
-  }
-  if (!newPalette) {
-    throw new Error('Failed to create or retrieve palette.');
+  let paletteId: string;
+
+  if (existingPalette) {
+    paletteId = existingPalette.id;
+    console.log(`Existing palette found: ${paletteId}`);
+  } else {
+    // 2. 팔레트가 없으면 새로 생성
+    const { data: newPalette, error: insertError } = await supabase
+      .from('palettes')
+      .insert({ name: 'My Palette', owner_id: user.id })
+      .select('id')
+      .single();
+
+    if (insertError)
+      throw new Error(
+        'Error creating personal palette: ' + insertError.message
+      );
+    if (!newPalette) throw new Error('Failed to create or retrieve palette.');
+
+    paletteId = newPalette.id;
+    console.log(`New palette created: ${paletteId}`);
   }
 
-  // 4. 새로 생성된 팔레트의 멤버로 자신을 추가합니다.
+  // 3. 팔레트 멤버로 자신을 추가 (중복 시 무시)
   const { error: memberInsertError } = await supabase
     .from('palette_members')
-    .insert({
-      palette_id: newPalette.id,
-      user_id: user.id,
-      role: 'owner',
-    });
-
-  if (memberInsertError) {
-    throw new Error(
-      'Error adding user to palette members: ' + memberInsertError.message
+    .insert(
+      { palette_id: paletteId, user_id: user.id, role: 'owner' },
+      { onConflict: 'palette_id, user_id' }
     );
+
+  if (memberInsertError && memberInsertError.code !== '23505') {
+    throw new Error(
+      'Error ensuring user is a palette member: ' + memberInsertError.message
+    );
+  } else {
+    console.log('User membership in palette is ensured.');
   }
 
-  return newPalette.id;
+  // 4. 기본 카테고리가 존재하는지 확인 및 생성
+  await ensureDefaultCategories(paletteId);
+
+  return paletteId;
 }
 
 /**
@@ -69,25 +98,22 @@ async function getOrCreatePersonalPalette(user: User): Promise<string> {
 export async function migrateGuestData(user: User): Promise<boolean> {
   console.log('Starting data migration for user:', user.id);
 
-  // 1. 로컬 스토리지에서 'transactions' 데이터를 가져옵니다.
   const localData = localStorage.getItem('transactions');
   if (!localData) {
     console.log('No local data to migrate. Skipping.');
-    return false; // 마이그레이션 할 데이터 없음
+    return false;
   }
 
   try {
     const localTransactions: LocalTransaction[] = JSON.parse(localData);
     if (localTransactions.length === 0) {
       console.log('Local transactions are empty. Skipping.');
-      localStorage.removeItem('transactions'); // 비어있는 데이터는 삭제
+      localStorage.removeItem('transactions');
       return false;
     }
 
-    // 2. 사용자의 개인 팔레트 ID를 확보합니다.
     const paletteId = await getOrCreatePersonalPalette(user);
 
-    // 3. 로컬 데이터를 Supabase 형식에 맞게 변환합니다.
     const transactionsToInsert = localTransactions.map((tx) => ({
       palette_id: paletteId,
       date: tx.date,
@@ -97,7 +123,6 @@ export async function migrateGuestData(user: User): Promise<boolean> {
       description: tx.description,
     }));
 
-    // 4. 변환된 데이터를 Supabase 'transactions' 테이블에 삽입합니다.
     const { error } = await supabase
       .from('transactions')
       .insert(transactionsToInsert);
@@ -106,15 +131,13 @@ export async function migrateGuestData(user: User): Promise<boolean> {
       throw new Error('Error inserting migrated data: ' + error.message);
     }
 
-    // 5. 마이그레이션 성공 시 로컬 데이터를 삭제합니다.
     localStorage.removeItem('transactions');
     console.log(
       `Successfully migrated ${transactionsToInsert.length} transactions.`
     );
-    return true; // 마이그레이션 성공
+    return true;
   } catch (error) {
     console.error('Data migration failed:', error);
-    // 실패 시 로컬 데이터는 유지하여 다음 로그인 시 재시도할 수 있도록 합니다.
-    return false; // 마이그레이션 실패
+    return false;
   }
 }
