@@ -1,0 +1,10 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <rect width="512" height="512" fill="#ffffff"/>
+    <path d="M256 48C141.1 48 48 141.1 48 256C48 370.9 141.1 464 256 464C370.9 464 464 370.9 464 256C464 141.1 370.9 48 256 48Z" fill="#F3F4F6"/>
+    <path d="M420 256C420 165.4 346.6 92 256 92C165.4 92 92 165.4 92 256C92 346.6 165.4 420 256 420C346.6 420 420 346.6 420 256Z" fill="#FFE4E6"/>
+    <circle cx="180" cy="180" r="35" fill="#F87171"/>
+    <circle cx="332" cy="180" r="35" fill="#60A5FA"/>
+    <circle cx="180" cy="332" r="35" fill="#34D399"/>
+    <circle cx="332" cy="332" r="35" fill="#FBBF24"/>
+    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="180" fill="#4B5563">₩</text>
+</svg>

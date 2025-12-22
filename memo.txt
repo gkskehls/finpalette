@@ -18,7 +18,7 @@ girhub랑 연동할거야.
 파이어베이스 연동했어.
 girhub 연동했어.
 인텔리제이를 연동했어.
-supabase 는 아직 프로젝트 생성만 했어.
+supabase 연동했어.
 
 
 
@@ -26,10 +26,14 @@ supabase 는 아직 프로젝트 생성만 했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(auth): 로그인 리다이렉트 URL 동적 설정
+feat(pwa): PWA 설정 및 앱 아이콘 적용, 공유 가계부 기획 구체화
 
-- signInWithOAuth 호출 시 redirectTo 옵션에 window.location.origin을 전달하여,
-  로컬 개발 환경과 배포 환경 모두에서 올바른 주소로 리다이렉트되도록 수정
+- 공유 가계부(Multi-Palette) 및 시크릿 메모 기능 명세 추가 (APP_SPECIFICATION.md)
+- Phase 2 완료 항목 업데이트 (PROJECT_PLAN.md)
+- PWA 지원을 위한 vite-plugin-pwa 추가 및 설정 (vite.config.ts)
+- 앱 아이콘(심플 팔레트 컨셉) 추가 및 파비콘 적용 (public/icon.svg, index.html)
+- PWA 플러그인 호환성을 위해 Vite 버전 조정 (v7 -> v5)
+- 파일 구조 문서 업데이트 (file_list.md)
 "
 git push origin main
 

@@ -24,7 +24,7 @@
 - **📄 tsconfig.json**: TypeScript 컴파일러의 전역 설정을 담고 있는 파일입니다.
 - **📄 tsconfig.app.json**: 애플리케이션 코드에 대한 TypeScript 설정을 담고 있습니다.
 - **📄 tsconfig.node.json**: Node.js 환경(예: 빌드 스크립트)에 대한 TypeScript 설정을 담고 있습니다.
-- **📄 vite.config.ts**: Vite 빌드 도구의 설정을 위한 파일입니다. 개발 서버, 빌드 프로세스 등을 설정합니다.
+- **📄 vite.config.ts**: Vite 빌드 도구의 설정을 위한 파일입니다. PWA 플러그인 설정이 포함되어 있습니다.
 
 ---
 
@@ -45,6 +45,7 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 
 빌드 과정에서 특별한 처리 없이 그대로 복사되는 정적 파일들을 담는 폴더입니다.
 
+- **📄 icon.svg**: 앱의 메인 아이콘 SVG 파일입니다. PWA 아이콘 및 파비콘으로 사용됩니다.
 - **📄 vite.svg**: Vite 로고 SVG 이미지 파일입니다.
 
 ### 📁 src/
