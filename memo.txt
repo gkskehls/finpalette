@@ -24,10 +24,12 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(migration): 게스트 데이터 마이그레이션 시 user_id 누락 오류 수정
+fix(auth): 로그인 시 마이그레이션 중복 실행으로 인한 데이터 복제 문제 해결
 
-로그인 시 로컬 스토리지의 게스트 데이터를 서버로 이전하는 과정에서 user_id가 누락되어 transactions 테이블의 NOT NULL 제약 조건을 위반하는 문제가 발생했습니다.
-마이그레이션 데이터에 현재 로그인한 사용자의 user_id를 포함하도록 migration.ts 파일을 수정하여 이 문제를 해결합니다.
+onAuthStateChange의 SIGNED_IN 이벤트가 여러 번 발생하여, 게스트 데이터를 서버로 이전하는 migrateGuestData 함수가 중복 호출되는 문제가 있었습니다.
+이로 인해 로컬 데이터가 서버에 여러 번 복제되어 등록되는 '경쟁 상태(Race Condition)'가 발생했습니다.
+useRef를 사용하여 마이그레이션 진행 상태를 추적하는 플래그(isMigrationRunning)를 추가하여, 해당 함수가 단 한 번만 실행되도록
+ 수정했습니다.
 "
 git push origin main
 

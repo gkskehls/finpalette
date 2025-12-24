@@ -11,6 +11,9 @@ interface AuthState {
   signOut: () => Promise<void>;
 }
 
+// 마이그레이션 중복 실행 방지 플래그 (컴포넌트 생명주기 바깥에 위치)
+let isMigrationRunning = false;
+
 export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,22 +24,32 @@ export function useAuth(): AuthState {
       (event, session) => {
         // 'SIGNED_IN' 이벤트가 발생했을 때 데이터 마이그레이션을 백그라운드에서 실행합니다.
         if (event === 'SIGNED_IN' && session) {
-          // 즉시 실행 함수(IIFE)로 감싸서 백그라운드에서 비동기 작업을 처리합니다.
-          // 이 함수를 'await'하지 않으므로 UI 렌더링을 차단하지 않습니다.
-          (async () => {
-            console.log(
-              'Detected SIGNED_IN event. Starting migration in background...'
-            );
-            const migrationOccurred = await migrateGuestData(session.user);
-            if (migrationOccurred) {
-              console.log(
-                'Migration successful. Invalidating transactions query.'
-              );
-              await queryClient.invalidateQueries({
-                queryKey: ['transactions'],
-              });
-            }
-          })();
+          if (!isMigrationRunning) {
+            isMigrationRunning = true;
+            (async () => {
+              try {
+                console.log(
+                  'Detected SIGNED_IN event. Starting migration in background...'
+                );
+                const migrationOccurred = await migrateGuestData(session.user);
+                if (migrationOccurred) {
+                  console.log(
+                    'Migration successful. Invalidating transactions query.'
+                  );
+                  // 마이그레이션 후 최신 데이터를 반영하기 위해 쿼리를 무효화합니다.
+                  // 팔레트 목록과 트랜잭션 목록 모두를 무효화하는 것이 안전합니다.
+                  await queryClient.invalidateQueries({
+                    queryKey: ['palettes'],
+                  });
+                  await queryClient.invalidateQueries({
+                    queryKey: ['transactions'],
+                  });
+                }
+              } finally {
+                isMigrationRunning = false;
+              }
+            })();
+          }
         }
 
         // 세션 정보를 바탕으로 유저 상태를 즉시 업데이트합니다.
@@ -74,8 +87,8 @@ export function useAuth(): AuthState {
       if (error) {
         console.error('Error signing out:', error);
       }
-      // 로그아웃 후 데이터 재조회를 위해 쿼리 무효화
-      await queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      // 로그아웃 후 모든 쿼리를 초기화하여 깨끗한 상태로 만듭니다.
+      queryClient.clear();
     } catch (error) {
       console.error('Unexpected error during sign-out:', error);
     }
