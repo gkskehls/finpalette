@@ -33,7 +33,12 @@ const getPalettes = async (userId: string): Promise<Palette[]> => {
 
   // data는 [{ palette: {...} }, { palette: {...} }] 형태이므로,
   // map을 이용해 [Palette, Palette, ...] 형태로 변환합니다.
-  return (data?.map((item) => item.palette).filter(Boolean) as Palette[]) || [];
+  // 타입 단언을 위해 unknown을 거칩니다.
+  return (
+    (data
+      ?.map((item) => item.palette)
+      .filter(Boolean) as unknown as Palette[]) || []
+  );
 };
 
 /**

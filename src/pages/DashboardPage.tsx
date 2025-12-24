@@ -5,6 +5,7 @@ import { TransactionSection } from '../components/dashboard/TransactionSection';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
 import type { TransactionItem } from '../types/ui';
+import type { Category } from '../types/category';
 
 import './DashboardPage.css';
 
@@ -26,7 +27,14 @@ const groupTransactionsByDate = (transactions: TransactionItem[]) => {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
 
-const allCategories = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
+// UI용 카테고리 목록에 임시 palette_id 추가
+const allCategories: Category[] = [
+  ...INCOME_CATEGORIES,
+  ...EXPENSE_CATEGORIES,
+].map((c) => ({
+  ...c,
+  palette_id: 'ui-default', // UI 표시용 기본값
+}));
 
 export function DashboardPage() {
   // TODO: 월 이동 기능을 위해 현재 날짜 상태 관리 필요
@@ -46,6 +54,7 @@ export function DashboardPage() {
         name: '미분류',
         color: '#888888',
         icon: 'HelpCircle',
+        palette_id: t.palette_id || 'unknown',
       },
     }));
   }, [transactions, categoryMap]);

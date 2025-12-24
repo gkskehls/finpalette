@@ -1,22 +1,55 @@
 import type { Transaction } from '../types/transaction';
 import type { Category } from '../types/category';
 
+const MOCK_PALETTE_ID = 'mock-palette-id';
+const MOCK_USER_ID = 'mock-user-id';
+
 // 1. 카테고리 목업 데이터 (DB `categories` 테이블 역할)
 export const mockCategories: Category[] = [
-  { code: 'c01', name: '식비', color: '#FBBF24', icon: 'Utensils' },
-  { code: 'c02', name: '교통', color: '#60A5FA', icon: 'Bus' },
-  { code: 'c03', name: '쇼핑', color: '#F87171', icon: 'ShoppingBag' },
-  { code: 'c04', name: '급여', color: '#818CF8', icon: 'Landmark' },
-  { code: 'c05', name: '기타', color: '#A78BFA', icon: 'PlusSquare' }, // 'Archive' -> 'PlusSquare'
+  {
+    palette_id: MOCK_PALETTE_ID,
+    code: 'c01',
+    name: '식비',
+    color: '#FBBF24',
+    icon: 'Utensils',
+  },
+  {
+    palette_id: MOCK_PALETTE_ID,
+    code: 'c02',
+    name: '교통',
+    color: '#60A5FA',
+    icon: 'Bus',
+  },
+  {
+    palette_id: MOCK_PALETTE_ID,
+    code: 'c03',
+    name: '쇼핑',
+    color: '#F87171',
+    icon: 'ShoppingBag',
+  },
+  {
+    palette_id: MOCK_PALETTE_ID,
+    code: 'c04',
+    name: '급여',
+    color: '#818CF8',
+    icon: 'Landmark',
+  },
+  {
+    palette_id: MOCK_PALETTE_ID,
+    code: 'c05',
+    name: '기타',
+    color: '#A78BFA',
+    icon: 'PlusSquare',
+  },
 ];
 
 // 2. 거래 내역 원본 목업 데이터 (DB `transactions` 테이블 역할)
-// DashboardPage 리팩토링 이후 이 데이터는 직접 사용되지 않지만,
-// 다른 컴포넌트의 스토리북이나 테스트를 위해 남겨둘 수 있습니다.
 export const mockTransactions: Transaction[] = [
   {
     localId: 'local-1',
     id: 'tran-1',
+    palette_id: MOCK_PALETTE_ID,
+    user_id: MOCK_USER_ID,
     date: new Date().toISOString().split('T')[0], // 오늘
     type: 'exp',
     amount: 15000,
@@ -26,6 +59,8 @@ export const mockTransactions: Transaction[] = [
   {
     localId: 'local-2',
     id: 'tran-2',
+    palette_id: MOCK_PALETTE_ID,
+    user_id: MOCK_USER_ID,
     date: new Date().toISOString().split('T')[0], // 오늘
     type: 'exp',
     amount: 4500,
@@ -35,6 +70,8 @@ export const mockTransactions: Transaction[] = [
   {
     localId: 'local-3',
     id: 'tran-3',
+    palette_id: MOCK_PALETTE_ID,
+    user_id: MOCK_USER_ID,
     date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // 어제
     type: 'exp',
     amount: 1250,
@@ -44,6 +81,8 @@ export const mockTransactions: Transaction[] = [
   {
     localId: 'local-4',
     id: 'tran-4',
+    palette_id: MOCK_PALETTE_ID,
+    user_id: MOCK_USER_ID,
     date: new Date(Date.now() - 86400000).toISOString().split('T')[0], // 어제
     type: 'exp',
     amount: 50000,
@@ -53,6 +92,8 @@ export const mockTransactions: Transaction[] = [
   {
     localId: 'local-5',
     id: 'tran-5',
+    palette_id: MOCK_PALETTE_ID,
+    user_id: MOCK_USER_ID,
     date: '2024-07-25',
     type: 'inc',
     amount: 3000000,
@@ -62,6 +103,8 @@ export const mockTransactions: Transaction[] = [
   {
     localId: 'local-6',
     id: 'tran-6',
+    palette_id: MOCK_PALETTE_ID,
+    user_id: MOCK_USER_ID,
     date: '2024-07-20',
     type: 'exp',
     amount: 89000,
