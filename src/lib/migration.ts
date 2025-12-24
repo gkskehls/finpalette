@@ -115,6 +115,7 @@ export async function migrateGuestData(user: User): Promise<boolean> {
 
     const transactionsToInsert = localTransactions.map((tx) => ({
       palette_id: paletteId,
+      user_id: user.id, // <-- FIX: Add user_id
       date: tx.date,
       type: tx.type,
       amount: tx.amount,
