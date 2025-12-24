@@ -1,113 +1,227 @@
--- RLS(Row Level Security) 활성화
+-- ==============================================================================
+-- Finpalette v2 Schema Migration Script (Multi-Palette Support)
+-- ==============================================================================
+
+-- ⚠️ WARNING: This script will DROP all existing tables and data!
+-- Use this only for development/reset purposes.
+
+-- 1. Drop existing tables with CASCADE
+DROP TABLE IF EXISTS public.transactions CASCADE;
+DROP TABLE IF EXISTS public.categories CASCADE;
+DROP TABLE IF EXISTS public.palette_invitations CASCADE;
+DROP TABLE IF EXISTS public.palette_members CASCADE;
+DROP TABLE IF EXISTS public.palettes CASCADE;
+
+-- 2. Create 'palettes' table
+CREATE TABLE public.palettes (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT NOT NULL,
+    theme_color TEXT DEFAULT '#6366F1',
+    owner_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+-- 3. Create 'palette_members' table
+CREATE TABLE public.palette_members (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    palette_id UUID REFERENCES public.palettes(id) ON DELETE CASCADE NOT NULL,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('owner', 'admin', 'editor', 'viewer')),
+    joined_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    UNIQUE(palette_id, user_id)
+);
+
+-- 4. Create 'palette_invitations' table
+CREATE TABLE public.palette_invitations (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    palette_id UUID REFERENCES public.palettes(id) ON DELETE CASCADE NOT NULL,
+    inviter_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    code TEXT NOT NULL UNIQUE,
+    expires_at TIMESTAMPTZ NOT NULL,
+    is_used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+-- 5. Create 'categories' table
+-- PK is composite: (palette_id, code)
+CREATE TABLE public.categories (
+    palette_id UUID REFERENCES public.palettes(id) ON DELETE CASCADE NOT NULL,
+    code TEXT NOT NULL,
+    name TEXT NOT NULL,
+    color TEXT NOT NULL,
+    icon TEXT NOT NULL,
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    PRIMARY KEY (palette_id, code)
+);
+
+-- 6. Create 'transactions' table
+CREATE TABLE public.transactions (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    palette_id UUID NOT NULL,
+    category_code TEXT NOT NULL,
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL NOT NULL,
+    date DATE NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('inc', 'exp')),
+    amount INTEGER NOT NULL,
+    description TEXT,
+    private_memo TEXT,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+
+    FOREIGN KEY (palette_id, category_code) REFERENCES public.categories(palette_id, code) ON DELETE CASCADE,
+    FOREIGN KEY (palette_id) REFERENCES public.palettes(id) ON DELETE CASCADE
+);
+
+
+-- ==============================================================================
+-- Helper Functions (Security Definer)
+-- ==============================================================================
+
+-- Function to check if the current user is a member of the given palette
+CREATE OR REPLACE FUNCTION check_if_member(_palette_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1
+    FROM public.palette_members
+    WHERE palette_id = _palette_id
+    AND user_id = auth.uid()
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+-- ==============================================================================
+-- Row Level Security (RLS) Policies
+-- ==============================================================================
+
 ALTER TABLE public.palettes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.palette_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.palette_invitations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 
--- 기존 정책 삭제 (충돌 방지 및 업데이트)
-DROP POLICY IF EXISTS "Users can create their own palettes" ON public.palettes;
-DROP POLICY IF EXISTS "Users can view palettes they are members of" ON public.palettes;
-DROP POLICY IF EXISTS "Users can view palettes they are members of or own" ON public.palettes;
-DROP POLICY IF EXISTS "Users can insert their own membership" ON public.palette_members;
-DROP POLICY IF EXISTS "Users can view their own membership" ON public.palette_members;
-DROP POLICY IF EXISTS "Users can manage transactions of their palettes" ON public.transactions;
-DROP POLICY IF EXISTS "Users can manage categories of their palettes" ON public.categories;
+-- ------------------------------------------------------------------------------
+-- 1. Policies for 'palettes'
+-- ------------------------------------------------------------------------------
+-- View: Use standard EXISTS query instead of function to avoid potential issues
+-- This is safe because 'palette_members' policy does NOT query 'palettes'.
+CREATE POLICY "Users can view palettes they belong to" ON public.palettes
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.palette_members
+            WHERE palette_id = public.palettes.id AND user_id = auth.uid()
+        )
+    );
 
--- 1. Palettes 테이블 정책
--- 생성: 인증된 사용자는 자신의 팔레트를 만들 수 있음
-CREATE POLICY "Users can create their own palettes"
-ON public.palettes
-FOR INSERT
-TO authenticated
-WITH CHECK (auth.uid() = owner_id);
+CREATE POLICY "Owners can update their palettes" ON public.palettes
+    FOR UPDATE USING (owner_id = auth.uid());
 
--- 조회: 자신이 소유한(owner) 팔레트만 볼 수 있음 (순환 참조 방지를 위해 멤버 조회 제거)
--- 마이그레이션 및 초기 단계에서는 이것으로 충분합니다.
--- 추후 공유 기능 활성화 시 함수 기반 정책으로 고도화가 필요합니다.
-CREATE POLICY "Users can view own palettes"
-ON public.palettes
-FOR SELECT
-TO authenticated
-USING (auth.uid() = owner_id);
+CREATE POLICY "Owners can delete their palettes" ON public.palettes
+    FOR DELETE USING (owner_id = auth.uid());
 
--- 2. Palette Members 테이블 정책
--- 생성: 자기 자신을 멤버로 추가할 수 있음
-CREATE POLICY "Users can insert their own membership"
-ON public.palette_members
-FOR INSERT
-TO authenticated
-WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can create palettes" ON public.palettes
+    FOR INSERT WITH CHECK (owner_id = auth.uid());
 
--- 조회: 자신의 멤버십 정보를 볼 수 있음
-CREATE POLICY "Users can view their own membership"
-ON public.palette_members
-FOR SELECT
-TO authenticated
-USING (auth.uid() = user_id);
 
--- 3. Transactions 테이블 정책
--- 전체 권한: 자신이 속한 팔레트의 거래 내역을 관리할 수 있음
--- 여기서는 순환 참조가 발생하지 않으므로 멤버십 체크를 유지합니다.
-CREATE POLICY "Users can manage transactions of their palettes"
-ON public.transactions
-FOR ALL
-TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM public.palettes
-    WHERE id = public.transactions.palette_id
-    AND owner_id = auth.uid()
-  )
-  OR
-  EXISTS (
-    SELECT 1 FROM public.palette_members
-    WHERE palette_id = public.transactions.palette_id
-    AND user_id = auth.uid()
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM public.palettes
-    WHERE id = public.transactions.palette_id
-    AND owner_id = auth.uid()
-  )
-  OR
-  EXISTS (
-    SELECT 1 FROM public.palette_members
-    WHERE palette_id = public.transactions.palette_id
-    AND user_id = auth.uid()
-  )
-);
+-- ------------------------------------------------------------------------------
+-- 2. Policies for 'palette_members'
+-- ------------------------------------------------------------------------------
+-- View: I can see my own membership
+CREATE POLICY "Users can view their own membership" ON public.palette_members
+    FOR SELECT USING (user_id = auth.uid());
 
--- 4. Categories 테이블 정책
--- 전체 권한: 자신이 속한 팔레트의 카테고리를 관리할 수 있음
-CREATE POLICY "Users can manage categories of their palettes"
-ON public.categories
-FOR ALL
-TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM public.palettes
-    WHERE id = public.categories.palette_id
-    AND owner_id = auth.uid()
-  )
-  OR
-  EXISTS (
-    SELECT 1 FROM public.palette_members
-    WHERE palette_id = public.categories.palette_id
-    AND user_id = auth.uid()
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM public.palettes
-    WHERE id = public.categories.palette_id
-    AND owner_id = auth.uid()
-  )
-  OR
-  EXISTS (
-    SELECT 1 FROM public.palette_members
-    WHERE palette_id = public.categories.palette_id
-    AND user_id = auth.uid()
-  )
-);
+-- Insert: I can add myself
+CREATE POLICY "Users can insert their own membership" ON public.palette_members
+    FOR INSERT WITH CHECK (user_id = auth.uid());
+
+-- Update: I can update my own membership
+CREATE POLICY "Users can update their own membership" ON public.palette_members
+    FOR UPDATE USING (user_id = auth.uid());
+
+-- Delete: I can leave
+CREATE POLICY "Users can leave palettes" ON public.palette_members
+    FOR DELETE USING (user_id = auth.uid());
+
+
+-- ------------------------------------------------------------------------------
+-- 3. Policies for 'transactions'
+-- ------------------------------------------------------------------------------
+-- Use the helper function for all operations
+CREATE POLICY "Members can view transactions" ON public.transactions
+    FOR SELECT USING (check_if_member(palette_id));
+
+CREATE POLICY "Members can insert transactions" ON public.transactions
+    FOR INSERT WITH CHECK (check_if_member(palette_id));
+
+CREATE POLICY "Members can update transactions" ON public.transactions
+    FOR UPDATE USING (check_if_member(palette_id));
+
+CREATE POLICY "Members can delete transactions" ON public.transactions
+    FOR DELETE USING (check_if_member(palette_id));
+
+
+-- ------------------------------------------------------------------------------
+-- 4. Policies for 'categories'
+-- ------------------------------------------------------------------------------
+CREATE POLICY "Members can view categories" ON public.categories
+    FOR SELECT USING (check_if_member(palette_id));
+
+CREATE POLICY "Admins/Owners can manage categories" ON public.categories
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.palette_members
+            WHERE palette_id = public.categories.palette_id
+            AND user_id = auth.uid()
+            AND role IN ('owner', 'admin')
+        )
+    );
+
+
+-- ------------------------------------------------------------------------------
+-- 5. Policies for 'palette_invitations'
+-- ------------------------------------------------------------------------------
+CREATE POLICY "Members can view invitations" ON public.palette_invitations
+    FOR SELECT USING (check_if_member(palette_id));
+
+CREATE POLICY "Members can create invitations" ON public.palette_invitations
+    FOR INSERT WITH CHECK (check_if_member(palette_id));
+
+
+-- ==============================================================================
+-- RPC Functions
+-- ==============================================================================
+
+CREATE OR REPLACE FUNCTION create_palette(
+  name TEXT,
+  theme_color TEXT
+) RETURNS UUID AS $$
+DECLARE
+  new_palette_id UUID;
+BEGIN
+  -- 1. Insert into palettes
+  INSERT INTO public.palettes (name, theme_color, owner_id)
+  VALUES (create_palette.name, create_palette.theme_color, auth.uid())
+  RETURNING id INTO new_palette_id;
+
+  -- 2. Insert into palette_members
+  INSERT INTO public.palette_members (palette_id, user_id, role)
+  VALUES (new_palette_id, auth.uid(), 'owner');
+
+  -- 3. Insert default categories
+  INSERT INTO public.categories (palette_id, code, name, color, icon, user_id)
+  VALUES
+    (new_palette_id, 'inc', '수입', '#10B981', 'PiggyBank', auth.uid()),
+    (new_palette_id, 'c01', '식비', '#EF4444', 'Utensils', auth.uid()),
+    (new_palette_id, 'c02', '교통', '#3B82F6', 'Bus', auth.uid()),
+    (new_palette_id, 'c03', '쇼핑', '#F59E0B', 'ShoppingBag', auth.uid()),
+    (new_palette_id, 'c04', '생활', '#8B5CF6', 'Home', auth.uid()),
+    (new_palette_id, 'c05', '기타', '#64748B', 'MoreHorizontal', auth.uid());
+
+  RETURN new_palette_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Force schema cache reload
+NOTIFY pgrst, 'reload config';

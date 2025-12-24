@@ -3,53 +3,40 @@ import { v4 as uuidv4 } from 'uuid';
 import type { Transaction } from '../../types/transaction';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../useAuth';
+import { usePalette } from '../../context/PaletteContext';
 
 // --- 타입 정의 ---
 
-export type NewTransaction = Omit<Transaction, 'localId' | 'id'>;
+// NewTransaction은 Transaction에서 ID 관련 필드만 뺀 것입니다.
+// palette_id와 user_id는 서버 저장 시 자동으로 처리되거나 별도로 주입됩니다.
+export type NewTransaction = Omit<
+  Transaction,
+  'localId' | 'id' | 'palette_id' | 'user_id'
+>;
+
 export type UpdateTransactionPayload = {
   id: string; // 로컬에서는 localId, 서버에서는 id
   data: NewTransaction;
 };
-
-// --- 헬퍼 함수 ---
-
-// 사용자의 개인 팔레트를 가져오거나 생성 (migration.ts의 함수와 유사)
-async function getOrCreatePersonalPalette(userId: string): Promise<string> {
-  const { data: existing } = await supabase
-    .from('palettes')
-    .select('id')
-    .eq('owner_id', userId)
-    .limit(1);
-
-  if (existing && existing.length > 0) return existing[0].id;
-
-  const { data: newPalette } = await supabase
-    .from('palettes')
-    .insert({ name: 'My Palette', owner_id: userId })
-    .select('id')
-    .single();
-
-  if (!newPalette) throw new Error('Could not create or find palette.');
-
-  await supabase
-    .from('palette_members')
-    .insert({ palette_id: newPalette.id, user_id: userId, role: 'owner' });
-
-  return newPalette.id;
-}
 
 // --- API 함수들 ---
 
 // [서버] 데이터 추가
 const addTransactionToServer = async (
   newTx: NewTransaction,
-  userId: string
+  userId: string,
+  paletteId: string
 ): Promise<Transaction> => {
-  const paletteId = await getOrCreatePersonalPalette(userId);
+  // palette_id와 user_id를 명시적으로 포함하여 저장합니다.
   const { data, error } = await supabase
     .from('transactions')
-    .insert([{ ...newTx, palette_id: paletteId }])
+    .insert([
+      {
+        ...newTx,
+        palette_id: paletteId,
+        user_id: userId,
+      },
+    ])
     .select()
     .single();
 
@@ -66,6 +53,8 @@ const addTransactionToLocal = async (
     ...newTx,
     localId: uuidv4(),
     id: null,
+    palette_id: '', // 로컬에서는 팔레트 개념 없음
+    user_id: '', // 로컬에서는 사용자 개념 없음
   };
   localStorage.setItem(
     'transactions',
@@ -79,6 +68,7 @@ const updateTransactionOnServer = async ({
   id,
   data,
 }: UpdateTransactionPayload): Promise<Transaction> => {
+  // 수정 시에는 palette_id나 user_id를 변경하지 않고, 내용만 업데이트합니다.
   const { data: updatedData, error } = await supabase
     .from('transactions')
     .update(data)
@@ -130,15 +120,21 @@ const deleteTransactionFromLocal = async (localId: string): Promise<void> => {
 export function useAddTransactionMutation() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { currentPalette } = usePalette();
 
   return useMutation<Transaction, Error, NewTransaction>({
-    mutationFn: (newTx) =>
-      user
-        ? addTransactionToServer(newTx, user.id)
-        : addTransactionToLocal(newTx),
+    mutationFn: (newTx) => {
+      if (user) {
+        if (!currentPalette) throw new Error('No active palette selected');
+        return addTransactionToServer(newTx, user.id, currentPalette.id);
+      } else {
+        return addTransactionToLocal(newTx);
+      }
+    },
     onSuccess: () => {
+      // 쿼리 키에 currentPalette.id가 포함되어 있으므로, 해당 키를 무효화해야 합니다.
       queryClient.invalidateQueries({
-        queryKey: ['transactions', user?.id ?? 'local'],
+        queryKey: ['transactions', user?.id ?? 'local', currentPalette?.id],
       });
     },
   });
@@ -147,6 +143,7 @@ export function useAddTransactionMutation() {
 export function useUpdateTransactionMutation() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { currentPalette } = usePalette();
 
   return useMutation<Transaction, Error, UpdateTransactionPayload>({
     mutationFn: (payload) =>
@@ -155,7 +152,7 @@ export function useUpdateTransactionMutation() {
         : updateTransactionInLocal(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['transactions', user?.id ?? 'local'],
+        queryKey: ['transactions', user?.id ?? 'local', currentPalette?.id],
       });
     },
   });
@@ -164,13 +161,14 @@ export function useUpdateTransactionMutation() {
 export function useDeleteTransactionMutation() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { currentPalette } = usePalette();
 
   return useMutation<void, Error, string>({
     mutationFn: (id) =>
       user ? deleteTransactionFromServer(id) : deleteTransactionFromLocal(id),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['transactions', user?.id ?? 'local'],
+        queryKey: ['transactions', user?.id ?? 'local', currentPalette?.id],
       });
     },
   });

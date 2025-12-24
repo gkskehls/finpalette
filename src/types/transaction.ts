@@ -6,4 +6,7 @@ export interface Transaction {
   amount: number;
   category_code: string; // 카테고리 코드 (Category.code 참조)
   description: string;
+  palette_id: string; // 이 거래내역이 속한 팔레트의 ID
+  user_id: string; // 작성자의 ID
+  private_memo?: string; // 나만 볼 수 있는 시크릿 메모
 }

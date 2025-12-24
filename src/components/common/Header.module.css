@@ -3,24 +3,48 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background-color: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.titleContainer:hover {
+  background-color: var(--bg-hover);
+}
+
 .title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.chevronIcon {
+  color: var(--text-secondary);
+  transition: transform 0.2s;
+}
+
+.titleContainer:hover .chevronIcon {
+  transform: translateY(2px);
 }
 
 .themeToggleButton {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
   padding: 0.5rem;
   border-radius: 50%;
   display: flex;
@@ -29,5 +53,5 @@
 }
 
 .themeToggleButton:hover {
-  background-color: var(--color-background-muted);
+  background-color: var(--bg-hover);
 }

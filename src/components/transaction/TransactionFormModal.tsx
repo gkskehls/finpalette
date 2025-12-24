@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import styles from './TransactionFormModal.module.css';
-import { X } from 'lucide-react';
+import { X, Lock } from 'lucide-react';
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../../config/constants';
 import type { Transaction } from '../../types/transaction';
 import {
   useAddTransactionMutation,
   useUpdateTransactionMutation,
 } from '../../hooks/queries/useTransactionsMutation';
-import type { UpdateTransactionPayload } from '../../hooks/queries/useTransactionsMutation';
-
-type NewTransactionData = Omit<Transaction, 'localId' | 'id'>;
+import type {
+  NewTransaction,
+  UpdateTransactionPayload,
+} from '../../hooks/queries/useTransactionsMutation';
 
 interface TransactionFormModalProps {
   onClose: () => void;
@@ -22,7 +23,6 @@ export function TransactionFormModal({
 }: TransactionFormModalProps) {
   const isEditMode = !!transactionToEdit;
 
-  // useEffect를 제거하고, useState에서 직접 초기값 설정
   const [type, setType] = useState(transactionToEdit?.type || 'exp');
   const [amount, setAmount] = useState(
     transactionToEdit?.amount.toString() || ''
@@ -36,19 +36,21 @@ export function TransactionFormModal({
   const [description, setDescription] = useState(
     transactionToEdit?.description || ''
   );
+  const [privateMemo, setPrivateMemo] = useState(
+    transactionToEdit?.private_memo || ''
+  );
 
   const addMutation = useAddTransactionMutation();
   const updateMutation = useUpdateTransactionMutation();
 
   const handleTypeChange = (newType: 'inc' | 'exp') => {
     setType(newType);
-    // 타입 변경 시, 수정 모드가 아닐 때만 카테고리를 기본값으로 변경
     if (!isEditMode) {
-      if (newType === 'inc') {
-        setCategory(INCOME_CATEGORIES[0]?.code || '');
-      } else {
-        setCategory(EXPENSE_CATEGORIES[0]?.code || '');
-      }
+      setCategory(
+        newType === 'inc'
+          ? INCOME_CATEGORIES[0]?.code || ''
+          : EXPENSE_CATEGORIES[0]?.code || ''
+      );
     }
   };
 
@@ -59,26 +61,26 @@ export function TransactionFormModal({
       return;
     }
 
-    const formData: NewTransactionData = {
+    const formData: NewTransaction = {
       type,
       amount: Number(amount),
       category_code: category,
       date,
       description,
+      private_memo: privateMemo,
     };
 
     if (isEditMode && transactionToEdit) {
-      // localId를 id로 변경하여 전달
       const payload: UpdateTransactionPayload = {
-        id: transactionToEdit.localId,
+        id: transactionToEdit.id!, // 서버 ID 사용
         data: formData,
       };
       updateMutation.mutate(payload, {
-        onSuccess: onClose, // 성공 시 모달 닫기
+        onSuccess: onClose,
       });
     } else {
       addMutation.mutate(formData, {
-        onSuccess: onClose, // 성공 시 모달 닫기
+        onSuccess: onClose,
       });
     }
   };
@@ -156,14 +158,29 @@ export function TransactionFormModal({
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="description">내용</label>
+            <label htmlFor="description">내용 (공개)</label>
             <input
               type="text"
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="내용을 입력하세요"
+              placeholder="모든 멤버에게 보여지는 내용"
             />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="privateMemo">나만 보기 메모 (비공개)</label>
+            <div className={styles.privateMemoContainer}>
+              <Lock size={16} className={styles.privateMemoIcon} />
+              <input
+                type="text"
+                id="privateMemo"
+                className={styles.privateMemoInput}
+                value={privateMemo}
+                onChange={(e) => setPrivateMemo(e.target.value)}
+                placeholder="나만 볼 수 있는 상세 내용"
+              />
+            </div>
           </div>
 
           <div className={styles.formActions}>

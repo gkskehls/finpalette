@@ -1,5 +1,5 @@
 .section {
-  background-color: var(--background-secondary);
+  background-color: var(--bg-secondary);
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -50,6 +50,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .icon {
@@ -57,14 +58,34 @@
   height: 20px;
 }
 
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .description {
   font-size: 14px;
   color: var(--text-primary);
 }
 
+.privateMemo {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lockIcon {
+  width: 10px;
+  height: 10px;
+}
+
 .amount {
   font-size: 14px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .income {
