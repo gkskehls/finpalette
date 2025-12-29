@@ -25,10 +25,12 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(migration): 팔레트 중복 생성 방지 로직 추가
+feat(category): DB/로컬 카테고리 분기 처리 및 버그 수정
 
-- 팔레트 조회 실패 시 무조건 생성하던 로직을 수정하여, 에러 발생 시 생성을 중단하도록 변경
-- RLS 에러 등으로 인한 '나의 가계부' 무한 증식 버그 해결
+- TransactionFormModal에서 DB 카테고리를 사용하도록 수정
+- useCategoriesQuery 훅을 생성하여 현재 팔레트의 카테고리 목록을 조회
+- 로그인/게스트 상태에 따라 DB 또는 로컬(constants)에서 카테고리를 분기하여 가져오도록 개선
+- 카테고리 코드 불일치로 인한 외래 키 제약 조건 에러(409 Conflict) 해결
 "
 git push origin main
 

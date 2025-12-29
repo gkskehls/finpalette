@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import styles from './TransactionFormModal.module.css';
 import { X, Lock } from 'lucide-react';
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../../config/constants';
+import { useCategoriesQuery } from '../../hooks/queries/useCategoriesQuery';
 import type { Transaction } from '../../types/transaction';
 import {
   useAddTransactionMutation,
@@ -14,7 +14,7 @@ import type {
 
 interface TransactionFormModalProps {
   onClose: () => void;
-  transactionToEdit?: Transaction; // 수정할 데이터 (선택적)
+  transactionToEdit?: Transaction;
 }
 
 export function TransactionFormModal({
@@ -23,12 +23,23 @@ export function TransactionFormModal({
 }: TransactionFormModalProps) {
   const isEditMode = !!transactionToEdit;
 
+  // DB에서 카테고리 목록을 가져옵니다.
+  const { data: categories, isLoading: isLoadingCategories } =
+    useCategoriesQuery();
+
+  // 수입/지출 카테고리를 분리합니다.
+  const { incomeCategories, expenseCategories } = useMemo(() => {
+    const income = categories?.filter((c) => c.code.startsWith('i')) || [];
+    const expense = categories?.filter((c) => c.code.startsWith('c')) || [];
+    return { incomeCategories: income, expenseCategories: expense };
+  }, [categories]);
+
   const [type, setType] = useState(transactionToEdit?.type || 'exp');
   const [amount, setAmount] = useState(
     transactionToEdit?.amount.toString() || ''
   );
   const [category, setCategory] = useState(
-    transactionToEdit?.category_code || EXPENSE_CATEGORIES[0]?.code || ''
+    transactionToEdit?.category_code || expenseCategories[0]?.code || ''
   );
   const [date, setDate] = useState(
     transactionToEdit?.date || new Date().toISOString().split('T')[0]
@@ -45,11 +56,12 @@ export function TransactionFormModal({
 
   const handleTypeChange = (newType: 'inc' | 'exp') => {
     setType(newType);
+    // 타입 변경 시, 해당 타입의 첫 번째 카테고리를 기본값으로 설정
     if (!isEditMode) {
       setCategory(
         newType === 'inc'
-          ? INCOME_CATEGORIES[0]?.code || ''
-          : EXPENSE_CATEGORIES[0]?.code || ''
+          ? incomeCategories[0]?.code || ''
+          : expenseCategories[0]?.code || ''
       );
     }
   };
@@ -72,7 +84,7 @@ export function TransactionFormModal({
 
     if (isEditMode && transactionToEdit) {
       const payload: UpdateTransactionPayload = {
-        id: transactionToEdit.id!, // 서버 ID 사용
+        id: transactionToEdit.id!,
         data: formData,
       };
       updateMutation.mutate(payload, {
@@ -86,7 +98,7 @@ export function TransactionFormModal({
   };
 
   const currentCategories =
-    type === 'inc' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+    type === 'inc' ? incomeCategories : expenseCategories;
 
   return (
     <div className={styles.modalBackdrop}>
@@ -134,9 +146,10 @@ export function TransactionFormModal({
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
+              disabled={isLoadingCategories}
             >
               <option value="" disabled>
-                카테고리 선택
+                {isLoadingCategories ? '카테고리 로딩 중...' : '카테고리 선택'}
               </option>
               {currentCategories.map((cat) => (
                 <option key={cat.code} value={cat.code}>
