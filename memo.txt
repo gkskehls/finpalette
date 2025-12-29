@@ -25,7 +25,13 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-빌드오류 수정
+fix(palette): 게스트 모드 팔레트 생성 제한 및 로그인 유도 UI 추가
+
+- 비로그인 상태에서 팔레트 생성 시도 시 발생하는 DB 에러(RLS) 해결
+- PaletteFormModal에 로그인 상태 체크 로직 추가
+- 비로그인 사용자에게 로그인 안내 메시지 및 구글 로그인 버튼 표시
+- PaletteFormModal 스타일(loginContainer 등) 추가
+
 "
 git push origin main
 

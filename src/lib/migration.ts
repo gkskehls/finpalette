@@ -26,7 +26,8 @@ async function ensureDefaultCategories(paletteId: string): Promise<void> {
     .upsert(categoriesToInsert, { onConflict: 'palette_id, code' });
 
   if (error) {
-    throw new Error('Error ensuring default categories: ' + error.message);
+    // 이미 존재하는 경우 무시하거나 에러 로깅
+    console.warn('Warning ensuring default categories: ' + error.message);
   } else {
     console.log('Default categories are ensured for the palette.');
   }
@@ -38,56 +39,49 @@ async function ensureDefaultCategories(paletteId: string): Promise<void> {
  * @returns 팔레트의 ID
  */
 async function getOrCreatePersonalPalette(user: User): Promise<string> {
-  // 1. 기존 팔레트 확인
-  const { data: existingPalette } = await supabase
+  // 1. 기존 팔레트 확인 (내가 소유한 팔레트 중 첫 번째)
+  // single() 대신 limit(1)을 사용하여 데이터가 없을 때 에러가 아닌 빈 배열을 받도록 함
+  const { data: existingPalettes, error: fetchError } = await supabase
     .from('palettes')
     .select('id')
     .eq('owner_id', user.id)
-    .single();
+    .limit(1);
 
-  let paletteId: string;
+  if (fetchError) {
+    console.error('Error fetching existing palette:', fetchError);
+  }
 
-  if (existingPalette) {
-    paletteId = existingPalette.id;
+  if (existingPalettes && existingPalettes.length > 0) {
+    const paletteId = existingPalettes[0].id;
     console.log(`Existing palette found: ${paletteId}`);
-  } else {
-    // 2. 팔레트가 없으면 새로 생성
-    const { data: newPalette, error: insertError } = await supabase
-      .from('palettes')
-      .insert({ name: 'My Palette', owner_id: user.id })
-      .select('id')
-      .single();
 
-    if (insertError)
-      throw new Error(
-        'Error creating personal palette: ' + insertError.message
-      );
-    if (!newPalette) throw new Error('Failed to create or retrieve palette.');
-
-    paletteId = newPalette.id;
-    console.log(`New palette created: ${paletteId}`);
+    // 기존 팔레트라면 카테고리가 없을 수 있으므로 보장
+    await ensureDefaultCategories(paletteId);
+    return paletteId;
   }
 
-  // 3. 팔레트 멤버로 자신을 추가 (onConflict 대신 upsert 사용)
-  const { error: memberInsertError } = await supabase
-    .from('palette_members')
-    .upsert(
-      { palette_id: paletteId, user_id: user.id, role: 'owner' },
-      { onConflict: 'palette_id, user_id' }
-    );
+  // 2. 팔레트가 없으면 RPC를 통해 안전하게 생성 (멤버, 카테고리 자동 생성됨)
+  console.log('No existing palette found. Creating new one via RPC...');
+  const { data: newPaletteId, error: rpcError } = await supabase.rpc(
+    'create_palette',
+    {
+      name: '나의 가계부',
+      theme_color: '#6366F1',
+    }
+  );
 
-  if (memberInsertError) {
+  if (rpcError) {
     throw new Error(
-      'Error ensuring user is a palette member: ' + memberInsertError.message
+      'Error creating personal palette via RPC: ' + rpcError.message
     );
-  } else {
-    console.log('User membership in palette is ensured.');
   }
 
-  // 4. 기본 카테고리가 존재하는지 확인 및 생성
-  await ensureDefaultCategories(paletteId);
+  if (!newPaletteId) {
+    throw new Error('Failed to create palette: No ID returned');
+  }
 
-  return paletteId;
+  console.log(`New palette created via RPC: ${newPaletteId}`);
+  return newPaletteId;
 }
 
 /**
@@ -98,16 +92,28 @@ export async function migrateGuestData(user: User): Promise<boolean> {
   console.log('Starting data migration for user:', user.id);
 
   const localData = localStorage.getItem('transactions');
+
+  // 로컬 데이터가 없더라도 팔레트는 하나 있어야 하므로 생성 시도
   if (!localData) {
-    console.log('No local data to migrate. Skipping.');
+    console.log('No local data to migrate. Ensuring palette exists.');
+    try {
+      await getOrCreatePersonalPalette(user);
+    } catch (e) {
+      console.error('Failed to ensure palette exists:', e);
+    }
     return false;
   }
 
   try {
     const localTransactions: LocalTransaction[] = JSON.parse(localData);
     if (localTransactions.length === 0) {
-      console.log('Local transactions are empty. Skipping.');
+      console.log('Local transactions are empty. Ensuring palette exists.');
       localStorage.removeItem('transactions');
+      try {
+        await getOrCreatePersonalPalette(user);
+      } catch (e) {
+        console.error('Failed to ensure palette exists:', e);
+      }
       return false;
     }
 
@@ -115,7 +121,7 @@ export async function migrateGuestData(user: User): Promise<boolean> {
 
     const transactionsToInsert = localTransactions.map((tx) => ({
       palette_id: paletteId,
-      user_id: user.id, // <-- FIX: Add user_id
+      user_id: user.id,
       date: tx.date,
       type: tx.type,
       amount: tx.amount,

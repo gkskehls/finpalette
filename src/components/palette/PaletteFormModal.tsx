@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react';
-import { X } from 'lucide-react';
+import { X, LogIn } from 'lucide-react';
 import { useAddPaletteMutation } from '../../hooks/queries/useAddPaletteMutation';
 import { usePalette } from '../../context/PaletteContext';
+import { useAuth } from '../../hooks/useAuth';
 import styles from './PaletteFormModal.module.css';
 
 interface PaletteFormModalProps {
@@ -22,6 +23,7 @@ const THEME_COLORS = [
 ];
 
 export function PaletteFormModal({ onClose }: PaletteFormModalProps) {
+  const { user, signInWithGoogle } = useAuth();
   const [name, setName] = useState('');
   const [selectedColor, setSelectedColor] = useState(THEME_COLORS[0]);
 
@@ -54,47 +56,61 @@ export function PaletteFormModal({ onClose }: PaletteFormModalProps) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="paletteName" className={styles.label}>
-              팔레트 이름
-            </label>
-            <input
-              id="paletteName"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="예: 우리 가족 가계부"
-              className={styles.input}
-              autoFocus
-              required
-            />
+        {!user ? (
+          <div className={styles.loginContainer}>
+            <p className={styles.loginMessage}>
+              새 팔레트를 만들려면 로그인이 필요합니다.
+              <br />
+              로그인하여 데이터를 안전하게 보관하고 공유해보세요!
+            </p>
+            <button className={styles.loginButton} onClick={signInWithGoogle}>
+              <LogIn size={20} />
+              구글로 로그인하기
+            </button>
           </div>
-
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>테마 색상</label>
-            <div className={styles.colorGrid}>
-              {THEME_COLORS.map((color) => (
-                <div
-                  key={color}
-                  className={`${styles.colorOption} ${
-                    selectedColor === color ? styles.selected : ''
-                  }`}
-                  style={{ backgroundColor: color }}
-                  onClick={() => setSelectedColor(color)}
-                />
-              ))}
+        ) : (
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="paletteName" className={styles.label}>
+                팔레트 이름
+              </label>
+              <input
+                id="paletteName"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="예: 우리 가족 가계부"
+                className={styles.input}
+                autoFocus
+                required
+              />
             </div>
-          </div>
 
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={isPending || !name.trim()}
-          >
-            {isPending ? '생성 중...' : '만들기'}
-          </button>
-        </form>
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>테마 색상</label>
+              <div className={styles.colorGrid}>
+                {THEME_COLORS.map((color) => (
+                  <div
+                    key={color}
+                    className={`${styles.colorOption} ${
+                      selectedColor === color ? styles.selected : ''
+                    }`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => setSelectedColor(color)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className={styles.submitButton}
+              disabled={isPending || !name.trim()}
+            >
+              {isPending ? '생성 중...' : '만들기'}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
