@@ -40,7 +40,6 @@ async function ensureDefaultCategories(paletteId: string): Promise<void> {
  */
 async function getOrCreatePersonalPalette(user: User): Promise<string> {
   // 1. 기존 팔레트 확인 (내가 소유한 팔레트 중 첫 번째)
-  // single() 대신 limit(1)을 사용하여 데이터가 없을 때 에러가 아닌 빈 배열을 받도록 함
   const { data: existingPalettes, error: fetchError } = await supabase
     .from('palettes')
     .select('id')
@@ -49,6 +48,8 @@ async function getOrCreatePersonalPalette(user: User): Promise<string> {
 
   if (fetchError) {
     console.error('Error fetching existing palette:', fetchError);
+    // 조회 에러 시 생성을 시도하지 않고 중단하여 중복 생성 방지
+    throw new Error('Failed to fetch existing palettes: ' + fetchError.message);
   }
 
   if (existingPalettes && existingPalettes.length > 0) {

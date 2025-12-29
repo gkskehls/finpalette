@@ -7,15 +7,13 @@ import { usePalette } from '../../context/PaletteContext';
 
 // --- 타입 정의 ---
 
-// NewTransaction은 Transaction에서 ID 관련 필드만 뺀 것입니다.
-// palette_id와 user_id는 서버 저장 시 자동으로 처리되거나 별도로 주입됩니다.
 export type NewTransaction = Omit<
   Transaction,
   'localId' | 'id' | 'palette_id' | 'user_id'
 >;
 
 export type UpdateTransactionPayload = {
-  id: string; // 로컬에서는 localId, 서버에서는 id
+  id: string;
   data: NewTransaction;
 };
 
@@ -27,7 +25,12 @@ const addTransactionToServer = async (
   userId: string,
   paletteId: string
 ): Promise<Transaction> => {
-  // palette_id와 user_id를 명시적으로 포함하여 저장합니다.
+  console.log('Adding transaction to server:', {
+    ...newTx,
+    palette_id: paletteId,
+    user_id: userId,
+  });
+
   const { data, error } = await supabase
     .from('transactions')
     .insert([
@@ -40,7 +43,10 @@ const addTransactionToServer = async (
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error adding transaction to server:', error);
+    throw error;
+  }
   return { ...data, localId: data.id };
 };
 
@@ -53,8 +59,8 @@ const addTransactionToLocal = async (
     ...newTx,
     localId: uuidv4(),
     id: null,
-    palette_id: '', // 로컬에서는 팔레트 개념 없음
-    user_id: '', // 로컬에서는 사용자 개념 없음
+    palette_id: '',
+    user_id: '',
   };
   localStorage.setItem(
     'transactions',
@@ -68,14 +74,16 @@ const updateTransactionOnServer = async ({
   id,
   data,
 }: UpdateTransactionPayload): Promise<Transaction> => {
-  // 수정 시에는 palette_id나 user_id를 변경하지 않고, 내용만 업데이트합니다.
   const { data: updatedData, error } = await supabase
     .from('transactions')
     .update(data)
     .eq('id', id)
     .select()
     .single();
-  if (error) throw error;
+  if (error) {
+    console.error('Error updating transaction on server:', error);
+    throw error;
+  }
   return { ...updatedData, localId: updatedData.id };
 };
 
@@ -103,7 +111,10 @@ const updateTransactionInLocal = async ({
 // [서버] 데이터 삭제
 const deleteTransactionFromServer = async (id: string): Promise<void> => {
   const { error } = await supabase.from('transactions').delete().eq('id', id);
-  if (error) throw error;
+  if (error) {
+    console.error('Error deleting transaction from server:', error);
+    throw error;
+  }
 };
 
 // [로컬] 데이터 삭제
@@ -132,7 +143,6 @@ export function useAddTransactionMutation() {
       }
     },
     onSuccess: () => {
-      // 쿼리 키에 currentPalette.id가 포함되어 있으므로, 해당 키를 무효화해야 합니다.
       queryClient.invalidateQueries({
         queryKey: ['transactions', user?.id ?? 'local', currentPalette?.id],
       });

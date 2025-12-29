@@ -25,13 +25,10 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-style(ui): 하단 네비게이션 및 레이아웃 구조 개선
+fix(migration): 팔레트 중복 생성 방지 로직 추가
 
-- 하단 네비게이션(BottomNav)을 고정형 바(Fixed Bar) 스타일로 변경하여 가독성 확보
-- 헤더(Header)를 고정형(Fixed)으로 변경하고 배경색 적용
-- 메인 콘텐츠 영역(App.css)에 상/하단 패딩을 추가하여 콘텐츠 가림 현상 해결
-- 플로팅 버튼(FAB) 위치 및 스타일 조정
-- 모바일 뷰 최적화를 위한 최대 너비(max-width) 설정
+- 팔레트 조회 실패 시 무조건 생성하던 로직을 수정하여, 에러 발생 시 생성을 중단하도록 변경
+- RLS 에러 등으로 인한 '나의 가계부' 무한 증식 버그 해결
 "
 git push origin main
 
