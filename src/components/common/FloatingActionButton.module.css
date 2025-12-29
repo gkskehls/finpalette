@@ -1,24 +1,29 @@
 .fab {
   position: fixed;
-  bottom: 80px; /* Adjust based on BottomNav height */
+  bottom: 90px; /* 하단 네비게이션(64px) + 여유 공간 */
   right: 20px;
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background-color: var(--accent-color); /* 수정 */
+  background-color: var(--primary-color); /* 테마 색상 사용 */
   color: white;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 조금 더 진하게 */
   cursor: pointer;
   transition:
-    background-color 0.3s ease,
-    filter 0.3s ease; /* transition 추가 */
+    transform 0.2s ease,
+    background-color 0.2s ease;
   z-index: 1000;
 }
 
 .fab:hover {
-  filter: brightness(0.9); /* 수정 */
+  background-color: var(--primary-color-dark);
+  transform: scale(1.05); /* 호버 시 살짝 커지는 효과 */
+}
+
+.fab:active {
+  transform: scale(0.95);
 }
