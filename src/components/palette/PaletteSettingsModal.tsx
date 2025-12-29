@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, UserPlus, Copy, Check } from 'lucide-react';
 import styles from './PaletteSettingsModal.module.css';
 import { useCreateInvitationMutation } from '../../hooks/queries/useCreateInvitationMutation';

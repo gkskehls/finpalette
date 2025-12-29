@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MailOpen, LogIn, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useAcceptInvitationMutation } from '../hooks/queries/useAcceptInvitationMutation';

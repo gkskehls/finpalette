@@ -25,14 +25,7 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(palette): 멤버 초대 및 수락 기능 구현
-
-- 팔레트 설정 모달(PaletteSettingsModal) 및 초대 링크 생성 UI 구현
-- 초대 수락을 위한 RPC 함수(accept_invitation) 연동 및 커스텀 훅 구현
-- 초대 수락 페이지(InvitePage) 및 라우팅(/invite) 처리 추가
-- 팔레트 목록에서 설정 모달 진입점 추가
-- 전역 CSS 변수 매핑 추가로 모달 배경 투명 문제 해결
-- 프로젝트 문서(file_list.md, PROJECT_PLAN.md) 최신화
+빌드오류 수정
 "
 git push origin main
 
