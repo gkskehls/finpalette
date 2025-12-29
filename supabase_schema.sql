@@ -132,7 +132,9 @@ CREATE POLICY "Users can create palettes" ON public.palettes
 CREATE POLICY "Users can view their own membership" ON public.palette_members
     FOR SELECT USING (user_id = auth.uid());
 
--- Insert: I can add myself
+-- Insert: I can add myself (ONLY via RPC or specific conditions - tightened for security)
+-- We will rely on RPC for adding members via invitation.
+-- For creating a palette, the owner adds themselves.
 CREATE POLICY "Users can insert their own membership" ON public.palette_members
     FOR INSERT WITH CHECK (user_id = auth.uid());
 
@@ -220,6 +222,49 @@ BEGIN
     (new_palette_id, 'c05', '기타', '#64748B', 'MoreHorizontal', auth.uid());
 
   RETURN new_palette_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to accept an invitation
+CREATE OR REPLACE FUNCTION accept_invitation(
+  invitation_code TEXT
+) RETURNS UUID AS $$
+DECLARE
+  invite_record RECORD;
+  is_already_member BOOLEAN;
+BEGIN
+  -- 1. Find the invitation
+  SELECT * INTO invite_record
+  FROM public.palette_invitations
+  WHERE code = invitation_code
+  AND is_used = FALSE
+  AND expires_at > now();
+
+  IF invite_record IS NULL THEN
+    RAISE EXCEPTION 'Invalid or expired invitation code';
+  END IF;
+
+  -- 2. Check if user is already a member
+  SELECT EXISTS (
+    SELECT 1 FROM public.palette_members
+    WHERE palette_id = invite_record.palette_id
+    AND user_id = auth.uid()
+  ) INTO is_already_member;
+
+  IF is_already_member THEN
+    RETURN invite_record.palette_id; -- Already a member, just return ID
+  END IF;
+
+  -- 3. Add user to palette_members
+  INSERT INTO public.palette_members (palette_id, user_id, role)
+  VALUES (invite_record.palette_id, auth.uid(), 'editor');
+
+  -- 4. (Optional) Mark invitation as used if it's a one-time use
+  -- For now, we keep it reusable until expiration, so we don't update is_used.
+  -- If you want one-time use, uncomment the line below:
+  -- UPDATE public.palette_invitations SET is_used = TRUE WHERE id = invite_record.id;
+
+  RETURN invite_record.palette_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

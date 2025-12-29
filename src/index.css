@@ -2,20 +2,29 @@
 [data-theme='light'] {
   --background-primary: #ffffff;
   --background-secondary: #f9f9f9;
-  --text-color: #213547; /* text-primary 대신 사용 */
-  --secondary-text-color: #888; /* text-secondary 대신 사용 */
+  --text-color: #213547;
+  --secondary-text-color: #888;
   --card-background: #ffffff;
   --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --primary-color: #646cff; /* accent-color 대신 사용 */
+  --primary-color: #646cff;
   --primary-color-dark: #535bf2;
   --button-text-color: #ffffff;
   --progress-bar-bg: #e0e0e0;
-  --accent-color: #28a745; /* 강조 색상 (CTA 버튼 등) */
+  --accent-color: #28a745;
   --accent-color-dark: #218838;
   --hover-background: #f0f0f0;
   --income-color: #28a745;
   --expense-color: #dc3545;
   --border-color: #eee;
+
+  /* Alias for compatibility */
+  --bg-primary: var(--background-primary);
+  --bg-secondary: var(--background-secondary);
+  --bg-hover: var(--hover-background);
+  --bg-color: var(--background-primary); /* Fallback */
+  --text-primary: var(--text-color);
+  --text-secondary: var(--secondary-text-color);
+  --primary-light: #e0e7ff; /* Light primary for backgrounds */
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -34,20 +43,29 @@
 [data-theme='dark'] {
   --background-primary: #242424;
   --background-secondary: #1a1a1a;
-  --text-color: rgba(255, 255, 255, 0.87); /* text-primary 대신 사용 */
-  --secondary-text-color: #aaaaaa; /* text-secondary 대신 사용 */
+  --text-color: rgba(255, 255, 255, 0.87);
+  --secondary-text-color: #aaaaaa;
   --card-background: #333333;
   --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --primary-color: #747bff; /* accent-color 대신 사용 */
+  --primary-color: #747bff;
   --primary-color-dark: #646cff;
   --button-text-color: #ffffff;
   --progress-bar-bg: #555555;
-  --accent-color: #28a745; /* 강조 색상 (CTA 버튼 등) */
+  --accent-color: #28a745;
   --accent-color-dark: #218838;
   --hover-background: #444444;
   --income-color: #28a745;
   --expense-color: #dc3545;
   --border-color: #333;
+
+  /* Alias for compatibility */
+  --bg-primary: var(--background-primary);
+  --bg-secondary: var(--background-secondary);
+  --bg-hover: var(--hover-background);
+  --bg-color: var(--background-primary);
+  --text-primary: var(--text-color);
+  --text-secondary: var(--secondary-text-color);
+  --primary-light: rgba(116, 123, 255, 0.2);
 
   color-scheme: dark;
 }
@@ -79,8 +97,8 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: var(--background-secondary); /* 기본 버튼 배경색 변경 */
-  color: var(--text-color); /* 기본 버튼 텍스트 색상 변경 */
+  background-color: var(--background-secondary);
+  color: var(--text-color);
   cursor: pointer;
   transition: border-color 0.25s;
 }

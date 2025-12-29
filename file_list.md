@@ -75,6 +75,8 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
   - **📄 Header.tsx**: 페이지 상단의 헤더 컴포넌트입니다.
   - **📄 Header.module.css**: `Header` 컴포넌트의 전용 CSS 모듈 파일입니다.
   - **📄 Icon.tsx**: 아이콘을 표시하기 위한 컴포넌트입니다.
+  - **📄 PaletteListBottomSheet.tsx**: 팔레트 목록을 보여주고 전환하는 바텀 시트 컴포넌트입니다.
+  - **📄 PaletteListBottomSheet.module.css**: `PaletteListBottomSheet` 컴포넌트의 전용 CSS 모듈 파일입니다.
 
 - **📁 dashboard/**: 대시보드 페이지에서만 사용되는 컴포넌트 폴더입니다.
   - **📄 CategorySection.tsx**: 카테고리별 지출 내역을 보여주는 섹션 컴포넌트입니다.
@@ -83,6 +85,12 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
   - **📄 SummaryCard.module.css**: `SummaryCard` 컴포넌트의 전용 CSS 모듈 파일입니다.
   - **📄 TransactionSection.tsx**: 최근 거래 내역을 보여주는 섹션 컴포넌트입니다.
   - **📄 TransactionSection.module.css**: `TransactionSection` 컴포넌트의 전용 CSS 모듈 파일입니다.
+
+- **📁 palette/**: 팔레트(가계부) 관리와 관련된 컴포넌트 폴더입니다.
+  - **📄 PaletteFormModal.tsx**: 새 팔레트를 생성하는 폼이 담긴 모달 컴포넌트입니다.
+  - **📄 PaletteFormModal.module.css**: `PaletteFormModal` 컴포넌트의 전용 CSS 모듈 파일입니다.
+  - **📄 PaletteSettingsModal.tsx**: 팔레트 설정 및 멤버 초대를 관리하는 모달 컴포넌트입니다.
+  - **📄 PaletteSettingsModal.module.css**: `PaletteSettingsModal` 컴포넌트의 전용 CSS 모듈 파일입니다.
 
 - **📁 transaction/**: 거래(수입/지출)와 관련된 컴포넌트 폴더입니다.
   - **📄 TransactionFormModal.tsx**: 거래 내역을 추가하거나 수정하는 폼이 담긴 모달 컴포넌트입니다.
@@ -108,6 +116,10 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 - **📁 queries/**: 데이터 페칭 및 상태 관리를 위한 React Query 관련 훅을 담는 폴더입니다.
   - **📄 useTransactionsQuery.ts**: 거래 내역을 조회하는(fetch) 커스텀 훅입니다.
   - **📄 useTransactionsMutation.ts**: 거래 내역을 생성, 수정, 삭제하는 커스텀 훅입니다.
+  - **📄 usePalettesQuery.ts**: 팔레트 목록을 조회하는 커스텀 훅입니다.
+  - **📄 useAddPaletteMutation.ts**: 새 팔레트를 생성하는 커스텀 훅입니다.
+  - **📄 useCreateInvitationMutation.ts**: 팔레트 초대 링크를 생성하는 커스텀 훅입니다.
+  - **📄 useAcceptInvitationMutation.ts**: 팔레트 초대를 수락하는 커스텀 훅입니다.
 
 #### 📁 pages/
 
@@ -115,6 +127,8 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 
 - **📄 DashboardPage.css**: `DashboardPage` 컴포넌트에 적용되는 CSS 스타일 파일입니다.
 - **📄 DashboardPage.tsx**: 대시보드 페이지의 메인 컴포넌트입니다.
+- **📄 InvitePage.tsx**: 초대 링크를 통해 접속했을 때 보여지는 초대 수락 페이지입니다.
+- **📄 InvitePage.module.css**: `InvitePage` 컴포넌트의 전용 CSS 모듈 파일입니다.
 - **📄 ProfilePage.tsx**: 마이페이지의 메인 컴포넌트입니다.
 - **📄 ProfilePage.module.css**: `ProfilePage` 컴포넌트의 전용 CSS 모듈 파일입니다.
 - **📄 StatsPage.tsx**: 통계 페이지의 메인 컴포넌트입니다.
@@ -127,6 +141,7 @@ TypeScript에서 사용되는 타입 정의들을 모아두는 폴더입니다.
 
 - **📄 category.ts**: 카테고리 관련 타입(interface, type)을 정의하는 파일입니다.
 - **📄 icon.ts**: 아이콘 관련 타입을 정의하는 파일입니다.
+- **📄 palette.ts**: 팔레트 및 초대 관련 타입을 정의하는 파일입니다.
 - **📄 transaction.ts**: 거래 내역 관련 타입을 정의하는 파일입니다.
 - **📄 ui.ts**: UI 요소와 관련된 공통 타입을 정의하는 파일입니다.
 

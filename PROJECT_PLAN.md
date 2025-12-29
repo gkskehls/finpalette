@@ -122,7 +122,11 @@
        - [O] `create_palette` RPC 함수 작성 (DB 트랜잭션 보장)
        - [O] `useAddPaletteMutation` 훅 구현
        - [O] `PaletteFormModal` UI 구현 및 연동
-     - **[ ] 멤버 초대 및 관리 기능**
+     - **[O] 멤버 초대 및 관리 기능**
+       - [O] `accept_invitation` RPC 함수 설계 및 구현
+       - [O] 초대 링크 생성 및 공유 UI 구현
+       - [O] 초대 수락 페이지 및 로직 구현
+       - [ ] 멤버 목록 조회 및 관리(추방/권한변경) UI 구현
   2. **[X] 내용/카테고리 기반 거래 내역 검색 기능**
   3. **[X] 반복 내역(고정 지출/수입) 자동 등록 기능**
   4. **[X] PWA(Progressive Web App) 적용 및 아이콘 설정**
