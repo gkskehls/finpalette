@@ -1,67 +1,92 @@
 .container {
   padding: 16px;
+  padding-bottom: 80px; /* 하단 네비게이션 공간 확보 */
 }
 
 .transactionItem {
   display: flex;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 12px; /* 패딩을 좀 더 넉넉하게 */
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  margin-bottom: 8px; /* 아이템 간 간격 추가 */
+  transition: background-color 0.2s;
+}
+
+.transactionItem:hover {
+  background-color: var(--bg-hover);
 }
 
 .categoryIcon {
   margin-right: 16px;
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 44px; /* 아이콘 크기 약간 키움 */
+  height: 44px;
   border-radius: 50%;
-  /* background-color: #f0f0f0;  대시보드와 동일하게 동적 배경색을 위해 제거 */
   display: flex;
   justify-content: center;
   align-items: center;
+  color: white; /* 아이콘 색상 흰색으로 통일 (배경색이 있으므로) */
 }
 
 .transactionDetails {
-  flex-grow: 1;
+  flex: 1; /* 남은 공간 모두 차지 */
   display: flex;
   flex-direction: column;
+  gap: 4px; /* 제목과 카테고리 사이 간격 */
+  min-width: 0; /* Flexbox 내에서 text-overflow 작동을 위해 필수 */
+  margin-right: 12px; /* 금액과의 간격 */
 }
 
 .description {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap; /* 한 줄로 표시 */
+  overflow: hidden; /* 넘치는 내용 숨김 */
+  text-overflow: ellipsis; /* 말줄임표 (...) */
 }
 
 .categoryName {
-  font-size: 14px;
-  color: #888;
-}
-
-.transactionAmount {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .amountAndButton {
-  /* 추가 */
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  flex-shrink: 0; /* 줄어들지 않도록 고정 */
+}
+
+.transactionAmount {
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap; /* 줄바꿈 방지 */
+  text-align: right;
+  min-width: 80px; /* 최소 너비 확보하여 숫자 정렬 맞춤 */
 }
 
 .deleteButton {
-  /* 추가 */
   background: none;
   border: none;
   cursor: pointer;
-  color: #888;
-  padding: 4px;
+  color: var(--text-secondary);
+  padding: 8px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .deleteButton:hover {
-  color: #f00;
+  background-color: rgba(239, 68, 68, 0.1); /* 붉은색 배경 */
+  color: #ef4444;
 }

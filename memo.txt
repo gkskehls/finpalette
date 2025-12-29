@@ -25,13 +25,12 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(palette): 게스트 모드 팔레트 생성 제한 및 로그인 유도 UI 추가
+style(transaction): 전체 내역 리스트 레이아웃 및 스타일 개선
 
-- 비로그인 상태에서 팔레트 생성 시도 시 발생하는 DB 에러(RLS) 해결
-- PaletteFormModal에 로그인 상태 체크 로직 추가
-- 비로그인 사용자에게 로그인 안내 메시지 및 구글 로그인 버튼 표시
-- PaletteFormModal 스타일(loginContainer 등) 추가
-
+- 리스트 아이템을 카드 형태로 변경하고 간격 및 패딩 조정
+- 긴 텍스트(내용, 카테고리명)에 말줄임표(...) 처리 적용하여 레이아웃 깨짐 방지
+- 금액 영역에 최소 너비 및 우측 정렬을 적용하여 가독성 향상
+- Flexbox 구조 최적화 (min-width: 0 적용 등)
 "
 git push origin main
 
