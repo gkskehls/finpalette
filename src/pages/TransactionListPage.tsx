@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
+import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import type { Transaction } from '../types/transaction';
 import {
   INCOME_CATEGORIES,
@@ -72,6 +73,9 @@ const TransactionItem = (props: TransactionItemProps) => {
 
 const TransactionListPage = () => {
   const { data: transactions, isLoading, error } = useTransactionsQuery();
+
+  // 스크롤 위치 복원 훅 적용 (데이터 로딩이 끝난 후 복원)
+  useScrollRestoration('transactions', isLoading);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<

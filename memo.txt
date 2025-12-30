@@ -28,14 +28,24 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-refactor(app): React Router 도입 및 주소 기반 라우팅 적용
+refactor(app): 라우팅 시스템 도입 및 스크롤 제어 기능 구현
 
-- react-router-dom 설치 및 BrowserRouter 적용
-- App.tsx: 상태 기반 페이지 전환을 Routes/Route 기반으로 변경
-- BottomNav: useNavigate를 사용하여 실제 URL 이동 방식으로 변경
-- Header: useLocation을 사용하여 현재 경로에 맞는 제목 표시
-- 각 페이지(대시보드, 통계, 내역, 마이)에 고유 URL 부여 (/stats, /profile 등)
-- 새로고침 시 페이지 유지 및 브라우저 뒤로가기 지원
+- **React Router 도입 및 주소 기반 라우팅 적용**
+  - 기존 상태 기반 페이지 전환 방식을 react-router-dom을 사용한 URL 기반 라우팅으로 전면 개편했습니다.
+  - 이제 새로고침 시 현재 페이지가 유지되고, 브라우저의 뒤로가기/앞으로가기 기능이 정상적으로 동작합니다.
+  - 각 페이지에 고유 주소(/, /transactions, /stats, /profile)가 부여됩니다.
+
+- **페이지 이동 시 스크롤 제어 기능 구현**
+  - ScrollToTop 컴포넌트를 구현하여, 페이지 이동 시 기본적으로 스크롤을 최상단으로 초기화합니다.
+  - useScrollRestoration 훅을 구현하여, '전체 내역' 페이지는 사용자가 보던 스크롤 위치를 기억하고 복원하도록 개선했습니다.
+
+- **UI 버그 수정 및 리팩토링**
+  - 팔레트 설정창이 선택창 뒤에 가려지는 z-index 문제를 해결했습니다.
+  - Header 컴포넌트에서 모달 상태 관리를 통합하여 관련 로직을 개선했습니다.
+
+- **기타 수정**
+  - useScrollRestoration 훅의 미사용 변수를 제거하여 ESLint 오류를 해결했습니다.
+  - 앱 버전을 1.0.8로 업데이트했습니다.
 "
 git push origin main
 

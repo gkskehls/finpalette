@@ -4,12 +4,17 @@ import { useLocation } from 'react-router-dom';
 import { usePalette } from '../../context/PaletteContext';
 import { PaletteListBottomSheet } from './PaletteListBottomSheet';
 import { PaletteFormModal } from '../palette/PaletteFormModal';
+import { PaletteSettingsModal } from '../palette/PaletteSettingsModal';
+import type { Palette } from '../../types/palette';
 import styles from './Header.module.css';
 
 export function Header() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [paletteForSetting, setPaletteForSetting] = useState<Palette | null>(
+    null
+  );
   const { currentPalette, isLoading } = usePalette();
   const location = useLocation();
 
@@ -29,6 +34,11 @@ export function Header() {
   const handleAddPalette = () => {
     setIsSheetOpen(false);
     setIsFormOpen(true);
+  };
+
+  const handleOpenSettings = (palette: Palette) => {
+    setIsSheetOpen(false); // 선택창 닫기
+    setPaletteForSetting(palette); // 설정할 팔레트 정보 저장
   };
 
   // 현재 경로에 따른 기본 제목 결정
@@ -69,10 +79,19 @@ export function Header() {
         <PaletteListBottomSheet
           onClose={() => setIsSheetOpen(false)}
           onAddPalette={handleAddPalette}
+          onOpenSettings={handleOpenSettings}
         />
       )}
 
       {isFormOpen && <PaletteFormModal onClose={() => setIsFormOpen(false)} />}
+
+      {paletteForSetting && (
+        <PaletteSettingsModal
+          isOpen={!!paletteForSetting}
+          onClose={() => setPaletteForSetting(null)}
+          palette={paletteForSetting}
+        />
+      )}
     </>
   );
 }
