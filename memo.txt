@@ -3,6 +3,9 @@
 'Finance‘와 'Palette’의 합성어입니다. 다양한 카테고리(식비, 교통비 등)를 팔레트의 색상처럼 분류하고 관리한다는 의미를 담고 있습니다
 
 이 프로젝트의 모든 답변은 한글로 해줘.
+프로젝트내의 필요한파일은 찾아서 참조해줘.
+매번 수정시마다 ProfilePage.tsx 파일의 앱 버전을 변경해줘. 새로 배포된 버전을 내가 보고있는지 확인하기 위함이야.
+동일 항목 수정시에도 버전은 계속 갱신해줘. 그래야 확인이 가능해.
 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md, supabase_schema.sql 꼭 지속적으로 참조해줘.
 매번 소스 수정을 할때마 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md 이 문서들을 업데이트 해줘.
 supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심해줘.
@@ -25,12 +28,13 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(category): DB/로컬 카테고리 분기 처리 및 버그 수정
+fix: 로그아웃 에러 해결 및 UI/UX 개선
 
-- TransactionFormModal에서 DB 카테고리를 사용하도록 수정
-- useCategoriesQuery 훅을 생성하여 현재 팔레트의 카테고리 목록을 조회
-- 로그인/게스트 상태에 따라 DB 또는 로컬(constants)에서 카테고리를 분기하여 가져오도록 개선
-- 카테고리 코드 불일치로 인한 외래 키 제약 조건 에러(409 Conflict) 해결
+- 로그아웃 시 빈 화면 및 'Object not found' 에러 해결 (상태 초기화 로직 개선)
+- PaletteContext 상태 관리 리팩토링 (Derived State 적용)
+- 전역 ErrorBoundary 컴포넌트 추가 및 적용
+- 팔레트 선택 바텀 시트 z-index 수정 (FAB 위로 표시되도록 개선)
+- 앱 버전 1.0.4로 업데이트
 "
 git push origin main
 

@@ -76,6 +76,10 @@ fix(header): 모바일에서 로고가 깨지는 문제 수정
   - `src/lib`: 외부 라이브러리 설정 (예: `supabaseClient.ts`)
   - `src/types`: 전역 타입 정의
   - `src/config`: 상수, 설정 파일
+- **앱 버전 관리**:
+  - 소스 코드를 조금이라도 수정할 경우, 반드시 `src/pages/ProfilePage.tsx` 파일 내의 앱 버전을 업데이트해야 합니다.
+  - 버전 형식은 `Major.Minor.Patch` (예: `1.0.4`)를 따르며, 일반적인 수정 시 Patch 버전을 1씩 증가시킵니다.
+  - 이는 배포된 앱이 최신 버전인지 확인하기 위함입니다.
 
 ### React & TypeScript
 

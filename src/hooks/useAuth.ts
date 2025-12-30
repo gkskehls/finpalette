@@ -89,6 +89,8 @@ export function useAuth(): AuthState {
       }
       // 로그아웃 후 모든 쿼리를 초기화하여 깨끗한 상태로 만듭니다.
       queryClient.clear();
+      // 로그아웃 후 페이지를 새로고침하여 상태를 완전히 초기화합니다.
+      window.location.reload();
     } catch (error) {
       console.error('Unexpected error during sign-out:', error);
     }
