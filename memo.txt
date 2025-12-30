@@ -28,13 +28,14 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix: 로그아웃 에러 해결 및 UI/UX 개선
+refactor(app): React Router 도입 및 주소 기반 라우팅 적용
 
-- 로그아웃 시 빈 화면 및 'Object not found' 에러 해결 (상태 초기화 로직 개선)
-- PaletteContext 상태 관리 리팩토링 (Derived State 적용)
-- 전역 ErrorBoundary 컴포넌트 추가 및 적용
-- 팔레트 선택 바텀 시트 z-index 수정 (FAB 위로 표시되도록 개선)
-- 앱 버전 1.0.4로 업데이트
+- react-router-dom 설치 및 BrowserRouter 적용
+- App.tsx: 상태 기반 페이지 전환을 Routes/Route 기반으로 변경
+- BottomNav: useNavigate를 사용하여 실제 URL 이동 방식으로 변경
+- Header: useLocation을 사용하여 현재 경로에 맞는 제목 표시
+- 각 페이지(대시보드, 통계, 내역, 마이)에 고유 URL 부여 (/stats, /profile 등)
+- 새로고침 시 페이지 유지 및 브라우저 뒤로가기 지원
 "
 git push origin main
 

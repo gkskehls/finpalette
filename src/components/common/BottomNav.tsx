@@ -1,41 +1,45 @@
-import { LayoutDashboard, ChartBarBig, User, List } from 'lucide-react'; // List 추가
+import { LayoutDashboard, ChartBarBig, User, List } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './BottomNav.module.css';
-import type { Page } from '../../App';
 
-interface BottomNavProps {
-  activePage: Page;
+export function BottomNav() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
 
-  onPageChange: (_page: Page) => void;
-}
+  // 현재 경로가 해당 탭의 경로와 일치하는지 확인 (루트 경로는 대시보드로 취급)
+  const isActive = (path: string) => {
+    if (path === '/' && currentPath === '/') return true;
+    if (path !== '/' && currentPath.startsWith(path)) return true;
+    return false;
+  };
 
-export function BottomNav({ activePage, onPageChange }: BottomNavProps) {
   return (
     <footer className={styles.bottomNav}>
       <button
-        className={`${styles.navItem} ${activePage === 'dashboard' ? styles.active : ''}`}
-        onClick={() => onPageChange('dashboard')}
+        className={`${styles.navItem} ${isActive('/') ? styles.active : ''}`}
+        onClick={() => navigate('/')}
       >
         <LayoutDashboard size={24} />
         <span>대시보드</span>
       </button>
-      {/* 추가된 '전체 내역' 버튼 */}
       <button
-        className={`${styles.navItem} ${activePage === 'transactions' ? styles.active : ''}`}
-        onClick={() => onPageChange('transactions')}
+        className={`${styles.navItem} ${isActive('/transactions') ? styles.active : ''}`}
+        onClick={() => navigate('/transactions')}
       >
         <List size={24} />
         <span>전체 내역</span>
       </button>
       <button
-        className={`${styles.navItem} ${activePage === 'stats' ? styles.active : ''}`}
-        onClick={() => onPageChange('stats')}
+        className={`${styles.navItem} ${isActive('/stats') ? styles.active : ''}`}
+        onClick={() => navigate('/stats')}
       >
         <ChartBarBig size={24} />
         <span>통계</span>
       </button>
       <button
-        className={`${styles.navItem} ${activePage === 'profile' ? styles.active : ''}`}
-        onClick={() => onPageChange('profile')}
+        className={`${styles.navItem} ${isActive('/profile') ? styles.active : ''}`}
+        onClick={() => navigate('/profile')}
       >
         <User size={24} />
         <span>마이</span>
