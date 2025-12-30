@@ -11,8 +11,18 @@ DROP TABLE IF EXISTS public.categories CASCADE;
 DROP TABLE IF EXISTS public.palette_invitations CASCADE;
 DROP TABLE IF EXISTS public.palette_members CASCADE;
 DROP TABLE IF EXISTS public.palettes CASCADE;
+DROP TABLE IF EXISTS public.profiles CASCADE;
 
--- 2. Create 'palettes' table
+-- 2. Create 'profiles' table to store public user data
+CREATE TABLE public.profiles (
+    id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL PRIMARY KEY,
+    email TEXT,
+    full_name TEXT,
+    avatar_url TEXT,
+    updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+-- 3. Create 'palettes' table
 CREATE TABLE public.palettes (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT NOT NULL,
@@ -22,7 +32,7 @@ CREATE TABLE public.palettes (
     updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
--- 3. Create 'palette_members' table
+-- 4. Create 'palette_members' table
 CREATE TABLE public.palette_members (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     palette_id UUID REFERENCES public.palettes(id) ON DELETE CASCADE NOT NULL,
@@ -32,7 +42,7 @@ CREATE TABLE public.palette_members (
     UNIQUE(palette_id, user_id)
 );
 
--- 4. Create 'palette_invitations' table
+-- 5. Create 'palette_invitations' table
 CREATE TABLE public.palette_invitations (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     palette_id UUID REFERENCES public.palettes(id) ON DELETE CASCADE NOT NULL,
@@ -43,8 +53,7 @@ CREATE TABLE public.palette_invitations (
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
--- 5. Create 'categories' table
--- PK is composite: (palette_id, code)
+-- 6. Create 'categories' table
 CREATE TABLE public.categories (
     palette_id UUID REFERENCES public.palettes(id) ON DELETE CASCADE NOT NULL,
     code TEXT NOT NULL,
@@ -56,7 +65,7 @@ CREATE TABLE public.categories (
     PRIMARY KEY (palette_id, code)
 );
 
--- 6. Create 'transactions' table
+-- 7. Create 'transactions' table
 CREATE TABLE public.transactions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     palette_id UUID NOT NULL,
@@ -75,18 +84,36 @@ CREATE TABLE public.transactions (
 
 
 -- ==============================================================================
--- Helper Functions (Security Definer)
+-- Helper Functions & Triggers
 -- ==============================================================================
 
--- Function to check if the current user is a member of the given palette
-CREATE OR REPLACE FUNCTION check_if_member(_palette_id UUID)
-RETURNS BOOLEAN AS $$
+-- Trigger function to sync new users to 'profiles' table
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name, avatar_url)
+  VALUES (
+    new.id,
+    new.raw_user_meta_data->>'email',
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'avatar_url'
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to execute the function on new user creation
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Helper function to check if a user is a member of a palette (SECURITY DEFINER to bypass RLS)
+CREATE OR REPLACE FUNCTION is_current_user_member(_palette_id UUID)
+RETURNS boolean AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1
-    FROM public.palette_members
-    WHERE palette_id = _palette_id
-    AND user_id = auth.uid()
+    SELECT 1 FROM public.palette_members
+    WHERE user_id = auth.uid() AND palette_id = _palette_id
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -96,6 +123,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Row Level Security (RLS) Policies
 -- ==============================================================================
 
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.palettes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.palette_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.palette_invitations ENABLE ROW LEVEL SECURITY;
@@ -103,17 +131,19 @@ ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 
 -- ------------------------------------------------------------------------------
--- 1. Policies for 'palettes'
+-- 1. Policies for 'profiles'
 -- ------------------------------------------------------------------------------
--- View: Use standard EXISTS query instead of function to avoid potential issues
--- This is safe because 'palette_members' policy does NOT query 'palettes'.
+CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles
+    FOR SELECT USING (true);
+
+CREATE POLICY "Users can update their own profile." ON public.profiles
+    FOR UPDATE USING (auth.uid() = id);
+
+-- ------------------------------------------------------------------------------
+-- 2. Policies for 'palettes'
+-- ------------------------------------------------------------------------------
 CREATE POLICY "Users can view palettes they belong to" ON public.palettes
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM public.palette_members
-            WHERE palette_id = public.palettes.id AND user_id = auth.uid()
-        )
-    );
+    FOR SELECT USING (is_current_user_member(id));
 
 CREATE POLICY "Owners can update their palettes" ON public.palettes
     FOR UPDATE USING (owner_id = auth.uid());
@@ -126,49 +156,58 @@ CREATE POLICY "Users can create palettes" ON public.palettes
 
 
 -- ------------------------------------------------------------------------------
--- 2. Policies for 'palette_members'
+-- 3. Policies for 'palette_members'
 -- ------------------------------------------------------------------------------
--- View: I can see my own membership
-CREATE POLICY "Users can view their own membership" ON public.palette_members
-    FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Members can view other members of the same palette" ON public.palette_members
+    FOR SELECT USING (is_current_user_member(palette_id));
 
--- Insert: I can add myself (ONLY via RPC or specific conditions - tightened for security)
--- We will rely on RPC for adding members via invitation.
--- For creating a palette, the owner adds themselves.
 CREATE POLICY "Users can insert their own membership" ON public.palette_members
     FOR INSERT WITH CHECK (user_id = auth.uid());
 
--- Update: I can update my own membership
-CREATE POLICY "Users can update their own membership" ON public.palette_members
-    FOR UPDATE USING (user_id = auth.uid());
+CREATE POLICY "Owners can update member roles" ON public.palette_members
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.palettes p
+            WHERE p.id = public.palette_members.palette_id
+            AND p.owner_id = auth.uid()
+        )
+    );
 
--- Delete: I can leave
-CREATE POLICY "Users can leave palettes" ON public.palette_members
-    FOR DELETE USING (user_id = auth.uid());
+CREATE POLICY "Users can leave palettes (but not owners)" ON public.palette_members
+    FOR DELETE USING (user_id = auth.uid() AND role <> 'owner');
+
+CREATE POLICY "Owners can remove other members" ON public.palette_members
+    FOR DELETE USING (
+        EXISTS (
+            SELECT 1 FROM public.palettes p
+            WHERE p.id = public.palette_members.palette_id
+            AND p.owner_id = auth.uid()
+        )
+        AND user_id <> auth.uid()
+    );
 
 
 -- ------------------------------------------------------------------------------
--- 3. Policies for 'transactions'
+-- 4. Policies for 'transactions'
 -- ------------------------------------------------------------------------------
--- Use the helper function for all operations
 CREATE POLICY "Members can view transactions" ON public.transactions
-    FOR SELECT USING (check_if_member(palette_id));
+    FOR SELECT USING (is_current_user_member(palette_id));
 
 CREATE POLICY "Members can insert transactions" ON public.transactions
-    FOR INSERT WITH CHECK (check_if_member(palette_id));
+    FOR INSERT WITH CHECK (is_current_user_member(palette_id));
 
 CREATE POLICY "Members can update transactions" ON public.transactions
-    FOR UPDATE USING (check_if_member(palette_id));
+    FOR UPDATE USING (is_current_user_member(palette_id));
 
 CREATE POLICY "Members can delete transactions" ON public.transactions
-    FOR DELETE USING (check_if_member(palette_id));
+    FOR DELETE USING (is_current_user_member(palette_id));
 
 
 -- ------------------------------------------------------------------------------
--- 4. Policies for 'categories'
+-- 5. Policies for 'categories'
 -- ------------------------------------------------------------------------------
 CREATE POLICY "Members can view categories" ON public.categories
-    FOR SELECT USING (check_if_member(palette_id));
+    FOR SELECT USING (is_current_user_member(palette_id));
 
 CREATE POLICY "Admins/Owners can manage categories" ON public.categories
     FOR ALL USING (
@@ -182,19 +221,20 @@ CREATE POLICY "Admins/Owners can manage categories" ON public.categories
 
 
 -- ------------------------------------------------------------------------------
--- 5. Policies for 'palette_invitations'
+-- 6. Policies for 'palette_invitations'
 -- ------------------------------------------------------------------------------
 CREATE POLICY "Members can view invitations" ON public.palette_invitations
-    FOR SELECT USING (check_if_member(palette_id));
+    FOR SELECT USING (is_current_user_member(palette_id));
 
 CREATE POLICY "Members can create invitations" ON public.palette_invitations
-    FOR INSERT WITH CHECK (check_if_member(palette_id));
+    FOR INSERT WITH CHECK (is_current_user_member(palette_id));
 
 
 -- ==============================================================================
 -- RPC Functions
 -- ==============================================================================
 
+-- Function to create a new palette with default settings
 CREATE OR REPLACE FUNCTION create_palette(
   name TEXT,
   theme_color TEXT
@@ -267,6 +307,39 @@ BEGIN
   RETURN invite_record.palette_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to get palette members with their profile info
+CREATE OR REPLACE FUNCTION get_palette_members(p_palette_id uuid)
+RETURNS TABLE (
+  id uuid,
+  palette_id uuid,
+  user_id uuid,
+  role text,
+  joined_at timestamptz,
+  email text,
+  full_name text,
+  avatar_url text
+)
+AS $$
+BEGIN
+  RETURN QUERY
+    SELECT
+      pm.id,
+      pm.palette_id,
+      pm.user_id,
+      pm.role,
+      pm.joined_at,
+      p.email,
+      p.full_name,
+      p.avatar_url
+    FROM
+      public.palette_members AS pm
+      LEFT JOIN public.profiles AS p ON pm.user_id = p.id
+    WHERE
+      pm.palette_id = p_palette_id;
+END;
+$$ LANGUAGE plpgsql;
+
 
 -- Force schema cache reload
 NOTIFY pgrst, 'reload config';
