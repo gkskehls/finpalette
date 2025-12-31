@@ -29,10 +29,10 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(ui): 내역 입력 모달 레이아웃 및 모바일 UX 개선
+fix(ui): 내역 입력 폼 린터 에러 수정 및 UX 개선
 
-- 입력창(input, select)이 모달 영역을 벗어나는 문제 수정 (box-sizing: border-box 적용)
-- 모바일에서 입력창 포커스 시 화면 자동 확대 방지 (font-size: 16px 적용)
+- 날짜 입력 필드 너비 자동 조정 및 카테고리 기본값 선택 로직 개선
+- useEffect 내 setState 동기 호출로 인한 ESLint 에러 수정 (setTimeout 적용)
 "
 git push origin main
 

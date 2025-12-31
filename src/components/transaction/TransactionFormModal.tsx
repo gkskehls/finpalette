@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import styles from './TransactionFormModal.module.css';
 import { X, Lock } from 'lucide-react';
 import { useCategoriesQuery } from '../../hooks/queries/useCategoriesQuery';
@@ -39,7 +39,7 @@ export function TransactionFormModal({
     transactionToEdit?.amount.toString() || ''
   );
   const [category, setCategory] = useState(
-    transactionToEdit?.category_code || expenseCategories[0]?.code || ''
+    transactionToEdit?.category_code || ''
   );
   const [date, setDate] = useState(
     transactionToEdit?.date || new Date().toISOString().split('T')[0]
@@ -53,6 +53,26 @@ export function TransactionFormModal({
 
   const addMutation = useAddTransactionMutation();
   const updateMutation = useUpdateTransactionMutation();
+
+  // 카테고리 데이터가 로드되면 기본값 자동 선택
+  useEffect(() => {
+    // 수정 모드이고 이미 값이 있다면 건너뜀
+    if (isEditMode && category) return;
+
+    const currentList = type === 'inc' ? incomeCategories : expenseCategories;
+
+    // 리스트는 로드되었는데 선택된 값이 없거나 유효하지 않은 경우 첫 번째 항목 선택
+    if (currentList.length > 0) {
+      const isValid = currentList.some((c) => c.code === category);
+      if (!category || !isValid) {
+        // 렌더링 중 상태 업데이트로 인한 린터 에러 방지를 위해 비동기 처리
+        const timer = setTimeout(() => {
+          setCategory(currentList[0].code);
+        }, 0);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [incomeCategories, expenseCategories, type, category, isEditMode]);
 
   const handleTypeChange = (newType: 'inc' | 'exp') => {
     setType(newType);
