@@ -20,10 +20,47 @@ export function useAuth(): AuthState {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    // 프로필 동기화 함수 (재사용을 위해 분리)
+    const syncUserProfile = async (session: { user: User }) => {
+      try {
+        const { user } = session;
+        const updates = {
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name,
+          avatar_url: user.user_metadata?.avatar_url,
+          updated_at: new Date().toISOString(),
+        };
+
+        const { error } = await supabase
+          .from('profiles')
+          .upsert(updates, { onConflict: 'id' });
+
+        if (error) {
+          console.error('Failed to sync user profile:', error);
+        } else {
+          console.log('User profile synced successfully.');
+        }
+      } catch (err) {
+        console.error('Error syncing profile:', err);
+      }
+    };
+
+    // 초기 로드 시 세션 확인 및 프로필 동기화
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        syncUserProfile(session);
+      }
+    });
+
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // 'SIGNED_IN' 이벤트가 발생했을 때 데이터 마이그레이션을 백그라운드에서 실행합니다.
+        // 'SIGNED_IN' 이벤트가 발생했을 때 데이터 마이그레이션 및 프로필 동기화를 실행합니다.
         if (event === 'SIGNED_IN' && session) {
+          // 1. 프로필 정보 동기화 (Self-Healing)
+          syncUserProfile(session);
+
+          // 2. 게스트 데이터 마이그레이션
           if (!isMigrationRunning) {
             isMigrationRunning = true;
             (async () => {
@@ -37,7 +74,6 @@ export function useAuth(): AuthState {
                     'Migration successful. Invalidating transactions query.'
                   );
                   // 마이그레이션 후 최신 데이터를 반영하기 위해 쿼리를 무효화합니다.
-                  // 팔레트 목록과 트랜잭션 목록 모두를 무효화하는 것이 안전합니다.
                   await queryClient.invalidateQueries({
                     queryKey: ['palettes'],
                   });

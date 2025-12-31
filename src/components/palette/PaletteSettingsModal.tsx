@@ -4,9 +4,9 @@ import styles from './PaletteSettingsModal.module.css';
 import { useCreateInvitationMutation } from '../../hooks/queries/useCreateInvitationMutation';
 import { usePaletteMembersQuery } from '../../hooks/queries/usePaletteMembersQuery';
 import { useAuth } from '../../hooks/useAuth';
-import type { Palette } from '../../types/palette';
+import type { Palette, PaletteMember } from '../../types/palette';
 
-// MemberList 컴포넌트 (파일 하단에 정의)
+// MemberList 컴포넌트
 const MemberList = ({ paletteId }: { paletteId: string }) => {
   const { user } = useAuth();
   const { data: members, isLoading, error } = usePaletteMembersQuery(paletteId);
@@ -14,21 +14,34 @@ const MemberList = ({ paletteId }: { paletteId: string }) => {
   if (isLoading) return <div>멤버 목록을 불러오는 중...</div>;
   if (error) return <div>오류: {error.message}</div>;
 
+  // member 파라미터의 타입을 PaletteMember로 명확히 지정
+  const getAvatarUrl = (member: PaletteMember) => {
+    if (member.avatar_url) {
+      return member.avatar_url;
+    }
+    // 이름이나 이메일이 있으면 사용, 없으면 user_id의 앞 2글자를 사용
+    const nameParam =
+      member.full_name || member.email || member.user_id.substring(0, 2);
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nameParam)}&background=random&color=fff`;
+  };
+
+  // member 파라미터의 타입을 PaletteMember로 명확히 지정
+  const getDisplayName = (member: PaletteMember) => {
+    return member.full_name || member.email || '알 수 없는 멤버';
+  };
+
   return (
     <ul className={styles.memberList}>
       {members?.map((member) => (
         <li key={member.id} className={styles.memberItem}>
           <img
-            src={
-              member.avatar_url ||
-              `https://ui-avatars.com/api/?name=${member.email}&background=random`
-            }
-            alt={member.full_name || member.email || 'avatar'}
+            src={getAvatarUrl(member)}
+            alt={getDisplayName(member)}
             className={styles.avatar}
           />
           <div className={styles.memberInfo}>
             <span className={styles.memberName}>
-              {member.full_name || member.email}
+              {getDisplayName(member)}
               {member.user_id === user?.id && (
                 <span className={styles.myBadge}>나</span>
               )}
