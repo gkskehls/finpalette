@@ -29,13 +29,12 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(transaction): 내역 리스트 UI 개편 및 무한 스크롤 구현
+feat(ui): 텅 빈 화면(Empty State) 디자인 적용
 
-- TransactionListPage UI를 Compact 디자인으로 변경 (날짜 그룹화, Sticky Header)
-- useTransactionsQuery를 useInfiniteQuery로 마이그레이션 (20개씩 로딩)
-- useIntersectionObserver 훅 추가 및 무한 스크롤 연동
-- PROJECT_PLAN.md: Phase 3.5 (Polishing) 단계 추가
-- 앱 버전 1.0.33으로 업데이트
+- 재사용 가능한 EmptyState 공통 컴포넌트 생성
+- 내역 리스트 및 통계 페이지에 데이터가 없을 때 안내 문구와 아이콘 표시
+- PROJECT_PLAN.md, APP_SPECIFICATION.md 문서 최신화
+- 앱 버전 1.0.35로 업데이트
 "
 git push origin main
 

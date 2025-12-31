@@ -38,14 +38,14 @@ const resizeImage = (file: File, maxWidth: number): Promise<Blob> => {
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, width, height);
 
-      // JPEG 포맷, 퀄리티 0.7로 압축
+      // JPEG 포맷, 퀄리티 0.8로 압축 (화질 개선을 위해 0.7 -> 0.8로 상향)
       canvas.toBlob(
         (blob) => {
           if (blob) resolve(blob);
           else reject(new Error('Canvas to Blob conversion failed'));
         },
         'image/jpeg',
-        0.7
+        0.8
       );
     };
 
@@ -63,9 +63,9 @@ export function useAvatarUpload() {
     try {
       setIsUploading(true);
 
-      // 1. 이미지 리사이징 (최대 128px)
-      // 아바타용이므로 작게 줄여서 용량을 최적화합니다.
-      const resizedBlob = await resizeImage(file, 128);
+      // 1. 이미지 리사이징 (최대 512px)
+      // Retina 디스플레이 대응을 위해 해상도를 512px로 상향 조정합니다.
+      const resizedBlob = await resizeImage(file, 512);
 
       // 2. 파일 경로 생성 (users/유저ID/timestamp.jpg)
       // 리사이징 과정에서 jpeg로 변환되므로 확장자는 jpg로 고정합니다.

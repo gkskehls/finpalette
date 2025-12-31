@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
@@ -10,9 +10,10 @@ import {
 } from '../config/constants';
 import { Icon } from '../components/common/Icon';
 import styles from './TransactionListPage.module.css';
-import { Lock } from 'lucide-react';
+import { Lock, Palette } from 'lucide-react';
 import { TransactionFormModal } from '../components/transaction/TransactionFormModal';
 import { useAuth } from '../hooks/useAuth';
+import { EmptyState } from '../components/common/EmptyState';
 
 const ALL_CATEGORIES = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
@@ -100,6 +101,11 @@ const TransactionListPage = () => {
     setIsModalOpen(true);
   };
 
+  const handleOpenAddModal = () => {
+    setSelectedTransaction(undefined);
+    setIsModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedTransaction(undefined);
@@ -115,8 +121,6 @@ const TransactionListPage = () => {
     if (allTransactions.length === 0) return [];
 
     const groups: { date: string; transactions: Transaction[] }[] = [];
-    // 이미 서버에서 정렬되어 오지만, 안전을 위해 한 번 더 정렬 (선택 사항)
-    // const sorted = [...allTransactions].sort(...)
 
     allTransactions.forEach((tx) => {
       const dateStr = tx.date; // YYYY-MM-DD
@@ -142,10 +146,13 @@ const TransactionListPage = () => {
       );
     if (allTransactions.length === 0)
       return (
-        <div className={styles.emptyState}>
-          <p>아직 거래 내역이 없습니다.</p>
-          <p className={styles.emptySubText}>첫 지출을 기록해보세요!</p>
-        </div>
+        <EmptyState
+          icon={Palette}
+          title="아직 기록된 내역이 없어요"
+          description="오늘의 소비는 어떤 색인가요? 첫 내역을 추가해보세요!"
+          actionLabel="내역 추가하기"
+          onAction={handleOpenAddModal}
+        />
       );
 
     return (

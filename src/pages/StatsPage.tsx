@@ -16,6 +16,8 @@ import {
 } from 'recharts';
 import type { Transaction } from '../types/transaction';
 import styles from './StatsPage.module.css';
+import { EmptyState } from '../components/common/EmptyState';
+import { PieChart as PieChartIcon } from 'lucide-react';
 
 interface MonthlySummary {
   month: string;
@@ -121,6 +123,19 @@ export function StatsPage() {
 
   const formattedMonth = `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}`;
 
+  // 데이터가 아예 없을 때 Empty State 표시
+  if (transactions.length === 0) {
+    return (
+      <div className={styles.container} style={{ justifyContent: 'center' }}>
+        <EmptyState
+          icon={PieChartIcon}
+          title="분석할 데이터가 충분하지 않아요"
+          description="내역이 쌓이면 멋진 차트를 보여드릴게요!"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -134,32 +149,38 @@ export function StatsPage() {
       </div>
       <h3 className={styles.sectionTitle}>카테고리별 지출</h3>
       <div className={styles.chartContainer}>
-        <ResponsiveContainer>
-          <PieChart>
-            <Pie
-              data={monthlyExpenseData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={80}
-              fill="#8884d8"
-              dataKey="value"
-              nameKey="name"
-              label={(entry) => `${entry.name}`}
-            >
-              {monthlyExpenseData.map((entry) => (
-                <Cell key={`cell-${entry.name}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value: number) => [
-                `${value.toLocaleString()}원`,
-                '지출액',
-              ]}
-            />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+        {monthlyExpenseData.length > 0 ? (
+          <ResponsiveContainer>
+            <PieChart>
+              <Pie
+                data={monthlyExpenseData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+                nameKey="name"
+                label={(entry) => `${entry.name}`}
+              >
+                {monthlyExpenseData.map((entry) => (
+                  <Cell key={`cell-${entry.name}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value: number) => [
+                  `${value.toLocaleString()}원`,
+                  '지출액',
+                ]}
+              />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className={styles.noDataMessage}>
+            이번 달 지출 내역이 없습니다.
+          </div>
+        )}
       </div>
 
       <h3 className={styles.sectionTitle}>월별 수입/지출</h3>
