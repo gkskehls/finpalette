@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './TransactionFormModal.module.css';
-import { X, Lock } from 'lucide-react';
+import { X, Lock, Trash2 } from 'lucide-react';
 import { useCategoriesQuery } from '../../hooks/queries/useCategoriesQuery';
 import type { Transaction } from '../../types/transaction';
 import {
   useAddTransactionMutation,
   useUpdateTransactionMutation,
+  useDeleteTransactionMutation,
 } from '../../hooks/queries/useTransactionsMutation';
 import type {
   NewTransaction,
@@ -23,11 +24,9 @@ export function TransactionFormModal({
 }: TransactionFormModalProps) {
   const isEditMode = !!transactionToEdit;
 
-  // DB에서 카테고리 목록을 가져옵니다.
   const { data: categories, isLoading: isLoadingCategories } =
     useCategoriesQuery();
 
-  // 수입/지출 카테고리를 분리합니다.
   const { incomeCategories, expenseCategories } = useMemo(() => {
     const income = categories?.filter((c) => c.code.startsWith('i')) || [];
     const expense = categories?.filter((c) => c.code.startsWith('c')) || [];
@@ -53,19 +52,14 @@ export function TransactionFormModal({
 
   const addMutation = useAddTransactionMutation();
   const updateMutation = useUpdateTransactionMutation();
+  const deleteMutation = useDeleteTransactionMutation();
 
-  // 카테고리 데이터가 로드되면 기본값 자동 선택
   useEffect(() => {
-    // 수정 모드이고 이미 값이 있다면 건너뜀
     if (isEditMode && category) return;
-
     const currentList = type === 'inc' ? incomeCategories : expenseCategories;
-
-    // 리스트는 로드되었는데 선택된 값이 없거나 유효하지 않은 경우 첫 번째 항목 선택
     if (currentList.length > 0) {
       const isValid = currentList.some((c) => c.code === category);
       if (!category || !isValid) {
-        // 렌더링 중 상태 업데이트로 인한 린터 에러 방지를 위해 비동기 처리
         const timer = setTimeout(() => {
           setCategory(currentList[0].code);
         }, 0);
@@ -76,7 +70,6 @@ export function TransactionFormModal({
 
   const handleTypeChange = (newType: 'inc' | 'exp') => {
     setType(newType);
-    // 타입 변경 시, 해당 타입의 첫 번째 카테고리를 기본값으로 설정
     if (!isEditMode) {
       setCategory(
         newType === 'inc'
@@ -114,6 +107,16 @@ export function TransactionFormModal({
       addMutation.mutate(formData, {
         onSuccess: onClose,
       });
+    }
+  };
+
+  const handleDelete = () => {
+    if (isEditMode && transactionToEdit) {
+      if (window.confirm('이 내역을 정말 삭제하시겠습니까?')) {
+        deleteMutation.mutate(transactionToEdit.id!, {
+          onSuccess: onClose,
+        });
+      }
     }
   };
 
@@ -217,6 +220,17 @@ export function TransactionFormModal({
           </div>
 
           <div className={styles.formActions}>
+            {isEditMode && (
+              <button
+                type="button"
+                className={styles.deleteButton}
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+              >
+                <Trash2 size={16} />
+                삭제
+              </button>
+            )}
             <button
               type="button"
               className={styles.cancelButton}
@@ -227,7 +241,11 @@ export function TransactionFormModal({
             <button
               type="submit"
               className={styles.submitButton}
-              disabled={addMutation.isPending || updateMutation.isPending}
+              disabled={
+                addMutation.isPending ||
+                updateMutation.isPending ||
+                deleteMutation.isPending
+              }
             >
               {isEditMode ? '수정' : '저장'}
             </button>

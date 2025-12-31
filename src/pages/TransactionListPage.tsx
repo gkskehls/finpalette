@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';

@@ -122,18 +122,23 @@
 
 .formActions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between; /* 양쪽 끝으로 정렬 */
+  align-items: center;
   gap: 12px;
   margin-top: 24px;
 }
 
 .cancelButton,
-.submitButton {
+.submitButton,
+.deleteButton {
   padding: 10px 20px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .cancelButton {
@@ -145,4 +150,16 @@
 .submitButton {
   background-color: var(--primary-color);
   color: white;
+}
+
+.deleteButton {
+  background-color: transparent;
+  color: var(--danger-color, #ef4444);
+  padding: 10px; /* 텍스트가 없으므로 패딩 조정 */
+  margin-right: auto; /* 왼쪽으로 밀착 */
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

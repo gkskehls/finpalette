@@ -105,7 +105,7 @@ export function ProfilePage() {
           fontFamily: 'monospace',
         }}
       >
-        v1.0.35
+        v1.0.36
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>
@@ -248,7 +248,7 @@ export function ProfilePage() {
       <h2 className={styles.sectionTitle}>기타 설정</h2>
       <div className={styles.menuItem}>
         <span>앱 버전</span>
-        <span>1.0.35</span>
+        <span>1.0.36</span>
       </div>
     </div>
   );
