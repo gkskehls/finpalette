@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useProfileQuery } from '../hooks/queries/useProfileQuery';
+import { useUpdateProfileMutation } from '../hooks/queries/useProfileMutation';
 import {
   getLocalStorageUsage,
   formatBytes,
@@ -12,6 +14,10 @@ import styles from './ProfilePage.module.css';
 export function ProfilePage() {
   const { user, isLoading, signInWithGoogle, signOut } = useAuth();
   const [localStorageUsage, setLocalStorageUsage] = useState(0);
+  const { data: profile } = useProfileQuery(user?.id);
+  const updateProfileMutation = useUpdateProfileMutation();
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState('');
 
   useEffect(() => {
     // 페이지 로드 시 및 로컬 스토리지 변경 시 사용량 업데이트
@@ -54,6 +60,18 @@ export function ProfilePage() {
     return { percentage, message, barColor, showWarningIcon, showCTA };
   }, [localStorageUsage]);
 
+  const handleUpdateName = () => {
+    if (!user || !newName.trim()) return;
+    updateProfileMutation.mutate(
+      { id: user.id, full_name: newName },
+      {
+        onSuccess: () => {
+          setIsEditingName(false);
+        },
+      }
+    );
+  };
+
   if (isLoading) {
     return <div className={styles.profileContainer}>로딩 중...</div>;
   }
@@ -63,7 +81,55 @@ export function ProfilePage() {
       <h2 className={styles.sectionTitle}>계정 정보</h2>
       {user ? (
         <div className={styles.authSection}>
-          <p>환영합니다, {user.email ?? '사용자'}님!</p>
+          <div className={styles.profileInfo}>
+            <div className={styles.profileRow}>
+              <span className={styles.label}>이메일</span>
+              <span className={styles.value}>{user.email}</span>
+            </div>
+            <div className={styles.profileRow}>
+              <span className={styles.label}>이름</span>
+              {isEditingName ? (
+                <div className={styles.editNameWrapper}>
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="이름을 입력하세요"
+                    className={styles.nameInput}
+                  />
+                  <button
+                    onClick={handleUpdateName}
+                    className={styles.saveButton}
+                  >
+                    저장
+                  </button>
+                  <button
+                    onClick={() => setIsEditingName(false)}
+                    className={styles.cancelButton}
+                  >
+                    취소
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.nameDisplay}>
+                  <span className={styles.value}>
+                    {profile?.full_name ||
+                      user.user_metadata?.full_name ||
+                      '이름 없음'}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setNewName(profile?.full_name || '');
+                      setIsEditingName(true);
+                    }}
+                    className={styles.editButton}
+                  >
+                    수정
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
           <button onClick={signOut} className={styles.authButton}>
             로그아웃
           </button>
@@ -119,7 +185,7 @@ export function ProfilePage() {
       <h2 className={styles.sectionTitle}>기타 설정</h2>
       <div className={styles.menuItem}>
         <span>앱 버전</span>
-        <span>1.0.21</span>
+        <span>1.0.23</span>
       </div>
     </div>
   );

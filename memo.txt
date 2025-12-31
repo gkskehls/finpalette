@@ -8,6 +8,7 @@
 동일 항목 수정시에도 버전은 계속 갱신해줘. 그래야 확인이 가능해.
 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md, supabase_schema.sql 꼭 지속적으로 참조해줘.
 매번 소스 수정을 할때마 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md 이 문서들을 업데이트 해줘.
+수정후에는 깃에 올릴 커밋메시지도 만들어줘. 이 메시지에는 `, " 문자는 포함되지 않게 조심해줘.
 supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심해줘.
 이문서들을 읽어보고 이번엔 뭘할지 논의를 하고 나서 그 후에 개발을 진행하도록 할께.
 넌 최고의 기획자야. 지금은 소스 수정은 안할꺼야. 의견부터 나누고 싶어.
@@ -28,10 +29,13 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(auth): 프로필 동기화 쿨다운 시간 연장 (1시간 -> 24시간)
+feat(profile): 사용자 이름 수정 기능 구현 및 UI 개선
 
-- 불필요한 DB 쓰기 작업을 줄이기 위해 프로필 자동 동기화 주기를 1시간에서 24시간으로 변경했습니다.
-- 프로필 정보 변경 빈도가 낮음을 고려한 최적화입니다.
+- 마이페이지에서 사용자가 직접 이름을 수정할 수 있는 기능 추가 (자동 동기화 대신 사용자 설정 우선)
+- 프로필 조회 및 수정을 위한 React Query 훅(useProfileQuery, useUpdateProfileMutation) 추가
+- 프로필 정보 표시 UI 개편 및 스타일 적용
+- 계정 정보 영역이 부모 컨테이너를 벗어나는 레이아웃 버그 수정 (box-sizing: border-box 적용)
+- 관련 문서(file_list.md, PROJECT_PLAN.md 등) 최신화
 "
 git push origin main
 

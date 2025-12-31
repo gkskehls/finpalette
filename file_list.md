@@ -117,6 +117,8 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
   - **📄 useTransactionsQuery.ts**: 거래 내역을 조회하는(fetch) 커스텀 훅입니다.
   - **📄 useTransactionsMutation.ts**: 거래 내역을 생성, 수정, 삭제하는 커스텀 훅입니다.
   - **📄 usePalettesQuery.ts**: 팔레트 목록을 조회하는 커스텀 훅입니다.
+  - **📄 useProfileQuery.ts**: 사용자 프로필 정보를 조회하는 커스텀 훅입니다.
+  - **📄 useProfileMutation.ts**: 사용자 프로필 정보를 수정하는 커스텀 훅입니다.
   - **📄 useAddPaletteMutation.ts**: 새 팔레트를 생성하는 커스텀 훅입니다.
   - **📄 useCreateInvitationMutation.ts**: 팔레트 초대 링크를 생성하는 커스텀 훅입니다.
   - **📄 useAcceptInvitationMutation.ts**: 팔레트 초대를 수락하는 커스텀 훅입니다.

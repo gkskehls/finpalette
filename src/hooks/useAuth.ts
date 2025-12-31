@@ -39,7 +39,7 @@ export function useAuth(): AuthState {
         const updates = {
           id: user.id,
           email: user.email,
-          full_name: user.user_metadata?.full_name,
+          // full_name: user.user_metadata?.full_name, // 사용자가 직접 관리하도록 자동 동기화 제외
           avatar_url: user.user_metadata?.avatar_url,
           updated_at: new Date().toISOString(),
         };
