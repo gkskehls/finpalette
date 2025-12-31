@@ -28,11 +28,10 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(auth): 앱 초기 실행 시 프로필 동기화 누락 문제 수정
+fix(db): 프로필 테이블 INSERT 권한 정책 추가
 
-- 앱을 새로고침하거나 초기 진입 시, 이미 로그인된 세션이 있어도 프로필 동기화(syncUserProfile)가 실행되지 않던 문제를 수정했습니다.
-- syncUserProfile 로직을 별도 함수로 분리하여 재사용성을 높였습니다.
-- supabase.auth.getSession()을 통해 초기 세션 확인 시 즉시 프로필 동기화를 수행하도록 개선했습니다.
+- profiles 테이블의 RLS 정책이 UPDATE만 허용하고 있어, upsert 실행 시 신규 행 생성이 차단되는 문제를 수정했습니다.
+- 사용자가 자신의 프로필을 생성(INSERT)할 수 있도록 'Users can insert their own profile' 정책을 추가했습니다.
 "
 git push origin main
 

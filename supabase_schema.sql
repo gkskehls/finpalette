@@ -1,20 +1,21 @@
 -- ==============================================================================
--- Finpalette v2 Schema Migration Script (Multi-Palette Support)
+-- Finpalette v2 Schema (Safe Update Mode)
 -- ==============================================================================
 
--- ⚠️ WARNING: This script will DROP all existing tables and data!
--- Use this only for development/reset purposes.
+-- ⚠️ 알림: 이 스크립트는 '안전 모드'로 작성되었습니다.
+-- 실행 시 기존 데이터를 삭제하지 않으며, 함수(RPC)나 정책(RLS)만 최신으로 업데이트합니다.
+-- 단, 테이블 구조(컬럼 추가 등) 변경은 자동으로 반영되지 않으므로 별도의 ALTER TABLE 문이 필요할 수 있습니다.
 
--- 1. Drop existing tables with CASCADE
-DROP TABLE IF EXISTS public.transactions CASCADE;
-DROP TABLE IF EXISTS public.categories CASCADE;
-DROP TABLE IF EXISTS public.palette_invitations CASCADE;
-DROP TABLE IF EXISTS public.palette_members CASCADE;
-DROP TABLE IF EXISTS public.palettes CASCADE;
-DROP TABLE IF EXISTS public.profiles CASCADE;
+-- 1. (주석 처리됨) Drop existing tables with CASCADE
+-- DROP TABLE IF EXISTS public.transactions CASCADE;
+-- DROP TABLE IF EXISTS public.categories CASCADE;
+-- DROP TABLE IF EXISTS public.palette_invitations CASCADE;
+-- DROP TABLE IF EXISTS public.palette_members CASCADE;
+-- DROP TABLE IF EXISTS public.palettes CASCADE;
+-- DROP TABLE IF EXISTS public.profiles CASCADE;
 
 -- 2. Create 'profiles' table to store public user data
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL PRIMARY KEY,
     email TEXT,
     full_name TEXT,
@@ -23,7 +24,7 @@ CREATE TABLE public.profiles (
 );
 
 -- 3. Create 'palettes' table
-CREATE TABLE public.palettes (
+CREATE TABLE IF NOT EXISTS public.palettes (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name TEXT NOT NULL,
     theme_color TEXT DEFAULT '#6366F1',
@@ -33,7 +34,7 @@ CREATE TABLE public.palettes (
 );
 
 -- 4. Create 'palette_members' table
-CREATE TABLE public.palette_members (
+CREATE TABLE IF NOT EXISTS public.palette_members (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     palette_id UUID REFERENCES public.palettes(id) ON DELETE CASCADE NOT NULL,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -43,7 +44,7 @@ CREATE TABLE public.palette_members (
 );
 
 -- 5. Create 'palette_invitations' table
-CREATE TABLE public.palette_invitations (
+CREATE TABLE IF NOT EXISTS public.palette_invitations (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     palette_id UUID REFERENCES public.palettes(id) ON DELETE CASCADE NOT NULL,
     inviter_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -54,7 +55,7 @@ CREATE TABLE public.palette_invitations (
 );
 
 -- 6. Create 'categories' table
-CREATE TABLE public.categories (
+CREATE TABLE IF NOT EXISTS public.categories (
     palette_id UUID REFERENCES public.palettes(id) ON DELETE CASCADE NOT NULL,
     code TEXT NOT NULL,
     name TEXT NOT NULL,
@@ -66,7 +67,7 @@ CREATE TABLE public.categories (
 );
 
 -- 7. Create 'transactions' table
-CREATE TABLE public.transactions (
+CREATE TABLE IF NOT EXISTS public.transactions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     palette_id UUID NOT NULL,
     category_code TEXT NOT NULL,
@@ -103,6 +104,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger to execute the function on new user creation
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
@@ -133,24 +135,34 @@ ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 -- ------------------------------------------------------------------------------
 -- 1. Policies for 'profiles'
 -- ------------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON public.profiles;
 CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Users can update their own profile." ON public.profiles;
 CREATE POLICY "Users can update their own profile." ON public.profiles
     FOR UPDATE USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can insert their own profile." ON public.profiles;
+CREATE POLICY "Users can insert their own profile." ON public.profiles
+    FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- ------------------------------------------------------------------------------
 -- 2. Policies for 'palettes'
 -- ------------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Users can view palettes they belong to" ON public.palettes;
 CREATE POLICY "Users can view palettes they belong to" ON public.palettes
     FOR SELECT USING (is_current_user_member(id));
 
+DROP POLICY IF EXISTS "Owners can update their palettes" ON public.palettes;
 CREATE POLICY "Owners can update their palettes" ON public.palettes
     FOR UPDATE USING (owner_id = auth.uid());
 
+DROP POLICY IF EXISTS "Owners can delete their palettes" ON public.palettes;
 CREATE POLICY "Owners can delete their palettes" ON public.palettes
     FOR DELETE USING (owner_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can create palettes" ON public.palettes;
 CREATE POLICY "Users can create palettes" ON public.palettes
     FOR INSERT WITH CHECK (owner_id = auth.uid());
 
@@ -158,12 +170,15 @@ CREATE POLICY "Users can create palettes" ON public.palettes
 -- ------------------------------------------------------------------------------
 -- 3. Policies for 'palette_members'
 -- ------------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Members can view other members of the same palette" ON public.palette_members;
 CREATE POLICY "Members can view other members of the same palette" ON public.palette_members
     FOR SELECT USING (is_current_user_member(palette_id));
 
+DROP POLICY IF EXISTS "Users can insert their own membership" ON public.palette_members;
 CREATE POLICY "Users can insert their own membership" ON public.palette_members
     FOR INSERT WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Owners can update member roles" ON public.palette_members;
 CREATE POLICY "Owners can update member roles" ON public.palette_members
     FOR UPDATE USING (
         EXISTS (
@@ -173,9 +188,11 @@ CREATE POLICY "Owners can update member roles" ON public.palette_members
         )
     );
 
+DROP POLICY IF EXISTS "Users can leave palettes (but not owners)" ON public.palette_members;
 CREATE POLICY "Users can leave palettes (but not owners)" ON public.palette_members
     FOR DELETE USING (user_id = auth.uid() AND role <> 'owner');
 
+DROP POLICY IF EXISTS "Owners can remove other members" ON public.palette_members;
 CREATE POLICY "Owners can remove other members" ON public.palette_members
     FOR DELETE USING (
         EXISTS (
@@ -190,15 +207,19 @@ CREATE POLICY "Owners can remove other members" ON public.palette_members
 -- ------------------------------------------------------------------------------
 -- 4. Policies for 'transactions'
 -- ------------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Members can view transactions" ON public.transactions;
 CREATE POLICY "Members can view transactions" ON public.transactions
     FOR SELECT USING (is_current_user_member(palette_id));
 
+DROP POLICY IF EXISTS "Members can insert transactions" ON public.transactions;
 CREATE POLICY "Members can insert transactions" ON public.transactions
     FOR INSERT WITH CHECK (is_current_user_member(palette_id));
 
+DROP POLICY IF EXISTS "Members can update transactions" ON public.transactions;
 CREATE POLICY "Members can update transactions" ON public.transactions
     FOR UPDATE USING (is_current_user_member(palette_id));
 
+DROP POLICY IF EXISTS "Members can delete transactions" ON public.transactions;
 CREATE POLICY "Members can delete transactions" ON public.transactions
     FOR DELETE USING (is_current_user_member(palette_id));
 
@@ -206,9 +227,11 @@ CREATE POLICY "Members can delete transactions" ON public.transactions
 -- ------------------------------------------------------------------------------
 -- 5. Policies for 'categories'
 -- ------------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Members can view categories" ON public.categories;
 CREATE POLICY "Members can view categories" ON public.categories
     FOR SELECT USING (is_current_user_member(palette_id));
 
+DROP POLICY IF EXISTS "Admins/Owners can manage categories" ON public.categories;
 CREATE POLICY "Admins/Owners can manage categories" ON public.categories
     FOR ALL USING (
         EXISTS (
@@ -223,9 +246,11 @@ CREATE POLICY "Admins/Owners can manage categories" ON public.categories
 -- ------------------------------------------------------------------------------
 -- 6. Policies for 'palette_invitations'
 -- ------------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Members can view invitations" ON public.palette_invitations;
 CREATE POLICY "Members can view invitations" ON public.palette_invitations
     FOR SELECT USING (is_current_user_member(palette_id));
 
+DROP POLICY IF EXISTS "Members can create invitations" ON public.palette_invitations;
 CREATE POLICY "Members can create invitations" ON public.palette_invitations
     FOR INSERT WITH CHECK (is_current_user_member(palette_id));
 
