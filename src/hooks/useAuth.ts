@@ -13,6 +13,7 @@ interface AuthState {
 
 // 마이그레이션 중복 실행 방지 플래그 (컴포넌트 생명주기 바깥에 위치)
 let isMigrationRunning = false;
+const PROFILE_SYNC_COOLDOWN = 1000 * 60 * 60 * 24; // 24시간 (밀리초)
 
 export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
@@ -23,6 +24,17 @@ export function useAuth(): AuthState {
     // 프로필 동기화 함수 (재사용을 위해 분리)
     const syncUserProfile = async (session: { user: User }) => {
       try {
+        // 0. 동기화 빈도 제한 (Throttling)
+        const lastSynced = localStorage.getItem('last_profile_sync');
+        const now = Date.now();
+
+        if (
+          lastSynced &&
+          now - parseInt(lastSynced, 10) < PROFILE_SYNC_COOLDOWN
+        ) {
+          return; // 쿨다운 기간이면 동기화 생략
+        }
+
         const { user } = session;
         const updates = {
           id: user.id,
@@ -40,6 +52,7 @@ export function useAuth(): AuthState {
           console.error('Failed to sync user profile:', error);
         } else {
           console.log('User profile synced successfully.');
+          localStorage.setItem('last_profile_sync', now.toString());
         }
       } catch (err) {
         console.error('Error syncing profile:', err);
