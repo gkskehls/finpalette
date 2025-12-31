@@ -15,6 +15,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import type { Transaction } from '../types/transaction';
+import styles from './StatsPage.module.css';
 
 interface MonthlySummary {
   month: string;
@@ -116,52 +117,18 @@ export function StatsPage() {
   const formattedMonth = `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}`;
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '2rem',
-        }}
-      >
-        <button
-          onClick={handlePrevMonth}
-          style={{
-            background: 'none',
-            border: 'none',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
-          }}
-        >
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <button onClick={handlePrevMonth} className={styles.navButton}>
           {'<'}
         </button>
-        <h2 style={{ margin: 0, fontSize: '1.2rem', color: 'currentColor' }}>
-          {formattedMonth}
-        </h2>
-        <button
-          onClick={handleNextMonth}
-          style={{
-            background: 'none',
-            border: 'none',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
-          }}
-        >
+        <h2 className={styles.monthTitle}>{formattedMonth}</h2>
+        <button onClick={handleNextMonth} className={styles.navButton}>
           {'>'}
         </button>
       </div>
-      <h3
-        style={{
-          marginTop: 0,
-          marginBottom: '1rem',
-          textAlign: 'center',
-          color: 'currentColor',
-        }}
-      >
-        카테고리별 지출
-      </h3>
-      <div style={{ width: '100%', height: 300, marginBottom: '2rem' }}>
+      <h3 className={styles.sectionTitle}>카테고리별 지출</h3>
+      <div className={styles.chartContainer}>
         <ResponsiveContainer>
           <PieChart>
             <Pie
@@ -190,16 +157,8 @@ export function StatsPage() {
         </ResponsiveContainer>
       </div>
 
-      <h3
-        style={{
-          marginTop: '2rem',
-          textAlign: 'center',
-          color: 'currentColor',
-        }}
-      >
-        월별 수입/지출
-      </h3>
-      <div style={{ width: '100%', height: 300 }}>
+      <h3 className={styles.sectionTitle}>월별 수입/지출</h3>
+      <div className={styles.chartContainer}>
         <ResponsiveContainer>
           <BarChart
             data={monthlySummaryData}
