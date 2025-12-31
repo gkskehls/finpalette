@@ -13,7 +13,6 @@ interface AuthState {
 
 // 마이그레이션 중복 실행 방지 플래그 (컴포넌트 생명주기 바깥에 위치)
 let isMigrationRunning = false;
-const PROFILE_SYNC_COOLDOWN = 1000 * 60 * 60 * 24; // 24시간 (밀리초)
 
 export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
@@ -21,59 +20,18 @@ export function useAuth(): AuthState {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    // 프로필 동기화 함수 (재사용을 위해 분리)
-    const syncUserProfile = async (session: { user: User }) => {
-      try {
-        // 0. 동기화 빈도 제한 (Throttling)
-        const lastSynced = localStorage.getItem('last_profile_sync');
-        const now = Date.now();
-
-        if (
-          lastSynced &&
-          now - parseInt(lastSynced, 10) < PROFILE_SYNC_COOLDOWN
-        ) {
-          return; // 쿨다운 기간이면 동기화 생략
-        }
-
-        const { user } = session;
-        const updates = {
-          id: user.id,
-          email: user.email,
-          // full_name: user.user_metadata?.full_name, // 사용자가 직접 관리하도록 자동 동기화 제외
-          avatar_url: user.user_metadata?.avatar_url,
-          updated_at: new Date().toISOString(),
-        };
-
-        const { error } = await supabase
-          .from('profiles')
-          .upsert(updates, { onConflict: 'id' });
-
-        if (error) {
-          console.error('Failed to sync user profile:', error);
-        } else {
-          console.log('User profile synced successfully.');
-          localStorage.setItem('last_profile_sync', now.toString());
-        }
-      } catch (err) {
-        console.error('Error syncing profile:', err);
-      }
-    };
-
-    // 초기 로드 시 세션 확인 및 프로필 동기화
+    // 초기 로드 시 세션 확인
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        syncUserProfile(session);
-      }
+      setUser(session?.user ?? null);
+      setIsLoading(false);
     });
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // 'SIGNED_IN' 이벤트가 발생했을 때 데이터 마이그레이션 및 프로필 동기화를 실행합니다.
+        // 'SIGNED_IN' 이벤트가 발생했을 때 데이터 마이그레이션만 실행합니다.
+        // (프로필 생성은 DB Trigger가 담당하므로 클라이언트 로직 제거)
         if (event === 'SIGNED_IN' && session) {
-          // 1. 프로필 정보 동기화 (Self-Healing)
-          syncUserProfile(session);
-
-          // 2. 게스트 데이터 마이그레이션
+          // 게스트 데이터 마이그레이션
           if (!isMigrationRunning) {
             isMigrationRunning = true;
             (async () => {
@@ -103,7 +61,6 @@ export function useAuth(): AuthState {
 
         // 세션 정보를 바탕으로 유저 상태를 즉시 업데이트합니다.
         setUser(session?.user ?? null);
-        // 인증 상태 확인이 완료되었으므로 로딩 상태를 즉시 해제합니다.
         setIsLoading(false);
       }
     );

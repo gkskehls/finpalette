@@ -147,6 +147,10 @@ DROP POLICY IF EXISTS "Users can insert their own profile." ON public.profiles;
 CREATE POLICY "Users can insert their own profile." ON public.profiles
     FOR INSERT WITH CHECK (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can delete their own profile." ON public.profiles;
+CREATE POLICY "Users can delete their own profile." ON public.profiles
+    FOR DELETE USING (auth.uid() = id);
+
 -- ------------------------------------------------------------------------------
 -- 2. Policies for 'palettes'
 -- ------------------------------------------------------------------------------

@@ -1,7 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
+import type { ChangeEvent } from 'react';
+import { Camera } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useProfileQuery } from '../hooks/queries/useProfileQuery';
 import { useUpdateProfileMutation } from '../hooks/queries/useProfileMutation';
+import { useAvatarUpload } from '../hooks/useAvatarUpload';
 import {
   getLocalStorageUsage,
   formatBytes,
@@ -16,6 +19,7 @@ export function ProfilePage() {
   const [localStorageUsage, setLocalStorageUsage] = useState(0);
   const { data: profile } = useProfileQuery(user?.id);
   const updateProfileMutation = useUpdateProfileMutation();
+  const { uploadAvatar, isUploading } = useAvatarUpload();
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState('');
 
@@ -72,6 +76,17 @@ export function ProfilePage() {
     );
   };
 
+  const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0 || !user) return;
+
+    const file = e.target.files[0];
+    const publicUrl = await uploadAvatar(file);
+
+    if (publicUrl) {
+      updateProfileMutation.mutate({ id: user.id, avatar_url: publicUrl });
+    }
+  };
+
   if (isLoading) {
     return <div className={styles.profileContainer}>로딩 중...</div>;
   }
@@ -81,53 +96,86 @@ export function ProfilePage() {
       <h2 className={styles.sectionTitle}>계정 정보</h2>
       {user ? (
         <div className={styles.authSection}>
-          <div className={styles.profileInfo}>
-            <div className={styles.profileRow}>
-              <span className={styles.label}>이메일</span>
-              <span className={styles.value}>{user.email}</span>
+          <div className={styles.profileHeader}>
+            <div className={styles.avatarWrapper}>
+              <img
+                src={
+                  profile?.avatar_url ||
+                  user.user_metadata?.avatar_url ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    profile?.full_name || user.email || 'User'
+                  )}&background=random`
+                }
+                alt="Profile"
+                className={styles.avatar}
+              />
+              <label
+                htmlFor="avatar-upload"
+                className={`${styles.avatarOverlay} ${isUploading ? styles.uploading : ''}`}
+              >
+                {isUploading ? (
+                  <div className={styles.spinner} />
+                ) : (
+                  <Camera size={20} color="white" />
+                )}
+              </label>
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className={styles.hiddenInput}
+                disabled={isUploading}
+              />
             </div>
-            <div className={styles.profileRow}>
-              <span className={styles.label}>이름</span>
-              {isEditingName ? (
-                <div className={styles.editNameWrapper}>
-                  <input
-                    type="text"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    placeholder="이름을 입력하세요"
-                    className={styles.nameInput}
-                  />
-                  <button
-                    onClick={handleUpdateName}
-                    className={styles.saveButton}
-                  >
-                    저장
-                  </button>
-                  <button
-                    onClick={() => setIsEditingName(false)}
-                    className={styles.cancelButton}
-                  >
-                    취소
-                  </button>
-                </div>
-              ) : (
-                <div className={styles.nameDisplay}>
-                  <span className={styles.value}>
-                    {profile?.full_name ||
-                      user.user_metadata?.full_name ||
-                      '이름 없음'}
-                  </span>
-                  <button
-                    onClick={() => {
-                      setNewName(profile?.full_name || '');
-                      setIsEditingName(true);
-                    }}
-                    className={styles.editButton}
-                  >
-                    수정
-                  </button>
-                </div>
-              )}
+            <div className={styles.profileInfo}>
+              <div className={styles.profileRow}>
+                <span className={styles.label}>이메일</span>
+                <span className={styles.value}>{user.email}</span>
+              </div>
+              <div className={styles.profileRow}>
+                <span className={styles.label}>이름</span>
+                {isEditingName ? (
+                  <div className={styles.editNameWrapper}>
+                    <input
+                      type="text"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      placeholder="이름을 입력하세요"
+                      className={styles.nameInput}
+                    />
+                    <button
+                      onClick={handleUpdateName}
+                      className={styles.saveButton}
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={() => setIsEditingName(false)}
+                      className={styles.cancelButton}
+                    >
+                      취소
+                    </button>
+                  </div>
+                ) : (
+                  <div className={styles.nameDisplay}>
+                    <span className={styles.value}>
+                      {profile?.full_name ||
+                        user.user_metadata?.full_name ||
+                        '이름 없음'}
+                    </span>
+                    <button
+                      onClick={() => {
+                        setNewName(profile?.full_name || '');
+                        setIsEditingName(true);
+                      }}
+                      className={styles.editButton}
+                    >
+                      수정
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <button onClick={signOut} className={styles.authButton}>
@@ -185,7 +233,7 @@ export function ProfilePage() {
       <h2 className={styles.sectionTitle}>기타 설정</h2>
       <div className={styles.menuItem}>
         <span>앱 버전</span>
-        <span>1.0.31</span>
+        <span>1.0.32</span>
       </div>
     </div>
   );
