@@ -69,6 +69,8 @@ export function PaletteListBottomSheet({
         <button className={styles.addButton} onClick={onAddPalette}>
           <Plus size={20} />새 팔레트 만들기
         </button>
+        {/* 하단 네비게이션/FAB에 가려지지 않도록 여백 추가 */}
+        <div style={{ height: '100px' }} aria-hidden="true" />
       </div>
     </div>
   );

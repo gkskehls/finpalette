@@ -67,6 +67,8 @@ export function TransactionSection({
           </div>
         </div>
       ))}
+      {/* 하단 네비게이션 및 FAB에 가려지지 않도록 여백 추가 */}
+      <div style={{ height: '100px' }} aria-hidden="true" />
     </div>
   );
 }

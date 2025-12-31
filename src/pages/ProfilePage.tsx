@@ -185,7 +185,7 @@ export function ProfilePage() {
       <h2 className={styles.sectionTitle}>기타 설정</h2>
       <div className={styles.menuItem}>
         <span>앱 버전</span>
-        <span>1.0.24</span>
+        <span>1.0.26</span>
       </div>
     </div>
   );
