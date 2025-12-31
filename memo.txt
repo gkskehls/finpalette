@@ -29,13 +29,13 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(profile): 프로필 이미지 업로드 및 신규 가입 로직 개선
+feat(transaction): 내역 리스트 UI 개편 및 무한 스크롤 구현
 
-- 프로필 이미지 업로드 기능 구현 (Supabase Storage 연동)
-- 이미지 리사이징(128px) 및 압축 로직 적용
-- 신규 가입 시에만 프로필 생성하도록 useAuth 로직 개선 (DB Trigger 활용)
-- PROJECT_PLAN.md, APP_SPECIFICATION.md 문서 최신화
-- 앱 버전 1.0.32로 업데이트
+- TransactionListPage UI를 Compact 디자인으로 변경 (날짜 그룹화, Sticky Header)
+- useTransactionsQuery를 useInfiniteQuery로 마이그레이션 (20개씩 로딩)
+- useIntersectionObserver 훅 추가 및 무한 스크롤 연동
+- PROJECT_PLAN.md: Phase 3.5 (Polishing) 단계 추가
+- 앱 버전 1.0.33으로 업데이트
 "
 git push origin main
 

@@ -24,8 +24,13 @@ interface MonthlySummary {
 }
 
 export function StatsPage() {
-  const { data: transactions = [] } = useTransactionsQuery();
+  const { data } = useTransactionsQuery();
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // InfiniteData를 평탄화하여 하나의 배열로 만듦
+  const transactions = useMemo(() => {
+    return data?.pages.flatMap((page) => page) || [];
+  }, [data]);
 
   const handlePrevMonth = () => {
     setSelectedDate((prevDate) => {

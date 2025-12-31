@@ -40,7 +40,12 @@ export function DashboardPage() {
   // TODO: 월 이동 기능을 위해 현재 날짜 상태 관리 필요
   const [currentDate] = useState(new Date());
 
-  const { data: transactions = [], isLoading, error } = useTransactionsQuery();
+  const { data, isLoading, error } = useTransactionsQuery();
+
+  // InfiniteData를 평탄화하여 하나의 배열로 만듦
+  const transactions = useMemo(() => {
+    return data?.pages.flatMap((page) => page) || [];
+  }, [data]);
 
   const categoryMap = useMemo(() => {
     return new Map(allCategories.map((cat) => [cat.code, cat]));
