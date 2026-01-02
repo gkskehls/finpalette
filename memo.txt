@@ -32,12 +32,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat: UX/UI 개선 및 버그 수정
+refactor: 전체 내역 페이지 UI 개선
 
-- 전체 내역 페이지에 월별 및 일별 수입/지출 합계 표시 기능 추가
-- 전체 내역 리스트의 아이템 컨텐츠 정렬 방식 개선
-- 카테고리 설정의 전체 아이콘 목록을 그룹별로 표시하도록 개선
-- 팔레트 설정 모달이 플로팅 버튼 위에 표시되도록 z-index 수정
+- 날짜 헤더가 스크롤 시 상단에 고정되도록 sticky 속성 적용
+- 대시보드와 중복되는 월별 합계 정보를 제거하여 UI 단순화
 "
 git push origin main
 

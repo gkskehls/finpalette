@@ -108,12 +108,8 @@ const TransactionListPage = () => {
     return data?.pages.flatMap((page) => page) || [];
   }, [data]);
 
-  const { groupedTransactions, monthlySummary } = useMemo(() => {
-    if (allTransactions.length === 0)
-      return { groupedTransactions: [], monthlySummary: null };
-
-    let totalIncome = 0;
-    let totalExpense = 0;
+  const groupedTransactions = useMemo(() => {
+    if (allTransactions.length === 0) return [];
 
     const groups: {
       date: string;
@@ -123,9 +119,6 @@ const TransactionListPage = () => {
     }[] = [];
 
     allTransactions.forEach((tx) => {
-      if (tx.type === 'inc') totalIncome += tx.amount;
-      else totalExpense += tx.amount;
-
       const dateStr = tx.date;
       const dateObj = new Date(dateStr);
       const formattedDate = `${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${['일', '월', '화', '수', '목', '금', '토'][dateObj.getDay()]}요일`;
@@ -149,10 +142,7 @@ const TransactionListPage = () => {
       }
     });
 
-    return {
-      groupedTransactions: groups,
-      monthlySummary: { totalIncome, totalExpense },
-    };
+    return groups;
   }, [allTransactions]);
 
   const renderContent = () => {
@@ -174,31 +164,6 @@ const TransactionListPage = () => {
 
     return (
       <div className={styles.listContainer}>
-        {monthlySummary && (
-          <div className={styles.monthlySummary}>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>총 수입</span>
-              <span className={`${styles.summaryAmount} ${styles.income}`}>
-                {monthlySummary.totalIncome.toLocaleString()}
-              </span>
-            </div>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>총 지출</span>
-              <span className={`${styles.summaryAmount} ${styles.expense}`}>
-                {monthlySummary.totalExpense.toLocaleString()}
-              </span>
-            </div>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>합계</span>
-              <span className={styles.summaryAmount}>
-                {(
-                  monthlySummary.totalIncome - monthlySummary.totalExpense
-                ).toLocaleString()}
-              </span>
-            </div>
-          </div>
-        )}
-
         {groupedTransactions.map((group) => (
           <div key={group.date} className={styles.dateGroup}>
             <h3 className={styles.dateHeader}>
