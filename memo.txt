@@ -29,12 +29,7 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(palette): 팔레트 설정 모달 개편 및 관리 기능 강화
-
-- 멤버/설정 탭 분리하여 UI 직관성 개선
-- 팔레트 이름 및 테마 색상 수정 기능 추가
-- 팔레트 삭제 시 이름 입력 확인 절차(Safety Check) 도입
-- 멤버 초대 및 관리(권한 변경, 추방) UX 개선
+feat(category): 카테고리 관리 페이지 및 커스텀 기능(아이콘/색상) 구현
 "
 git push origin main
 

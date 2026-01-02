@@ -6,6 +6,7 @@ import { StatsPage } from './pages/StatsPage';
 import TransactionListPage from './pages/TransactionListPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { InvitePage } from './pages/InvitePage';
+import { CategorySettingsPage } from './pages/CategorySettingsPage';
 import { BottomNav } from './components/common/BottomNav';
 import { Header } from './components/common/Header';
 import { FloatingActionButton } from './components/common/FloatingActionButton';
@@ -16,8 +17,11 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
 
-  // 초대 페이지에서는 헤더, 네비게이션, FAB를 숨깁니다.
-  const isInvitePage = location.pathname.startsWith('/invite');
+  // 초대 페이지와 카테고리 설정 페이지에서는 헤더, 네비게이션, FAB를 숨깁니다.
+  // (카테고리 설정 페이지는 자체 헤더를 가짐)
+  const isFullScreenPage =
+    location.pathname.startsWith('/invite') ||
+    location.pathname.startsWith('/categories');
 
   return (
     <div className="appContainer">
@@ -70,7 +74,7 @@ function App() {
         }}
       />
 
-      {!isInvitePage && <Header />}
+      {!isFullScreenPage && <Header />}
 
       <main className="mainContent">
         <Routes>
@@ -79,10 +83,11 @@ function App() {
           <Route path="/stats" element={<StatsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/invite" element={<InvitePage />} />
+          <Route path="/categories" element={<CategorySettingsPage />} />
         </Routes>
       </main>
 
-      {!isInvitePage && (
+      {!isFullScreenPage && (
         <>
           <BottomNav />
           <FloatingActionButton onClick={() => setIsModalOpen(true)} />
