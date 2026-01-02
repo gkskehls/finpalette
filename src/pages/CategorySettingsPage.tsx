@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X, Edit2, EyeOff } from 'lucide-react';
+import { ArrowLeft, Plus, X, Edit2, EyeOff, Pipette } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import {
@@ -44,6 +44,7 @@ function CategoryFormModal({
   const { currentPalette } = usePalette();
   const addMutation = useAddCategoryMutation();
   const updateMutation = useUpdateCategoryMutation();
+  const colorInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState(initialData?.name || '');
   const [selectedIcon, setSelectedIcon] = useState<IconName>(
@@ -78,8 +79,6 @@ function CategoryFormModal({
         })
         .then(onClose);
     } else {
-      // 새 코드 생성 (임시 로직: 타임스탬프 기반)
-      // 실제로는 UUID나 순차 코드를 쓰는 게 좋지만, 여기서는 간단히 처리
       const newCode = `${type === 'inc' ? 'i' : 'c'}_${Date.now().toString(36)}`;
 
       const promise = addMutation.mutateAsync({
@@ -113,7 +112,6 @@ function CategoryFormModal({
         </div>
 
         <div className={styles.modalBody}>
-          {/* 이름 입력 */}
           <div>
             <div className={styles.sectionTitle}>이름</div>
             <input
@@ -122,11 +120,9 @@ function CategoryFormModal({
               onChange={(e) => setName(e.target.value)}
               placeholder="카테고리 이름 (예: 간식)"
               className={styles.input}
-              autoFocus
             />
           </div>
 
-          {/* 아이콘 선택 */}
           <div>
             <div className={styles.sectionTitle}>아이콘</div>
             <div className={styles.iconGrid}>
@@ -152,7 +148,6 @@ function CategoryFormModal({
             )}
           </div>
 
-          {/* 색상 선택 */}
           <div>
             <div className={styles.sectionTitle}>색상</div>
             <div className={styles.colorGrid}>
@@ -166,20 +161,19 @@ function CategoryFormModal({
                   onClick={() => setSelectedColor(color)}
                 />
               ))}
-              {/* 커스텀 컬러 피커 */}
               <div
                 className={styles.colorOption}
-                style={{
-                  backgroundColor: selectedColor,
-                  position: 'relative',
-                }}
+                onClick={() => colorInputRef.current?.click()}
               >
+                <div className={styles.customColorButton}>
+                  <Pipette size={20} />
+                </div>
                 <input
+                  ref={colorInputRef}
                   type="color"
                   value={selectedColor}
                   onChange={(e) => setSelectedColor(e.target.value)}
                   className={styles.customColorInput}
-                  title="직접 선택"
                 />
               </div>
             </div>
@@ -270,8 +264,6 @@ export function CategorySettingsPage() {
               </div>
               <div className={styles.categoryInfo}>
                 <span className={styles.categoryName}>{category.name}</span>
-                {/* 디버깅용 코드 표시 (나중에 제거 가능) */}
-                {/* <span className={styles.categoryCode}>{category.code}</span> */}
               </div>
               <div style={{ display: 'flex', gap: '4px' }}>
                 <button
@@ -280,7 +272,6 @@ export function CategorySettingsPage() {
                 >
                   <Edit2 size={18} />
                 </button>
-                {/* 기본 카테고리인지 확인하는 로직이 필요하지만, 일단 모두 숨김 버튼 표시 */}
                 <button
                   className={styles.actionButton}
                   onClick={handleHideClick}

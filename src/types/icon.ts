@@ -184,4 +184,5 @@ export type IconName =
   | 'PlusSquare'
   | 'Film'
   | 'Users'
-  | 'HelpCircle';
+  | 'HelpCircle'
+  | 'Pipette';

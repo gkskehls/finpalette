@@ -29,14 +29,10 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-perf: lucide-react 트리 쉐이킹 최적화
+feat: 카테고리 수정 모달 UX/UI 개선
 
-- Icon.tsx에서 모든 아이콘을 import하던 방식을 필요한 아이콘만 개별적으로 import하여 매핑하는 방식으로 변경
-- 빌드 시 사용하지 않는 아이콘이 모두 포함되어 청크 파일 크기가 비대해지던 문제 해결
-- 빌드 경고를 제거하고 초기 로딩 성능을 향상
-- 실제 라이브러리에 존재하지 않는 아이콘 이름을 올바른 이름으로 변경
-- Boat, FirstAidKit, Safe -> FirstAid, Vault
-- 빌드 시 발생하던 타입 에러 해결
+- 모달 진입 시 키보드가 자동으로 올라오는 현상을 막기 위해 autoFocus 제거
+- 기본 색상 선택기를 Pipette 아이콘 버튼으로 대체하여 UI 통일성 확보
 "
 git push origin main
 

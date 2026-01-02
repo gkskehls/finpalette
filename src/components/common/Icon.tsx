@@ -178,6 +178,7 @@ import {
   Film,
   Users,
   HelpCircle,
+  Pipette,
 } from 'lucide-react';
 import type { IconName } from '../../types/icon';
 
@@ -359,6 +360,7 @@ const icons: Record<IconName, React.ElementType> = {
   Film,
   Users,
   HelpCircle,
+  Pipette,
 };
 
 interface IconProps extends Omit<LucideProps, 'name'> {

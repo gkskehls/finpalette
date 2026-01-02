@@ -189,4 +189,5 @@ export const EXTENDED_ICONS: IconName[] = [
   'Film',
   'Users',
   'HelpCircle',
+  'Pipette',
 ];

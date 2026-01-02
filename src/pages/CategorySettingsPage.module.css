@@ -241,6 +241,7 @@
   cursor: pointer;
   border: 2px solid transparent;
   transition: border-color 0.2s;
+  position: relative;
 }
 
 .colorOption.selected {
@@ -248,30 +249,24 @@
 }
 
 .customColorInput {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  border: none;
-  border-radius: 50%;
   cursor: pointer;
-  background: none;
-  padding: 0;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-/* For Webkit browsers */
-.customColorInput::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-.customColorInput::-webkit-color-swatch {
-  border: none;
-  border-radius: 50%;
 }
 
-/* For Firefox */
-.customColorInput::-moz-color-swatch {
-  border: none;
+.customColorButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-secondary);
   border-radius: 50%;
+  color: var(--text-secondary);
 }
 
 .submitButton {
