@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
@@ -16,6 +17,7 @@ import {
 import styles from './ProfilePage.module.css';
 
 export function ProfilePage() {
+  const navigate = useNavigate();
   const { user, isLoading, signInWithGoogle, signOut } = useAuth();
   const [localStorageUsage, setLocalStorageUsage] = useState(0);
   const { data: profile } = useProfileQuery(user?.id);
@@ -127,7 +129,7 @@ export function ProfilePage() {
           fontFamily: 'monospace',
         }}
       >
-        v1.0.42
+        v1.0.43
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>
@@ -262,7 +264,11 @@ export function ProfilePage() {
       )}
 
       <h2 className={styles.sectionTitle}>카테고리 관리</h2>
-      <div className={styles.menuItem}>
+      <div
+        className={styles.menuItem}
+        onClick={() => navigate('/categories')}
+        style={{ cursor: 'pointer' }}
+      >
         <span>카테고리 설정</span>
         <span>&gt;</span>
       </div>

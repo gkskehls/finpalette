@@ -13,6 +13,7 @@ import type {
   NewTransaction,
   UpdateTransactionPayload,
 } from '../../hooks/queries/useTransactionsMutation';
+import { useAuth } from '../../hooks/useAuth';
 
 interface TransactionFormModalProps {
   onClose: () => void;
@@ -24,6 +25,7 @@ export function TransactionFormModal({
   transactionToEdit,
 }: TransactionFormModalProps) {
   const isEditMode = !!transactionToEdit;
+  const { user } = useAuth();
 
   const { data: categories, isLoading: isLoadingCategories } =
     useCategoriesQuery();
@@ -97,8 +99,18 @@ export function TransactionFormModal({
     };
 
     if (isEditMode && transactionToEdit) {
+      // 로그인 상태에 따라 올바른 ID 사용
+      // 로그인 유저: transactionToEdit.id (서버 ID)
+      // 게스트 유저: transactionToEdit.localId (로컬 ID)
+      const targetId = user ? transactionToEdit.id : transactionToEdit.localId;
+
+      if (!targetId) {
+        toast.error('수정할 대상을 찾을 수 없습니다.');
+        return;
+      }
+
       const payload: UpdateTransactionPayload = {
-        id: transactionToEdit.id!,
+        id: targetId,
         data: formData,
       };
 
@@ -131,7 +143,17 @@ export function TransactionFormModal({
   const handleDelete = () => {
     if (isEditMode && transactionToEdit) {
       if (window.confirm('이 내역을 정말 삭제하시겠습니까?')) {
-        const promise = deleteMutation.mutateAsync(transactionToEdit.id!);
+        // 로그인 상태에 따라 올바른 ID 사용
+        const targetId = user
+          ? transactionToEdit.id
+          : transactionToEdit.localId;
+
+        if (!targetId) {
+          toast.error('삭제할 대상을 찾을 수 없습니다.');
+          return;
+        }
+
+        const promise = deleteMutation.mutateAsync(targetId);
 
         toast
           .promise(promise, {
