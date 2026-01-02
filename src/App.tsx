@@ -1,31 +1,64 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { DashboardPage } from './pages/DashboardPage';
-import { StatsPage } from './pages/StatsPage';
-import TransactionListPage from './pages/TransactionListPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { InvitePage } from './pages/InvitePage';
-import { CategorySettingsPage } from './pages/CategorySettingsPage';
+
+// Dynamic Imports for Code Splitting with Named Exports
+const DashboardPage = lazy(() =>
+  import('./pages/DashboardPage').then((module) => ({
+    default: module.DashboardPage,
+  }))
+);
+const StatsPage = lazy(() =>
+  import('./pages/StatsPage').then((module) => ({ default: module.StatsPage }))
+);
+// `TransactionListPage` has a default export, so we can import it directly.
+const TransactionListPage = lazy(() => import('./pages/TransactionListPage'));
+const ProfilePage = lazy(() =>
+  import('./pages/ProfilePage').then((module) => ({
+    default: module.ProfilePage,
+  }))
+);
+const InvitePage = lazy(() =>
+  import('./pages/InvitePage').then((module) => ({
+    default: module.InvitePage,
+  }))
+);
+const CategorySettingsPage = lazy(() =>
+  import('./pages/CategorySettingsPage').then((module) => ({
+    default: module.CategorySettingsPage,
+  }))
+);
+
 import { BottomNav } from './components/common/BottomNav';
 import { Header } from './components/common/Header';
 import { FloatingActionButton } from './components/common/FloatingActionButton';
 import { TransactionFormModal } from './components/transaction/TransactionFormModal';
 import './App.css';
 
+// Declare LoadingIndicator outside of the App component
+const LoadingIndicator = () => (
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100%',
+    }}
+  >
+    로딩 중...
+  </div>
+);
+
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
 
-  // 초대 페이지와 카테고리 설정 페이지에서는 헤더, 네비게이션, FAB를 숨깁니다.
-  // (카테고리 설정 페이지는 자체 헤더를 가짐)
   const isFullScreenPage =
     location.pathname.startsWith('/invite') ||
     location.pathname.startsWith('/categories');
 
   return (
     <div className="appContainer">
-      {/* 전역 토스트 설정 */}
       <Toaster
         position="top-center"
         reverseOrder={false}
@@ -33,7 +66,6 @@ function App() {
         containerClassName=""
         containerStyle={{}}
         toastOptions={{
-          // 기본 옵션
           className: '',
           duration: 2000,
           style: {
@@ -43,7 +75,6 @@ function App() {
             fontSize: '0.9rem',
             maxWidth: '90%',
           },
-          // 성공 시 옵션
           success: {
             duration: 2000,
             style: {
@@ -57,7 +88,6 @@ function App() {
               secondary: '#fff',
             },
           },
-          // 에러 시 옵션
           error: {
             duration: 3000,
             style: {
@@ -77,14 +107,16 @@ function App() {
       {!isFullScreenPage && <Header />}
 
       <main className="mainContent">
-        <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/transactions" element={<TransactionListPage />} />
-          <Route path="/stats" element={<StatsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/invite" element={<InvitePage />} />
-          <Route path="/categories" element={<CategorySettingsPage />} />
-        </Routes>
+        <Suspense fallback={<LoadingIndicator />}>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/transactions" element={<TransactionListPage />} />
+            <Route path="/stats" element={<StatsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/invite" element={<InvitePage />} />
+            <Route path="/categories" element={<CategorySettingsPage />} />
+          </Routes>
+        </Suspense>
       </main>
 
       {!isFullScreenPage && (
