@@ -1,6 +1,6 @@
 .appContainer {
-  display: grid;
-  grid-template-rows: auto 1fr; /* Header, Main Content */
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   max-width: 600px;
   margin: 0 auto;
@@ -9,8 +9,9 @@
 }
 
 .mainContent {
+  flex: 1;
   overflow-y: auto;
-  padding: 0 0 80px; /* 하단 네비게이션 높이(64px) + 여유 공간 */
+  padding-bottom: 80px; /* 하단 네비게이션 높이(64px) + 여유 공간 */
   box-sizing: border-box;
 }
 

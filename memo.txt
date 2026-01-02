@@ -23,11 +23,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-refactor: 전체 내역 페이지 UI/UX 전면 개선
+fix: 전체 내역 페이지 레이아웃 및 데이터 로직 오류 수정
 
-- Sticky 헤더가 동작하지 않던 이중 스크롤 문제 해결
-- 항목별/전체 간격을 줄여 정보 밀도를 높이는 컴팩트 디자인 적용
-- 내역 설명 및 메모를 우측 정렬하여 시각적 안정감 개선
+- mainContent의 padding-top을 제거하여 상단 공백 문제 해결
+- TransactionListPage의 날짜 그룹화 로직을 reduce로 변경하여 key 중복 오류 해결
+- 날짜 헤더의 top 값을 0으로 수정하여 Sticky 기능 정상화
 "
 git push origin main
 

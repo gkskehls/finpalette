@@ -2,17 +2,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1.5rem; /* 상하 패딩 제거하고 높이로 제어 */
-  height: 60px; /* 고정 높이 */
-  background-color: var(--bg-primary); /* 배경색 명시 */
+  padding: 0 1.5rem;
+  height: 60px;
+  background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
-  position: fixed; /* sticky -> fixed 변경 */
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100; /* 하단 네비게이션과 동일 레벨 */
-  margin: 0 auto; /* 중앙 정렬 */
-  max-width: 600px; /* 모바일 너비 제한에 맞춤 */
+  position: sticky; /* 수정: fixed -> sticky */
+  top: 0; /* 수정: 최상단에 고정 */
+  width: 100%;
+  z-index: 100;
+  margin: 0 auto;
+  max-width: 600px;
   box-sizing: border-box;
 }
 

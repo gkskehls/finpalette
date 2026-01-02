@@ -111,27 +111,30 @@ const TransactionListPage = () => {
   const groupedTransactions = useMemo(() => {
     if (allTransactions.length === 0) return [];
 
-    const groups: {
-      date: string;
+    type Group = {
+      originalDate: string;
+      displayDate: string;
       transactions: Transaction[];
       dailyIncome: number;
       dailyExpense: number;
-    }[] = [];
+    };
 
-    allTransactions.forEach((tx) => {
-      const dateStr = tx.date;
-      const dateObj = new Date(dateStr);
-      const formattedDate = `${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${['일', '월', '화', '수', '목', '금', '토'][dateObj.getDay()]}요일`;
+    return allTransactions.reduce<Group[]>((acc, tx) => {
+      const originalDate = tx.date;
+      const dateObj = new Date(originalDate);
+      const displayDate = `${dateObj.getFullYear()}년 ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${['일', '월', '화', '수', '목', '금', '토'][dateObj.getDay()]}요일`;
 
-      let lastGroup = groups[groups.length - 1];
-      if (!lastGroup || lastGroup.date !== formattedDate) {
+      let lastGroup = acc[acc.length - 1];
+
+      if (!lastGroup || lastGroup.originalDate !== originalDate) {
         lastGroup = {
-          date: formattedDate,
+          originalDate,
+          displayDate,
           transactions: [],
           dailyIncome: 0,
           dailyExpense: 0,
         };
-        groups.push(lastGroup);
+        acc.push(lastGroup);
       }
 
       lastGroup.transactions.push(tx);
@@ -140,9 +143,9 @@ const TransactionListPage = () => {
       } else {
         lastGroup.dailyExpense += tx.amount;
       }
-    });
 
-    return groups;
+      return acc;
+    }, []);
   }, [allTransactions]);
 
   const renderContent = () => {
@@ -165,9 +168,9 @@ const TransactionListPage = () => {
     return (
       <div className={styles.listContainer}>
         {groupedTransactions.map((group) => (
-          <div key={group.date} className={styles.dateGroup}>
+          <div key={group.originalDate} className={styles.dateGroup}>
             <h3 className={styles.dateHeader}>
-              <span>{group.date}</span>
+              <span>{group.displayDate}</span>
               <span className={styles.dailySummary}>
                 {group.dailyIncome > 0 && (
                   <span className={styles.dailyIncome}>
