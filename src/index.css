@@ -1,5 +1,4 @@
-:root,
-[data-theme='light'] {
+:root {
   --background-primary: #ffffff;
   --background-secondary: #f9f9f9;
   --text-color: #213547;
@@ -40,7 +39,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-[data-theme='dark'] {
+html.dark {
   --background-primary: #242424;
   --background-secondary: #1a1a1a;
   --text-color: rgba(255, 255, 255, 0.87);

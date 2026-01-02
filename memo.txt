@@ -29,10 +29,10 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix: 카테고리 모달에서 선택된 항목이 잘려보이는 현상 수정
+fix: 다크모드 테마 적용 방식 통일
 
-- 색상 옵션 선택 시 크기를 키우는 scale 애니메이션 제거
-- 모달 내용 부분에 좌우 패딩을 추가하여 테두리가 잘리지 않도록 수정
+- CSS의 테마 선택자를 [data-theme='dark']에서 html.dark로 변경
+- index.html의 초기화 스크립트와 CSS의 테마 적용 방식을 일치시켜, 특정 페이지에서 새로고침 시 다크모드가 풀리던 근본적인 문제 해결
 "
 git push origin main
 
