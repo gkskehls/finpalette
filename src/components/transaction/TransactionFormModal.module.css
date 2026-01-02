@@ -22,6 +22,11 @@
   animation: slideUp 0.3s ease-out;
   max-height: 90vh;
   overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.modalContent * {
+  box-sizing: border-box;
 }
 
 .modalHeader {
@@ -103,17 +108,23 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 0 12px; /* 내부 input의 padding을 wrapper로 이동 */
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
 }
 
-.dateInputWrapper input {
-  flex: 1;
+.dateInputWrapper input[type='date'] {
+  width: auto; /* 수정: flex: 1 -> width: auto */
+  border: none; /* wrapper에 테두리가 있으므로 제거 */
+  background-color: transparent; /* wrapper에 배경색이 있으므로 제거 */
+  padding: 12px 0; /* 내부 padding 재조정 */
 }
 
 .dayOfWeek {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
-  padding: 12px 0;
 }
 
 .privateMemoContainer {
