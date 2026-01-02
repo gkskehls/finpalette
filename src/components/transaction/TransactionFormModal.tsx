@@ -57,6 +57,18 @@ export function TransactionFormModal({
   const updateMutation = useUpdateTransactionMutation();
   const deleteMutation = useDeleteTransactionMutation();
 
+  const dayOfWeek = useMemo(() => {
+    if (!date) return '';
+    const dateObj = new Date(date);
+    // UTC 기준 날짜로 계산하여 시간대 문제 방지
+    const utcDate = new Date(
+      dateObj.getUTCFullYear(),
+      dateObj.getUTCMonth(),
+      dateObj.getUTCDate()
+    );
+    return ['일', '월', '화', '수', '목', '금', '토'][utcDate.getDay()];
+  }, [date]);
+
   useEffect(() => {
     if (isEditMode && category) return;
     const currentList = type === 'inc' ? incomeCategories : expenseCategories;
@@ -99,9 +111,6 @@ export function TransactionFormModal({
     };
 
     if (isEditMode && transactionToEdit) {
-      // 로그인 상태에 따라 올바른 ID 사용
-      // 로그인 유저: transactionToEdit.id (서버 ID)
-      // 게스트 유저: transactionToEdit.localId (로컬 ID)
       const targetId = user ? transactionToEdit.id : transactionToEdit.localId;
 
       if (!targetId) {
@@ -143,7 +152,6 @@ export function TransactionFormModal({
   const handleDelete = () => {
     if (isEditMode && transactionToEdit) {
       if (window.confirm('이 내역을 정말 삭제하시겠습니까?')) {
-        // 로그인 상태에 따라 올바른 ID 사용
         const targetId = user
           ? transactionToEdit.id
           : transactionToEdit.localId;
@@ -232,13 +240,16 @@ export function TransactionFormModal({
 
           <div className={styles.formGroup}>
             <label htmlFor="date">날짜</label>
-            <input
-              type="date"
-              id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-            />
+            <div className={styles.dateInputWrapper}>
+              <input
+                type="date"
+                id="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+              />
+              <span className={styles.dayOfWeek}>{dayOfWeek}</span>
+            </div>
           </div>
 
           <div className={styles.formGroup}>
