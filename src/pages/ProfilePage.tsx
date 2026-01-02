@@ -115,7 +115,7 @@ export function ProfilePage() {
 
   return (
     <div className={styles.profileContainer} style={{ position: 'relative' }}>
-      {/* [Debug] 앱 버전 표시 */}
+      {/* 앱 버전 표시 (우측 상단) */}
       <div
         style={{
           position: 'absolute',
@@ -127,7 +127,7 @@ export function ProfilePage() {
           fontFamily: 'monospace',
         }}
       >
-        v1.0.38
+        v1.0.41
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>
@@ -265,12 +265,6 @@ export function ProfilePage() {
       <div className={styles.menuItem}>
         <span>카테고리 설정</span>
         <span>&gt;</span>
-      </div>
-
-      <h2 className={styles.sectionTitle}>기타 설정</h2>
-      <div className={styles.menuItem}>
-        <span>앱 버전</span>
-        <span>1.0.38</span>
       </div>
     </div>
   );

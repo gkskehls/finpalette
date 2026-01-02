@@ -22,7 +22,9 @@
   animation: slideUp 0.3s ease-out;
   display: flex;
   flex-direction: column;
-  gap: 16px; /* 탭과 콘텐츠 사이 간격 조정 */
+  gap: 16px;
+  max-height: 85vh;
+  overflow-y: auto;
 }
 
 .header {
@@ -60,6 +62,7 @@
   background-color: var(--bg-secondary);
   border-radius: 10px;
   padding: 4px;
+  flex-shrink: 0;
 }
 
 .tabButton {
@@ -86,10 +89,13 @@
 }
 
 .tabContent {
-  min-height: 200px; /* 콘텐츠 영역 최소 높이 */
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* --- 초대 탭 스타일 --- */
+/* --- 초대 박스 (멤버 탭 상단) --- */
 .inviteBox {
   background-color: var(--bg-secondary);
   border-radius: 12px;
@@ -186,6 +192,7 @@
   padding: 8px;
   border-radius: 8px;
   background-color: var(--bg-secondary);
+  position: relative;
 }
 
 .avatar {
@@ -222,6 +229,176 @@
   font-size: 0.8rem;
   color: var(--text-secondary);
   text-transform: capitalize;
+}
+
+.moreButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moreButton:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* --- 드롭다운 메뉴 --- */
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 120px;
+  overflow: hidden;
+  animation: fadeIn 0.1s ease-out;
+}
+
+.dropdownItem {
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdownItem:hover {
+  background-color: var(--bg-secondary);
+}
+
+.dropdownItem.danger {
+  color: #ef4444;
+}
+
+.dropdownItem.danger:hover {
+  background-color: #fef2f2;
+}
+
+/* --- 설정 탭 (Settings) 스타일 --- */
+.settingsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.colorOption {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s;
+}
+
+.colorOption:hover {
+  transform: scale(1.1);
+}
+
+.colorOption.selected {
+  border-color: var(--text-primary);
+  transform: scale(1.1);
+}
+
+.saveButton {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- 위험 구역 (Danger Zone) --- */
+.dangerZone {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dangerTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+.deletePaletteButton {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ef4444;
+  background-color: transparent;
+  color: #ef4444;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.deletePaletteButton:hover {
+  background-color: #fef2f2;
 }
 
 @keyframes fadeIn {
