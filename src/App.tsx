@@ -59,6 +59,32 @@ function App() {
 
   return (
     <div className="appContainer">
+      {!isFullScreenPage && <Header />}
+
+      <main className="mainContent">
+        <Suspense fallback={<LoadingIndicator />}>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/transactions" element={<TransactionListPage />} />
+            <Route path="/stats" element={<StatsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/invite" element={<InvitePage />} />
+            <Route path="/categories" element={<CategorySettingsPage />} />
+          </Routes>
+        </Suspense>
+      </main>
+
+      {!isFullScreenPage && (
+        <>
+          <BottomNav />
+          <FloatingActionButton onClick={() => setIsModalOpen(true)} />
+        </>
+      )}
+
+      {isModalOpen && (
+        <TransactionFormModal onClose={() => setIsModalOpen(false)} />
+      )}
+
       <Toaster
         position="top-center"
         reverseOrder={false}
@@ -103,32 +129,6 @@ function App() {
           },
         }}
       />
-
-      {!isFullScreenPage && <Header />}
-
-      <main className="mainContent">
-        <Suspense fallback={<LoadingIndicator />}>
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/transactions" element={<TransactionListPage />} />
-            <Route path="/stats" element={<StatsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/invite" element={<InvitePage />} />
-            <Route path="/categories" element={<CategorySettingsPage />} />
-          </Routes>
-        </Suspense>
-      </main>
-
-      {!isFullScreenPage && (
-        <>
-          <BottomNav />
-          <FloatingActionButton onClick={() => setIsModalOpen(true)} />
-        </>
-      )}
-
-      {isModalOpen && (
-        <TransactionFormModal onClose={() => setIsModalOpen(false)} />
-      )}
     </div>
   );
 }

@@ -1,7 +1,5 @@
 .container {
   padding: 0;
-  /* height: 100%; <- 이중 스크롤 및 sticky 오작동의 원인 */
-  /* overflow-y: auto; <- 이중 스크롤 문제의 원인이므로 제거 */
 }
 
 .listContainer {
@@ -16,14 +14,14 @@
 }
 
 .dateGroup {
-  margin-bottom: 12px; /* 간격 축소 */
+  margin-bottom: 16px;
 }
 
 .dateHeader {
   position: sticky;
   top: 0;
   background-color: var(--bg-primary);
-  padding: 8px 0; /* 상하 간격 축소 */
+  padding: 12px 0;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-secondary);
@@ -51,19 +49,23 @@
 .groupList {
   display: flex;
   flex-direction: column;
-  gap: 4px; /* 간격 축소 */
-  padding-top: 8px;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  margin-top: 8px;
 }
 
 .transactionItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px; /* 상하좌우 간격 축소 */
-  background-color: var(--bg-secondary);
-  border-radius: 10px; /* 좀 더 부드럽게 */
+  padding: 10px 12px;
   cursor: pointer;
   transition: background-color 0.2s;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.transactionItem:last-child {
+  border-bottom: none;
 }
 
 .transactionItem:hover {
@@ -73,14 +75,14 @@
 .leftContent {
   display: flex;
   align-items: center;
-  gap: 10px; /* 간격 축소 */
+  gap: 12px;
   flex: 1;
   min-width: 0;
 }
 
 .categoryIcon {
-  width: 36px; /* 크기 축소 */
-  height: 36px; /* 크기 축소 */
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -94,7 +96,7 @@
   gap: 2px;
   flex: 1;
   min-width: 0;
-  text-align: right; /* 우측 정렬 적용 */
+  text-align: left; /* 좌측 정렬 */
 }
 
 .description {
@@ -103,15 +105,14 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 0.95rem; /* 폰트 크기 미세 조정 */
+  font-size: 0.95rem;
 }
 
 .privateMemo {
-  font-size: 0.75rem; /* 폰트 크기 미세 조정 */
+  font-size: 0.75rem;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* 아이콘과 텍스트를 우측으로 정렬 */
   gap: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -125,12 +126,12 @@
 .rightContent {
   display: flex;
   align-items: center;
-  margin-left: 10px; /* 간격 축소 */
+  margin-left: 12px;
 }
 
 .amount {
   font-weight: 600;
-  font-size: 0.95rem; /* 폰트 크기 미세 조정 */
+  font-size: 0.95rem;
   white-space: nowrap;
 }
 
