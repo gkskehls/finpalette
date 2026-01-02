@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 import { migrateGuestData } from '../lib/migration';
+import toast from 'react-hot-toast';
 
 interface AuthState {
   user: User | null;
@@ -51,12 +52,20 @@ export function useAuth(): AuthState {
                   await queryClient.invalidateQueries({
                     queryKey: ['transactions'],
                   });
+                  toast.success('기존 데이터가 성공적으로 동기화되었습니다!');
+                } else {
+                  toast.success('환영합니다! 로그인되었습니다.');
                 }
+              } catch (error) {
+                console.error('Migration failed:', error);
+                toast.error('데이터 동기화 중 문제가 발생했습니다.');
               } finally {
                 isMigrationRunning = false;
               }
             })();
           }
+        } else if (event === 'SIGNED_OUT') {
+          toast.success('로그아웃되었습니다.');
         }
 
         // 세션 정보를 바탕으로 유저 상태를 즉시 업데이트합니다.
@@ -81,9 +90,11 @@ export function useAuth(): AuthState {
       });
       if (error) {
         console.error('Error signing in with Google:', error);
+        toast.error('Google 로그인에 실패했습니다.');
       }
     } catch (error) {
       console.error('Unexpected error during Google sign-in:', error);
+      toast.error('로그인 중 알 수 없는 오류가 발생했습니다.');
     }
   };
 
@@ -92,6 +103,7 @@ export function useAuth(): AuthState {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);
+        toast.error('로그아웃에 실패했습니다.');
       }
       // 로그아웃 후 모든 쿼리를 초기화하여 깨끗한 상태로 만듭니다.
       queryClient.clear();
@@ -99,6 +111,7 @@ export function useAuth(): AuthState {
       window.location.reload();
     } catch (error) {
       console.error('Unexpected error during sign-out:', error);
+      toast.error('로그아웃 중 오류가 발생했습니다.');
     }
   };
 

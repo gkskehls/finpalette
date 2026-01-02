@@ -29,10 +29,7 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-docs: 팔레트 삭제 정책 수립 및 나만 보기 이슈 해결 표시
-
-- APP_SPECIFICATION.md: 팔레트 삭제(Owner 전용, 이름 입력 확인, 마지막 팔레트 유지) 및 나가기 정책 추가
-- PROJECT_PLAN.md: '나만 보기' 기능 관련 이슈 해결([x]) 표시
+feat(ui): 토스트 알림 시스템 도입 및 전역 적용
 "
 git push origin main
 

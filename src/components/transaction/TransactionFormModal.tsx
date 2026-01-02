@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './TransactionFormModal.module.css';
 import { X, Lock, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useCategoriesQuery } from '../../hooks/queries/useCategoriesQuery';
 import type { Transaction } from '../../types/transaction';
 import {
@@ -82,7 +83,7 @@ export function TransactionFormModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!category) {
-      alert('카테고리를 선택해주세요.');
+      toast.error('카테고리를 선택해주세요.');
       return;
     }
 
@@ -100,22 +101,47 @@ export function TransactionFormModal({
         id: transactionToEdit.id!,
         data: formData,
       };
-      updateMutation.mutate(payload, {
-        onSuccess: onClose,
-      });
+
+      const promise = updateMutation.mutateAsync(payload);
+
+      toast
+        .promise(promise, {
+          loading: '내역을 수정하는 중...',
+          success: '내역이 수정되었습니다!',
+          error: '수정에 실패했습니다.',
+        })
+        .then(() => {
+          onClose();
+        });
     } else {
-      addMutation.mutate(formData, {
-        onSuccess: onClose,
-      });
+      const promise = addMutation.mutateAsync(formData);
+
+      toast
+        .promise(promise, {
+          loading: '내역을 저장하는 중...',
+          success: '내역이 저장되었습니다!',
+          error: '저장에 실패했습니다.',
+        })
+        .then(() => {
+          onClose();
+        });
     }
   };
 
   const handleDelete = () => {
     if (isEditMode && transactionToEdit) {
       if (window.confirm('이 내역을 정말 삭제하시겠습니까?')) {
-        deleteMutation.mutate(transactionToEdit.id!, {
-          onSuccess: onClose,
-        });
+        const promise = deleteMutation.mutateAsync(transactionToEdit.id!);
+
+        toast
+          .promise(promise, {
+            loading: '내역을 삭제하는 중...',
+            success: '내역이 삭제되었습니다.',
+            error: '삭제에 실패했습니다.',
+          })
+          .then(() => {
+            onClose();
+          });
       }
     }
   };

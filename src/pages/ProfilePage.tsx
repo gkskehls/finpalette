@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
 import { Camera } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 import { useProfileQuery } from '../hooks/queries/useProfileQuery';
 import { useUpdateProfileMutation } from '../hooks/queries/useProfileMutation';
@@ -66,25 +67,46 @@ export function ProfilePage() {
 
   const handleUpdateName = () => {
     if (!user || !newName.trim()) return;
-    updateProfileMutation.mutate(
-      { id: user.id, full_name: newName },
-      {
-        onSuccess: () => {
-          setIsEditingName(false);
-        },
-      }
-    );
+
+    const promise = updateProfileMutation.mutateAsync({
+      id: user.id,
+      full_name: newName,
+    });
+
+    toast
+      .promise(promise, {
+        loading: '이름을 변경하는 중...',
+        success: '이름이 변경되었습니다!',
+        error: '이름 변경에 실패했습니다.',
+      })
+      .then(() => {
+        setIsEditingName(false);
+      });
   };
 
   const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0 || !user) return;
 
     const file = e.target.files[0];
-    const publicUrl = await uploadAvatar(file);
 
-    if (publicUrl) {
-      updateProfileMutation.mutate({ id: user.id, avatar_url: publicUrl });
-    }
+    // 이미지 업로드 및 프로필 업데이트 과정을 하나의 Promise로 묶어 토스트 처리
+    const uploadProcess = async () => {
+      const publicUrl = await uploadAvatar(file);
+      if (publicUrl) {
+        await updateProfileMutation.mutateAsync({
+          id: user.id,
+          avatar_url: publicUrl,
+        });
+      } else {
+        throw new Error('Upload failed');
+      }
+    };
+
+    toast.promise(uploadProcess(), {
+      loading: '프로필 사진을 업로드 중...',
+      success: '프로필 사진이 변경되었습니다!',
+      error: '사진 업로드에 실패했습니다.',
+    });
   };
 
   if (isLoading) {
@@ -105,7 +127,7 @@ export function ProfilePage() {
           fontFamily: 'monospace',
         }}
       >
-        v1.0.36
+        v1.0.38
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>
@@ -248,7 +270,7 @@ export function ProfilePage() {
       <h2 className={styles.sectionTitle}>기타 설정</h2>
       <div className={styles.menuItem}>
         <span>앱 버전</span>
-        <span>1.0.36</span>
+        <span>1.0.38</span>
       </div>
     </div>
   );

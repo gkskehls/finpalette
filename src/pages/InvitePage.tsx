@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MailOpen, LogIn, CheckCircle, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 import { useAcceptInvitationMutation } from '../hooks/queries/useAcceptInvitationMutation';
 import styles from './InvitePage.module.css';
@@ -22,13 +23,21 @@ export function InvitePage() {
 
   const handleAccept = () => {
     if (!code) return;
-    acceptInvitationMutation.mutate(code, {
-      onSuccess: () => {
+
+    const promise = acceptInvitationMutation.mutateAsync(code);
+
+    toast.promise(promise, {
+      loading: '초대를 수락하는 중...',
+      success: () => {
         // 성공 시 홈으로 이동 (쿼리 파라미터 제거)
-        window.location.href = '/';
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+        return '초대가 수락되었습니다! 홈으로 이동합니다.';
       },
-      onError: (err) => {
+      error: (err) => {
         setError(err.message || '초대 수락 중 오류가 발생했습니다.');
+        return '초대 수락에 실패했습니다.';
       },
     });
   };

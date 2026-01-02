@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { X, LogIn } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAddPaletteMutation } from '../../hooks/queries/useAddPaletteMutation';
 import { usePalette } from '../../context/PaletteContext';
 import { useAuth } from '../../hooks/useAuth';
@@ -27,23 +28,25 @@ export function PaletteFormModal({ onClose }: PaletteFormModalProps) {
   const [name, setName] = useState('');
   const [selectedColor, setSelectedColor] = useState(THEME_COLORS[0]);
 
-  const { mutate: addPalette, isPending } = useAddPaletteMutation();
+  const { mutateAsync: addPalette, isPending } = useAddPaletteMutation();
   const { changePalette } = usePalette();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
-    addPalette(
-      { name, theme_color: selectedColor },
-      {
-        onSuccess: (newPaletteId) => {
-          // 생성 후 해당 팔레트로 자동 전환
-          changePalette(newPaletteId);
-          onClose();
-        },
-      }
-    );
+    const promise = addPalette({ name, theme_color: selectedColor });
+
+    toast.promise(promise, {
+      loading: '새 팔레트를 만드는 중...',
+      success: (newPaletteId) => {
+        // 생성 후 해당 팔레트로 자동 전환
+        changePalette(newPaletteId);
+        onClose();
+        return '팔레트가 생성되었습니다!';
+      },
+      error: '팔레트 생성에 실패했습니다.',
+    });
   };
 
   return (

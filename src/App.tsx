@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { DashboardPage } from './pages/DashboardPage';
 import { StatsPage } from './pages/StatsPage';
 import TransactionListPage from './pages/TransactionListPage';
@@ -20,6 +21,55 @@ function App() {
 
   return (
     <div className="appContainer">
+      {/* 전역 토스트 설정 */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          // 기본 옵션
+          className: '',
+          duration: 2000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+            borderRadius: '20px',
+            fontSize: '0.9rem',
+            maxWidth: '90%',
+          },
+          // 성공 시 옵션
+          success: {
+            duration: 2000,
+            style: {
+              background: '#fff',
+              color: '#333',
+              border: '1px solid #E0E0E0',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            },
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#fff',
+            },
+          },
+          // 에러 시 옵션
+          error: {
+            duration: 3000,
+            style: {
+              background: '#fff',
+              color: '#333',
+              border: '1px solid #E0E0E0',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            },
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+
       {!isInvitePage && <Header />}
 
       <main className="mainContent">

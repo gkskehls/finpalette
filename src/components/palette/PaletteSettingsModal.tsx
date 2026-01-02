@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, UserPlus, Copy, Check, Users } from 'lucide-react';
+import toast from 'react-hot-toast';
 import styles from './PaletteSettingsModal.module.css';
 import { useCreateInvitationMutation } from '../../hooks/queries/useCreateInvitationMutation';
 import { usePaletteMembersQuery } from '../../hooks/queries/usePaletteMembersQuery';
@@ -74,11 +75,16 @@ export function PaletteSettingsModal({
   if (!isOpen) return null;
 
   const handleCreateInvite = () => {
-    createInvitationMutation.mutate(palette.id, {
-      onSuccess: (data) => {
+    const promise = createInvitationMutation.mutateAsync(palette.id);
+
+    toast.promise(promise, {
+      loading: '초대 링크를 생성하는 중...',
+      success: (data) => {
         const link = `${window.location.origin}/invite?code=${data.code}`;
         setInviteLink(link);
+        return '초대 링크가 생성되었습니다!';
       },
+      error: '초대 링크 생성에 실패했습니다.',
     });
   };
 
@@ -87,9 +93,11 @@ export function PaletteSettingsModal({
       try {
         await navigator.clipboard.writeText(inviteLink);
         setIsCopied(true);
+        toast.success('링크가 복사되었습니다!');
         setTimeout(() => setIsCopied(false), 2000);
       } catch (err) {
         console.error('Failed to copy text: ', err);
+        toast.error('복사에 실패했습니다.');
       }
     }
   };
