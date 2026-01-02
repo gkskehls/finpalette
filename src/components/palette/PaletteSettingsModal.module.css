@@ -292,6 +292,12 @@
   background-color: #fef2f2;
 }
 
+.divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 4px 0;
+}
+
 /* --- 설정 탭 (Settings) 스타일 --- */
 .settingsForm {
   display: flex;

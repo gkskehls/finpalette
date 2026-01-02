@@ -115,10 +115,10 @@
 }
 
 .dateInputWrapper input[type='date'] {
-  width: auto; /* 수정: flex: 1 -> width: auto */
-  border: none; /* wrapper에 테두리가 있으므로 제거 */
-  background-color: transparent; /* wrapper에 배경색이 있으므로 제거 */
-  padding: 12px 0; /* 내부 padding 재조정 */
+  width: auto;
+  border: none;
+  background-color: transparent;
+  padding: 12px 0;
 }
 
 .dayOfWeek {
@@ -127,11 +127,11 @@
   color: var(--text-primary);
 }
 
-.privateMemoContainer {
+.memoContainer {
   position: relative;
 }
 
-.privateMemoIcon {
+.memoIcon {
   position: absolute;
   left: 12px;
   top: 50%;
@@ -139,7 +139,7 @@
   color: var(--text-secondary);
 }
 
-.privateMemoInput {
+.memoInput {
   padding-left: 36px !important;
 }
 

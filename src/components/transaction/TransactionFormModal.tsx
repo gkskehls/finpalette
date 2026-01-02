@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './TransactionFormModal.module.css';
-import { X, Lock, Trash2 } from 'lucide-react';
+import { X, Lock, Trash2, MessageSquareText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCategoriesQuery } from '../../hooks/queries/useCategoriesQuery';
 import type { Transaction } from '../../types/transaction';
@@ -49,6 +49,9 @@ export function TransactionFormModal({
   const [description, setDescription] = useState(
     transactionToEdit?.description || ''
   );
+  const [publicMemo, setPublicMemo] = useState(
+    transactionToEdit?.public_memo || ''
+  );
   const [privateMemo, setPrivateMemo] = useState(
     transactionToEdit?.private_memo || ''
   );
@@ -60,7 +63,6 @@ export function TransactionFormModal({
   const dayOfWeek = useMemo(() => {
     if (!date) return '';
     const dateObj = new Date(date);
-    // UTC 기준 날짜로 계산하여 시간대 문제 방지
     const utcDate = new Date(
       dateObj.getUTCFullYear(),
       dateObj.getUTCMonth(),
@@ -107,6 +109,7 @@ export function TransactionFormModal({
       category_code: category,
       date,
       description,
+      public_memo: publicMemo,
       private_memo: privateMemo,
     };
 
@@ -253,24 +256,39 @@ export function TransactionFormModal({
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="description">내용 (공개)</label>
+            <label htmlFor="description">내용 (핵심 요약)</label>
             <input
               type="text"
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="모든 멤버에게 보여지는 내용"
+              placeholder="예: 중식 (짜장면, 짬뽕)"
             />
           </div>
 
           <div className={styles.formGroup}>
+            <label htmlFor="publicMemo">공개 메모 (추가 정보)</label>
+            <div className={styles.memoContainer}>
+              <MessageSquareText size={16} className={styles.memoIcon} />
+              <input
+                type="text"
+                id="publicMemo"
+                className={styles.memoInput}
+                value={publicMemo}
+                onChange={(e) => setPublicMemo(e.target.value)}
+                placeholder="모든 멤버에게 보여지는 내용"
+              />
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
             <label htmlFor="privateMemo">나만 보기 메모 (비공개)</label>
-            <div className={styles.privateMemoContainer}>
-              <Lock size={16} className={styles.privateMemoIcon} />
+            <div className={styles.memoContainer}>
+              <Lock size={16} className={styles.memoIcon} />
               <input
                 type="text"
                 id="privateMemo"
-                className={styles.privateMemoInput}
+                className={styles.memoInput}
                 value={privateMemo}
                 onChange={(e) => setPrivateMemo(e.target.value)}
                 placeholder="나만 볼 수 있는 상세 내용"

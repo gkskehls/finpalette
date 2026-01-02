@@ -75,7 +75,7 @@ const MemberItem = ({
   const handleRemove = () => {
     const message = isMe
       ? '정말 이 팔레트에서 나가시겠습니까?'
-      : '정말 이 멤버를 추방하시겠습니까?';
+      : `정말 '${getDisplayName()}' 님을 추방하시겠습니까?`;
 
     if (window.confirm(message)) {
       const promise = removeMemberMutation.mutateAsync({
@@ -165,20 +165,15 @@ const MemberItem = ({
                   >
                     <User size={16} /> 뷰어로 변경
                   </button>
-                  <div
-                    style={{
-                      height: '1px',
-                      backgroundColor: 'var(--border-color)',
-                      margin: '4px 0',
-                    }}
-                  />
+                  <div className={styles.divider} />
                 </>
               )}
               <button
                 className={`${styles.dropdownItem} ${styles.danger}`}
                 onClick={handleRemove}
               >
-                <LogOut size={16} /> {isMe ? '나가기' : '추방하기'}
+                {isMe ? <LogOut size={16} /> : <Trash2 size={16} />}
+                {isMe ? '나가기' : '추방하기'}
               </button>
             </div>
           )}
@@ -322,7 +317,6 @@ export function PaletteSettingsModal({
           </button>
         </div>
 
-        {/* 탭 메뉴 */}
         <div className={styles.tabContainer}>
           <button
             className={`${styles.tabButton} ${activeTab === 'members' ? styles.active : ''}`}
@@ -340,11 +334,9 @@ export function PaletteSettingsModal({
           </button>
         </div>
 
-        {/* 탭 콘텐츠 */}
         <div className={styles.tabContent}>
           {activeTab === 'members' && (
             <>
-              {/* 초대 영역 */}
               <div className={styles.inviteBox}>
                 <p className={styles.inviteDescription}>
                   초대 링크를 공유하여 가족이나 친구를 초대하세요.
@@ -381,14 +373,12 @@ export function PaletteSettingsModal({
                 )}
               </div>
 
-              {/* 멤버 리스트 */}
               <MemberList paletteId={palette.id} />
             </>
           )}
 
           {activeTab === 'settings' && (
             <div className={styles.settingsForm}>
-              {/* 팔레트 이름 수정 */}
               <div className={styles.inputGroup}>
                 <label className={styles.label}>팔레트 이름</label>
                 <input
@@ -400,7 +390,6 @@ export function PaletteSettingsModal({
                 />
               </div>
 
-              {/* 테마 색상 변경 */}
               <div className={styles.inputGroup}>
                 <label className={styles.label}>테마 색상</label>
                 <div className={styles.colorGrid}>
@@ -443,7 +432,6 @@ export function PaletteSettingsModal({
                 </div>
               </div>
 
-              {/* 저장 버튼 */}
               {isOwner && (
                 <button
                   className={styles.saveButton}
@@ -456,7 +444,6 @@ export function PaletteSettingsModal({
                 </button>
               )}
 
-              {/* 위험 구역 */}
               <div className={styles.dangerZone}>
                 <span className={styles.dangerTitle}>위험 구역</span>
                 {isOwner ? (

@@ -16,6 +16,7 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 
 멤버 권한 관련해서 정리 필요.
 카테고리 멤버 추가 권한이 없는듯.
+이부분은 논의 필요. 멤버권한을 어떻게 어디까지 주고, 내역 추가 수정삭제랑 카테고리 수정삭제 이런거 어떻게 할지 논의 필요.
 내역에 일반 메모도 있었으면 좋겠어.
 나만보기메모는 지출 내역 작성자가 아닌, 지금 작성하고 있는 나만 보이는 메모였으면 좋겠어.
 
@@ -27,10 +28,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix: 내역 등록 모달의 날짜 필드 및 레이아웃 개선
+feat: 팔레트 설정에 멤버 역할 변경 기능 구현
 
-- 날짜 입력창의 너비를 자동으로 조절하여 요일과 가깝게 표시되도록 수정
-- box-sizing 속성을 적용하여 입력창 너비가 화면을 벗어나던 문제 해결
+- 소유자(Owner)가 다른 멤버의 역할을 Admin, Editor, Viewer로 변경할 수 있는 UI 추가
+- useUpdateMemberRoleMutation을 연동하여 실제 데이터 변경 기능 구현
+- 드롭다운 메뉴의 시각적 구성을 개선하여 사용성 향상
 "
 git push origin main
 
