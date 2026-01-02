@@ -1,34 +1,27 @@
 import type { IconName } from '../types/icon';
 
-// 1. 엄선된 기본 아이콘 (Top 30)
 export const DEFAULT_ICONS: IconName[] = [
-  // 식비/카페
   'Utensils',
   'Coffee',
   'Beer',
   'Pizza',
-  // 교통/차량
   'Bus',
   'Car',
   'Fuel',
   'Plane',
-  // 쇼핑/생활
   'ShoppingBag',
   'ShoppingCart',
   'Gift',
   'Home',
   'Wifi',
   'Phone',
-  // 건강/운동
   'Dumbbell',
   'HeartPulse',
   'Stethoscope',
-  // 교육/문화
   'BookOpen',
   'GraduationCap',
   'Music',
   'Ticket',
-  // 금융/기타
   'PiggyBank',
   'Wallet',
   'CreditCard',
@@ -40,10 +33,8 @@ export const DEFAULT_ICONS: IconName[] = [
   'Smile',
 ];
 
-// 2. 확장 아이콘 (더보기 시 노출)
 export const EXTENDED_ICONS: IconName[] = [
-  ...DEFAULT_ICONS,
-  // 추가 아이콘들...
+  // 음식
   'Apple',
   'Banana',
   'Beef',
@@ -71,7 +62,6 @@ export const EXTENDED_ICONS: IconName[] = [
   // 교통
   'Anchor',
   'Bike',
-  'Boat',
   'CableCar',
   'Container',
   'Navigation',
@@ -149,7 +139,7 @@ export const EXTENDED_ICONS: IconName[] = [
   'Brain',
   'Cross',
   'Eye',
-  'FirstAidKit',
+  'BriefcaseMedical',
   'Pill',
   'Syringe',
   'ThermometerSun',
@@ -189,8 +179,14 @@ export const EXTENDED_ICONS: IconName[] = [
   'Landmark',
   'Percent',
   'Receipt',
-  'Safe',
+  'Vault',
   'Scale',
   'TrendingDown',
   'TrendingUp',
+  // 기타
+  'Store',
+  'PlusSquare',
+  'Film',
+  'Users',
+  'HelpCircle',
 ];
