@@ -9,7 +9,7 @@ import {
 } from '../hooks/queries/useCategoryMutation';
 import { usePalette } from '../context/PaletteContext';
 import { Icon } from '../components/common/Icon';
-import { DEFAULT_ICONS, EXTENDED_ICONS } from '../data/iconList';
+import { DEFAULT_ICONS, LEVEL_2_ICONS, ALL_ICONS } from '../data/iconList';
 import type { IconName } from '../types/icon';
 import type { Category } from '../types/category';
 import styles from './CategorySettingsPage.module.css';
@@ -48,14 +48,19 @@ function CategoryFormModal({
 
   const [name, setName] = useState(initialData?.name || '');
   const [selectedIcon, setSelectedIcon] = useState<IconName>(
-    (initialData?.icon as IconName) || 'Tag'
+    (initialData?.icon as IconName) || 'Utensils'
   );
   const [selectedColor, setSelectedColor] = useState(
     initialData?.color || PRESET_COLORS[0]
   );
-  const [showAllIcons, setShowAllIcons] = useState(false);
+  const [iconLevel, setIconLevel] = useState(1);
 
-  const iconList = showAllIcons ? EXTENDED_ICONS : DEFAULT_ICONS;
+  const iconList =
+    iconLevel === 1
+      ? DEFAULT_ICONS
+      : iconLevel === 2
+        ? LEVEL_2_ICONS
+        : ALL_ICONS;
 
   const handleSubmit = () => {
     if (!name.trim() || !currentPalette) return;
@@ -138,10 +143,10 @@ function CategoryFormModal({
                 </div>
               ))}
             </div>
-            {!showAllIcons && (
+            {iconLevel < 3 && (
               <button
                 className={styles.moreIconsButton}
-                onClick={() => setShowAllIcons(true)}
+                onClick={() => setIconLevel((prev) => prev + 1)}
               >
                 + 더 많은 아이콘 보기
               </button>
@@ -165,8 +170,18 @@ function CategoryFormModal({
                 className={styles.colorOption}
                 onClick={() => colorInputRef.current?.click()}
               >
-                <div className={styles.customColorButton}>
-                  <Pipette size={20} />
+                <div
+                  className={styles.customColorButton}
+                  style={{ backgroundColor: selectedColor }}
+                >
+                  <Pipette
+                    size={20}
+                    color={
+                      ['#ffffff', '#000000'].includes(selectedColor)
+                        ? '#888'
+                        : '#fff'
+                    }
+                  />
                 </div>
                 <input
                   ref={colorInputRef}

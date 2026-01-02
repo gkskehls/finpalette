@@ -11,6 +11,7 @@ import {
   Shield,
   User,
   Settings,
+  Pipette,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import styles from './PaletteSettingsModal.module.css';
@@ -228,6 +229,7 @@ export function PaletteSettingsModal({
   const [activeTab, setActiveTab] = useState<'members' | 'settings'>('members');
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const colorInputRef = useRef<HTMLInputElement>(null);
 
   // 설정 탭 상태
   const [paletteName, setPaletteName] = useState(palette.name);
@@ -412,20 +414,29 @@ export function PaletteSettingsModal({
                       onClick={() => isOwner && setThemeColor(color)}
                     />
                   ))}
-                  {/* 커스텀 컬러 피커 */}
                   <div
                     className={styles.colorOption}
-                    style={{
-                      backgroundColor: themeColor,
-                      position: 'relative',
-                    }}
+                    onClick={() => isOwner && colorInputRef.current?.click()}
                   >
+                    <div
+                      className={styles.customColorButton}
+                      style={{ backgroundColor: themeColor }}
+                    >
+                      <Pipette
+                        size={20}
+                        color={
+                          ['#ffffff', '#000000'].includes(themeColor)
+                            ? '#888'
+                            : '#fff'
+                        }
+                      />
+                    </div>
                     <input
+                      ref={colorInputRef}
                       type="color"
                       value={themeColor}
                       onChange={(e) => isOwner && setThemeColor(e.target.value)}
                       className={styles.customColorInput}
-                      title="직접 선택"
                       disabled={!isOwner}
                     />
                   </div>
@@ -457,8 +468,6 @@ export function PaletteSettingsModal({
                     팔레트 삭제하기
                   </button>
                 ) : (
-                  // 멤버용 나가기 버튼은 MemberList에서 처리하므로 여기서는 안내 문구만 표시하거나 생략 가능
-                  // 하지만 명시적으로 보여주는 것이 좋음
                   <p
                     style={{
                       fontSize: '0.9rem',
