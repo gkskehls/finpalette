@@ -119,33 +119,34 @@ const TransactionListPage = () => {
       dailyExpense: number;
     };
 
-    return allTransactions.reduce<Group[]>((acc, tx) => {
+    const groupMap = new Map<string, Group>();
+
+    allTransactions.forEach((tx) => {
       const originalDate = tx.date;
-      const dateObj = new Date(originalDate);
-      const displayDate = `${dateObj.getFullYear()}년 ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${['일', '월', '화', '수', '목', '금', '토'][dateObj.getDay()]}요일`;
+      let group = groupMap.get(originalDate);
 
-      let lastGroup = acc[acc.length - 1];
-
-      if (!lastGroup || lastGroup.originalDate !== originalDate) {
-        lastGroup = {
+      if (!group) {
+        const dateObj = new Date(originalDate);
+        const displayDate = `${dateObj.getFullYear()}년 ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${['일', '월', '화', '수', '목', '금', '토'][dateObj.getDay()]}요일`;
+        group = {
           originalDate,
           displayDate,
           transactions: [],
           dailyIncome: 0,
           dailyExpense: 0,
         };
-        acc.push(lastGroup);
+        groupMap.set(originalDate, group);
       }
 
-      lastGroup.transactions.push(tx);
+      group.transactions.push(tx);
       if (tx.type === 'inc') {
-        lastGroup.dailyIncome += tx.amount;
+        group.dailyIncome += tx.amount;
       } else {
-        lastGroup.dailyExpense += tx.amount;
+        group.dailyExpense += tx.amount;
       }
+    });
 
-      return acc;
-    }, []);
+    return Array.from(groupMap.values());
   }, [allTransactions]);
 
   const renderContent = () => {

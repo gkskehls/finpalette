@@ -23,11 +23,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix: 전체 내역 페이지 레이아웃 및 데이터 로직 오류 수정
+fix: 전체 내역 페이지의 그룹화 로직을 Map으로 변경하여 key 중복 오류 최종 해결
 
-- mainContent의 padding-top을 제거하여 상단 공백 문제 해결
-- TransactionListPage의 날짜 그룹화 로직을 reduce로 변경하여 key 중복 오류 해결
-- 날짜 헤더의 top 값을 0으로 수정하여 Sticky 기능 정상화
+- 데이터 정렬 상태와 무관하게 동작하는 안정적인 그룹화 로직 적용
+- 페이지네이션 시 동일한 날짜가 다른 그룹으로 나뉘던 근본적인 문제 해결
 "
 git push origin main
 
