@@ -1,70 +1,71 @@
 .container {
-  padding: 0; /* 전체 패딩 제거 (헤더 sticky를 위해) */
-  background-color: var(--bg-primary);
-  min-height: 100vh;
+  padding: 0;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .listContainer {
-  padding-bottom: 80px;
+  padding: 0 16px;
 }
 
 .loadingText,
 .errorText {
   text-align: center;
-  padding: 2rem;
+  margin-top: 40px;
   color: var(--text-secondary);
 }
 
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60vh;
-  color: var(--text-secondary);
-  gap: 8px;
-}
-
-.emptySubText {
-  font-size: 0.9rem;
-  opacity: 0.7;
-}
-
-/* --- 날짜 그룹 스타일 --- */
 .dateGroup {
-  margin-bottom: 0;
+  margin-bottom: 16px;
 }
 
 .dateHeader {
   position: sticky;
-  top: 60px; /* 헤더 높이만큼 띄움 (헤더가 있다면) */
-  background-color: var(--bg-primary); /* 배경색을 줘서 뒤에 내용 가림 */
-  padding: 12px 16px;
-  font-size: 0.85rem;
+  top: 0;
+  background-color: var(--bg-primary);
+  padding: 12px 0;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-secondary);
-  border-bottom: 1px solid var(--border-color);
   z-index: 10;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-}
-
-.groupList {
-  background-color: var(--bg-primary);
-}
-
-/* --- 트랜잭션 아이템 스타일 (Compact) --- */
-.transactionItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px; /* 상하 패딩 축소 (16px -> 10px) */
-  cursor: pointer;
-  transition: background-color 0.2s;
-  border-bottom: 1px solid var(--border-color);
 }
 
-.transactionItem:active {
-  background-color: var(--hover-background);
+.dailySummary {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.dailyIncome {
+  color: var(--income-color);
+  margin-right: 8px;
+}
+
+.dailyExpense {
+  color: var(--expense-color);
+}
+
+.groupList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.transactionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.transactionItem:hover {
+  background-color: var(--bg-hover);
 }
 
 .leftContent {
@@ -72,12 +73,12 @@
   align-items: center;
   gap: 12px;
   flex: 1;
-  min-width: 0; /* 말줄임표 작동을 위해 필수 */
+  min-width: 0; /* flex item이 줄어들 수 있도록 함 */
 }
 
 .categoryIcon {
-  width: 36px; /* 아이콘 영역 축소 (40px -> 36px) */
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -94,7 +95,6 @@
 }
 
 .description {
-  font-size: 0.95rem;
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
@@ -103,53 +103,69 @@
 }
 
 .privateMemo {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .lockIcon {
-  opacity: 0.7;
+  flex-shrink: 0;
 }
 
 .rightContent {
   display: flex;
   align-items: center;
-  gap: 8px;
+  margin-left: 12px;
 }
 
 .amount {
-  font-size: 1rem;
   font-weight: 600;
+  font-size: 1rem;
   white-space: nowrap;
 }
 
 .income {
-  color: var(--income-color, #10b981);
+  color: var(--income-color);
 }
 
 .expense {
-  color: var(--text-primary); /* 지출은 기본색으로 (너무 빨갛지 않게) */
+  color: var(--expense-color);
 }
 
-.deleteButton {
-  background: none;
-  border: none;
-  color: var(--text-tertiary);
-  padding: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-/* --- 무한 스크롤 로딩 인디케이터 --- */
 .loadingIndicator {
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
+  padding: 20px;
   color: var(--text-secondary);
-  font-size: 0.85rem;
+}
+
+.monthlySummary {
+  padding: 16px;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summaryLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.summaryAmount {
+  font-size: 1.1rem;
+  font-weight: 700;
 }

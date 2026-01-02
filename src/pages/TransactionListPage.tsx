@@ -3,11 +3,7 @@ import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import type { Transaction } from '../types/transaction';
-import {
-  INCOME_CATEGORIES,
-  EXPENSE_CATEGORIES,
-  TRANSACTION_TYPES,
-} from '../config/constants';
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
 import { Icon } from '../components/common/Icon';
 import styles from './TransactionListPage.module.css';
 import { Lock, Palette } from 'lucide-react';
@@ -29,9 +25,8 @@ const TransactionItem = (props: TransactionItemProps) => {
   const category = ALL_CATEGORIES.find(
     (c) => c.code === transaction.category_code
   );
-  const transactionType = TRANSACTION_TYPES[transaction.type];
 
-  if (!category || !transactionType) {
+  if (!category) {
     return null;
   }
 
@@ -81,10 +76,8 @@ const TransactionListPage = () => {
     isFetchingNextPage,
   } = useTransactionsQuery();
 
-  // 스크롤 위치 복원
   useScrollRestoration('transactions', isLoading);
 
-  // 무한 스크롤 감지 (바닥에서 300px 남았을 때 미리 로딩)
   const loadMoreRef = useIntersectionObserver({
     onIntersect: fetchNextPage,
     enabled: hasNextPage && !isFetchingNextPage,
@@ -111,31 +104,55 @@ const TransactionListPage = () => {
     setSelectedTransaction(undefined);
   };
 
-  // 모든 페이지의 데이터를 하나의 배열로 병합
   const allTransactions = useMemo(() => {
     return data?.pages.flatMap((page) => page) || [];
   }, [data]);
 
-  // 날짜별 그룹화 로직
-  const groupedTransactions = useMemo(() => {
-    if (allTransactions.length === 0) return [];
+  const { groupedTransactions, monthlySummary } = useMemo(() => {
+    if (allTransactions.length === 0)
+      return { groupedTransactions: [], monthlySummary: null };
 
-    const groups: { date: string; transactions: Transaction[] }[] = [];
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    const groups: {
+      date: string;
+      transactions: Transaction[];
+      dailyIncome: number;
+      dailyExpense: number;
+    }[] = [];
 
     allTransactions.forEach((tx) => {
-      const dateStr = tx.date; // YYYY-MM-DD
+      if (tx.type === 'inc') totalIncome += tx.amount;
+      else totalExpense += tx.amount;
+
+      const dateStr = tx.date;
       const dateObj = new Date(dateStr);
       const formattedDate = `${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${['일', '월', '화', '수', '목', '금', '토'][dateObj.getDay()]}요일`;
 
-      const lastGroup = groups[groups.length - 1];
-      if (lastGroup && lastGroup.date === formattedDate) {
-        lastGroup.transactions.push(tx);
+      let lastGroup = groups[groups.length - 1];
+      if (!lastGroup || lastGroup.date !== formattedDate) {
+        lastGroup = {
+          date: formattedDate,
+          transactions: [],
+          dailyIncome: 0,
+          dailyExpense: 0,
+        };
+        groups.push(lastGroup);
+      }
+
+      lastGroup.transactions.push(tx);
+      if (tx.type === 'inc') {
+        lastGroup.dailyIncome += tx.amount;
       } else {
-        groups.push({ date: formattedDate, transactions: [tx] });
+        lastGroup.dailyExpense += tx.amount;
       }
     });
 
-    return groups;
+    return {
+      groupedTransactions: groups,
+      monthlySummary: { totalIncome, totalExpense },
+    };
   }, [allTransactions]);
 
   const renderContent = () => {
@@ -157,9 +174,48 @@ const TransactionListPage = () => {
 
     return (
       <div className={styles.listContainer}>
+        {monthlySummary && (
+          <div className={styles.monthlySummary}>
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>총 수입</span>
+              <span className={`${styles.summaryAmount} ${styles.income}`}>
+                {monthlySummary.totalIncome.toLocaleString()}
+              </span>
+            </div>
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>총 지출</span>
+              <span className={`${styles.summaryAmount} ${styles.expense}`}>
+                {monthlySummary.totalExpense.toLocaleString()}
+              </span>
+            </div>
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>합계</span>
+              <span className={styles.summaryAmount}>
+                {(
+                  monthlySummary.totalIncome - monthlySummary.totalExpense
+                ).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        )}
+
         {groupedTransactions.map((group) => (
           <div key={group.date} className={styles.dateGroup}>
-            <h3 className={styles.dateHeader}>{group.date}</h3>
+            <h3 className={styles.dateHeader}>
+              <span>{group.date}</span>
+              <span className={styles.dailySummary}>
+                {group.dailyIncome > 0 && (
+                  <span className={styles.dailyIncome}>
+                    +{group.dailyIncome.toLocaleString()}
+                  </span>
+                )}
+                {group.dailyExpense > 0 && (
+                  <span className={styles.dailyExpense}>
+                    -{group.dailyExpense.toLocaleString()}
+                  </span>
+                )}
+              </span>
+            </h3>
             <div className={styles.groupList}>
               {group.transactions.map((tx) => (
                 <TransactionItem
@@ -172,7 +228,6 @@ const TransactionListPage = () => {
           </div>
         ))}
 
-        {/* 무한 스크롤 감지 영역 (Loading Indicator) */}
         <div ref={loadMoreRef} className={styles.loadingIndicator}>
           {isFetchingNextPage && <span>추가 내역 불러오는 중...</span>}
         </div>

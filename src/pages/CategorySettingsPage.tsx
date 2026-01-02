@@ -9,7 +9,11 @@ import {
 } from '../hooks/queries/useCategoryMutation';
 import { usePalette } from '../context/PaletteContext';
 import { Icon } from '../components/common/Icon';
-import { DEFAULT_ICONS, LEVEL_2_ICONS, ALL_ICONS } from '../data/iconList';
+import {
+  DEFAULT_ICONS,
+  LEVEL_2_ICONS,
+  ICON_CATEGORIES,
+} from '../data/iconList';
 import type { IconName } from '../types/icon';
 import type { Category } from '../types/category';
 import styles from './CategorySettingsPage.module.css';
@@ -55,13 +59,6 @@ function CategoryFormModal({
   );
   const [iconLevel, setIconLevel] = useState(1);
 
-  const iconList =
-    iconLevel === 1
-      ? DEFAULT_ICONS
-      : iconLevel === 2
-        ? LEVEL_2_ICONS
-        : ALL_ICONS;
-
   const handleSubmit = () => {
     if (!name.trim() || !currentPalette) return;
 
@@ -104,6 +101,61 @@ function CategoryFormModal({
     }
   };
 
+  const renderIconList = () => {
+    if (iconLevel === 1) {
+      return (
+        <div className={styles.iconGrid}>
+          {DEFAULT_ICONS.map((iconName) => (
+            <div
+              key={iconName}
+              className={`${styles.iconOption} ${
+                selectedIcon === iconName ? styles.selected : ''
+              }`}
+              onClick={() => setSelectedIcon(iconName)}
+            >
+              <Icon name={iconName} size={20} />
+            </div>
+          ))}
+        </div>
+      );
+    }
+    if (iconLevel === 2) {
+      return (
+        <div className={styles.iconGrid}>
+          {LEVEL_2_ICONS.map((iconName) => (
+            <div
+              key={iconName}
+              className={`${styles.iconOption} ${
+                selectedIcon === iconName ? styles.selected : ''
+              }`}
+              onClick={() => setSelectedIcon(iconName)}
+            >
+              <Icon name={iconName} size={20} />
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return ICON_CATEGORIES.map((category) => (
+      <div key={category.title}>
+        <h4 className={styles.iconCategoryTitle}>{category.title}</h4>
+        <div className={styles.iconGrid}>
+          {category.icons.map((iconName) => (
+            <div
+              key={iconName}
+              className={`${styles.iconOption} ${
+                selectedIcon === iconName ? styles.selected : ''
+              }`}
+              onClick={() => setSelectedIcon(iconName)}
+            >
+              <Icon name={iconName} size={20} />
+            </div>
+          ))}
+        </div>
+      </div>
+    ));
+  };
+
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -130,19 +182,7 @@ function CategoryFormModal({
 
           <div>
             <div className={styles.sectionTitle}>아이콘</div>
-            <div className={styles.iconGrid}>
-              {iconList.map((iconName) => (
-                <div
-                  key={iconName}
-                  className={`${styles.iconOption} ${
-                    selectedIcon === iconName ? styles.selected : ''
-                  }`}
-                  onClick={() => setSelectedIcon(iconName)}
-                >
-                  <Icon name={iconName} size={20} />
-                </div>
-              ))}
-            </div>
+            {renderIconList()}
             {iconLevel < 3 && (
               <button
                 className={styles.moreIconsButton}
