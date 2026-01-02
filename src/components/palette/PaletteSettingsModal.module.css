@@ -27,6 +27,10 @@
   overflow-y: auto;
 }
 
+.modal * {
+  box-sizing: border-box;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -324,26 +328,44 @@
 
 .colorGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 10px;
 }
 
 .colorOption {
-  width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: transform 0.2s;
-}
-
-.colorOption:hover {
-  transform: scale(1.1);
+  transition: border-color 0.2s;
 }
 
 .colorOption.selected {
   border-color: var(--text-primary);
-  transform: scale(1.1);
+}
+
+.customColorInput {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+.customColorInput::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.customColorInput::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+.customColorInput::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
 }
 
 .saveButton {

@@ -29,10 +29,10 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix: 다크모드 테마 적용 방식 통일
+feat: 팔레트 설정의 테마 색상 UI 개선
 
-- CSS의 테마 선택자를 [data-theme='dark']에서 html.dark로 변경
-- index.html의 초기화 스크립트와 CSS의 테마 적용 방식을 일치시켜, 특정 페이지에서 새로고침 시 다크모드가 풀리던 근본적인 문제 해결
+- 팔레트 설정의 색상 선택 UI를 카테고리 설정과 동일한 반응형 그리드 스타일로 통일
+- 커스텀 색상 선택 기능을 추가하고 관련 UI가 깨져 보이던 문제 해결
 "
 git push origin main
 

@@ -412,6 +412,23 @@ export function PaletteSettingsModal({
                       onClick={() => isOwner && setThemeColor(color)}
                     />
                   ))}
+                  {/* 커스텀 컬러 피커 */}
+                  <div
+                    className={styles.colorOption}
+                    style={{
+                      backgroundColor: themeColor,
+                      position: 'relative',
+                    }}
+                  >
+                    <input
+                      type="color"
+                      value={themeColor}
+                      onChange={(e) => isOwner && setThemeColor(e.target.value)}
+                      className={styles.customColorInput}
+                      title="직접 선택"
+                      disabled={!isOwner}
+                    />
+                  </div>
                 </div>
               </div>
 
