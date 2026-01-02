@@ -6,7 +6,7 @@ import type { Transaction } from '../types/transaction';
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
 import { Icon } from '../components/common/Icon';
 import styles from './TransactionListPage.module.css';
-import { Lock, Palette } from 'lucide-react';
+import { Lock, MessageSquareText, Palette } from 'lucide-react';
 import { TransactionFormModal } from '../components/transaction/TransactionFormModal';
 import { useAuth } from '../hooks/useAuth';
 import { EmptyState } from '../components/common/EmptyState';
@@ -46,9 +46,15 @@ const TransactionItem = (props: TransactionItemProps) => {
           <span className={styles.description}>
             {transaction.description || category.name}
           </span>
+          {transaction.public_memo && (
+            <span className={styles.publicMemo}>
+              <MessageSquareText size={10} className={styles.memoIcon} />
+              {transaction.public_memo}
+            </span>
+          )}
           {isMyMemo && (
             <span className={styles.privateMemo}>
-              <Lock size={10} className={styles.lockIcon} />
+              <Lock size={10} className={styles.memoIcon} />
               {transaction.private_memo}
             </span>
           )}

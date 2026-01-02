@@ -8,8 +8,12 @@
 동일 항목 수정시에도 버전은 계속 갱신해줘. 그래야 확인이 가능해.
 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md, supabase_schema.sql 꼭 지속적으로 참조해줘.
 매번 소스 수정을 할때마 PROJECT_PLAN.md, agents.md, APP_SPECIFICATION.md, file_list.md 이 문서들을 업데이트 해줘.
+업데이트 할때 이전에 작성한내용은 수정, 삭제된거 아니면 손대지 말아줘. 기존 내역이 삭제되면 이력 추적하기가 어려워.
 수정후에는 깃에 올릴 커밋메시지도 만들어줘. 이 메시지에는 `, " 문자는 포함되지 않게 조심해줘.
 supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심해줘.
+기존 테이블생성, 정책생성, 함수생성 쿼리는 삭제하지 말아줘. 필요한 부분만 수정 추가해줘.
+소스 수정시 주석은 삭제하지 말아줘. 그래야 다음에 알아보기가 쉬워. 주석을 너무 자세하게 안남겨도 되는데 그렇다고 아에 안남기지는 말아줘.
+간단하게 주석 작성해줘. 기존 주석은 변경이나 삭제된거 아니면 그대로 남겨줘.
 이문서들을 읽어보고 이번엔 뭘할지 논의를 하고 나서 그 후에 개발을 진행하도록 할께.
 넌 최고의 기획자야. 지금은 소스 수정은 안할꺼야. 의견부터 나누고 싶어.
 
@@ -28,11 +32,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat: 팔레트 설정에 멤버 역할 변경 기능 구현
+feat: RBAC 및 3단계 메모 시스템 기반 구현
 
-- 소유자(Owner)가 다른 멤버의 역할을 Admin, Editor, Viewer로 변경할 수 있는 UI 추가
-- useUpdateMemberRoleMutation을 연동하여 실제 데이터 변경 기능 구현
-- 드롭다운 메뉴의 시각적 구성을 개선하여 사용성 향상
+- DB 스키마: 새로운 권한 시스템(RBAC)을 위한 RLS 정책과 헬퍼 함수를 재설계하고, 3단계 메모 시스템을 위해 public_memo 컬럼과 private_memos 테이블을 추가. 내역과 메모를 한번에 처리하는 RPC 함수 구현.
+- 메모 기능: 내역 입력 폼에 '내용', '공개 메모', '나만 보기 메모' 3가지 필드를 적용하고, 관련 데이터 저장 및 조회 로직을 구현.
+- 멤버 권한 UI: 팔레트 소유자가 다른 멤버의 역할을 변경할 수 있는 UI를 구현.
+- 문서: 변경된 설계 내용을 PROJECT_PLAN과 supabase_schema.sql에 모두 반영.
 "
 git push origin main
 

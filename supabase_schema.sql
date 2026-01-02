@@ -194,6 +194,59 @@ CREATE POLICY "Members can create invitations" ON public.palette_invitations FOR
 -- 4. RPC Functions
 -- ==============================================================================
 
+CREATE OR REPLACE FUNCTION upsert_transaction_with_memos(
+    p_id uuid, -- 내역 ID (수정 시 사용, 추가 시 NULL)
+    p_palette_id uuid,
+    p_category_code text,
+    p_date date,
+    p_type text,
+    p_amount integer,
+    p_description text,
+    p_public_memo text,
+    p_private_memo_content text
+)
+RETURNS uuid AS $$
+DECLARE
+    v_transaction_id uuid;
+    v_user_id uuid := auth.uid();
+BEGIN
+    -- 1. 내역(Transaction) 추가 또는 수정
+    IF p_id IS NULL THEN
+        -- 추가
+        INSERT INTO public.transactions (palette_id, category_code, user_id, date, type, amount, description, public_memo)
+        VALUES (p_palette_id, p_category_code, v_user_id, p_date, p_type, p_amount, p_description, p_public_memo)
+        RETURNING id INTO v_transaction_id;
+    ELSE
+        -- 수정
+        UPDATE public.transactions
+        SET
+            category_code = p_category_code,
+            date = p_date,
+            type = p_type,
+            amount = p_amount,
+            description = p_description,
+            public_memo = p_public_memo
+        WHERE id = p_id
+        RETURNING id INTO v_transaction_id;
+    END IF;
+
+    -- 2. 비공개 메모(Private Memo) 추가 또는 수정
+    IF p_private_memo_content IS NOT NULL AND p_private_memo_content <> '' THEN
+        INSERT INTO public.private_memos (transaction_id, user_id, content)
+        VALUES (v_transaction_id, v_user_id, p_private_memo_content)
+        ON CONFLICT (transaction_id, user_id)
+        DO UPDATE SET content = EXCLUDED.content, updated_at = now();
+    ELSE
+        -- 내용이 없으면 삭제
+        DELETE FROM public.private_memos
+        WHERE transaction_id = v_transaction_id AND user_id = v_user_id;
+    END IF;
+
+    RETURN v_transaction_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
 CREATE OR REPLACE FUNCTION create_palette(name TEXT, theme_color TEXT)
 RETURNS UUID AS $$
 DECLARE
