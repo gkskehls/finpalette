@@ -144,17 +144,25 @@
   border-radius: 20px 20px 0 0;
   padding: 24px;
   max-height: 90vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   animation: slideUp 0.3s ease-out;
+}
+
+.modalBody {
+  overflow-y: auto;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding-bottom: 16px; /* 스크롤바와 버튼 사이 여백 */
 }
 
 .modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 16px; /* 헤더와 내용 구분 */
 }
 
 .modalTitle {
@@ -181,7 +189,7 @@
 
 .iconGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
   gap: 10px;
 }
 
@@ -204,7 +212,7 @@
 }
 
 .moreIconsButton {
-  grid-column: 1 / -1;
+  width: 100%;
   padding: 10px;
   background-color: var(--bg-secondary);
   border: none;
@@ -217,7 +225,7 @@
 
 .colorGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
   gap: 10px;
 }
 
@@ -235,11 +243,29 @@
 
 .customColorInput {
   width: 100%;
-  height: 40px;
+  height: 100%;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   cursor: pointer;
   background: none;
+  padding: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+/* For Webkit browsers */
+.customColorInput::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.customColorInput::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+/* For Firefox */
+.customColorInput::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
 }
 
 .submitButton {

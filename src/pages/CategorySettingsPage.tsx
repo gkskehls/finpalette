@@ -112,68 +112,76 @@ function CategoryFormModal({
           </button>
         </div>
 
-        {/* 이름 입력 */}
-        <div>
-          <div className={styles.sectionTitle}>이름</div>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="카테고리 이름 (예: 간식)"
-            className={styles.input}
-            autoFocus
-          />
-        </div>
-
-        {/* 아이콘 선택 */}
-        <div>
-          <div className={styles.sectionTitle}>아이콘</div>
-          <div className={styles.iconGrid}>
-            {iconList.map((iconName) => (
-              <div
-                key={iconName}
-                className={`${styles.iconOption} ${
-                  selectedIcon === iconName ? styles.selected : ''
-                }`}
-                onClick={() => setSelectedIcon(iconName)}
-              >
-                <Icon name={iconName} size={20} />
-              </div>
-            ))}
+        <div className={styles.modalBody}>
+          {/* 이름 입력 */}
+          <div>
+            <div className={styles.sectionTitle}>이름</div>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="카테고리 이름 (예: 간식)"
+              className={styles.input}
+              autoFocus
+            />
           </div>
-          {!showAllIcons && (
-            <button
-              className={styles.moreIconsButton}
-              onClick={() => setShowAllIcons(true)}
-            >
-              + 더 많은 아이콘 보기
-            </button>
-          )}
-        </div>
 
-        {/* 색상 선택 */}
-        <div>
-          <div className={styles.sectionTitle}>색상</div>
-          <div className={styles.colorGrid}>
-            {PRESET_COLORS.map((color) => (
+          {/* 아이콘 선택 */}
+          <div>
+            <div className={styles.sectionTitle}>아이콘</div>
+            <div className={styles.iconGrid}>
+              {iconList.map((iconName) => (
+                <div
+                  key={iconName}
+                  className={`${styles.iconOption} ${
+                    selectedIcon === iconName ? styles.selected : ''
+                  }`}
+                  onClick={() => setSelectedIcon(iconName)}
+                >
+                  <Icon name={iconName} size={20} />
+                </div>
+              ))}
+            </div>
+            {!showAllIcons && (
+              <button
+                className={styles.moreIconsButton}
+                onClick={() => setShowAllIcons(true)}
+              >
+                + 더 많은 아이콘 보기
+              </button>
+            )}
+          </div>
+
+          {/* 색상 선택 */}
+          <div>
+            <div className={styles.sectionTitle}>색상</div>
+            <div className={styles.colorGrid}>
+              {PRESET_COLORS.map((color) => (
+                <div
+                  key={color}
+                  className={`${styles.colorOption} ${
+                    selectedColor === color ? styles.selected : ''
+                  }`}
+                  style={{ backgroundColor: color }}
+                  onClick={() => setSelectedColor(color)}
+                />
+              ))}
+              {/* 커스텀 컬러 피커 */}
               <div
-                key={color}
-                className={`${styles.colorOption} ${
-                  selectedColor === color ? styles.selected : ''
-                }`}
-                style={{ backgroundColor: color }}
-                onClick={() => setSelectedColor(color)}
-              />
-            ))}
-            {/* 커스텀 컬러 피커 */}
-            <div className={styles.colorOption} style={{ overflow: 'hidden' }}>
-              <input
-                type="color"
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-                className={styles.customColorInput}
-                title="직접 선택"
-              />
+                className={styles.colorOption}
+                style={{
+                  backgroundColor: selectedColor,
+                  position: 'relative',
+                }}
+              >
+                <input
+                  type="color"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                  className={styles.customColorInput}
+                  title="직접 선택"
+                />
+              </div>
             </div>
           </div>
         </div>

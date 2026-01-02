@@ -29,13 +29,13 @@ supabase 연동했어.
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix: 카테고리 설정 페이지 이동 및 게스트 내역 수정 오류 해결
+fix: 카테고리 수정 모달 스크롤 오류 해결
 
-- ProfilePage에서 '카테고리 설정' 클릭 시 /categories로 이동하도록 수정
-- 게스트 모드에서 내역 수정 및 삭제가 동작하지 않던 버그 수정
-- TransactionFormModal에서 로그인 상태에 따라 올바른 ID(id/localId)를 사용하도록 변경
-
-docs: 알려진 이슈에 카테고리 관리 메뉴 미작동 항목 추가
+- 모바일에서 카테고리 수정 시 모달 내용이 길어지면 상단 닫기 버튼이 보이지 않던 문제 수정
+- 모달 헤더는 고정하고 내용 부분만 스크롤되도록 CSS 및 JSX 구조 변경
+- 좁은 화면에서 카테고리 수정 모달에 좌우 스크롤이 생기던 문제 해결
+- 아이콘 및 색상 그리드를 화면 크기에 따라 열 개수가 자동 조절되도록 수정
+- 커스텀 색상 선택기의 UI를 개선하여 일관된 디자인 유지
 "
 git push origin main
 
