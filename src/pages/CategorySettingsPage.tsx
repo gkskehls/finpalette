@@ -105,7 +105,7 @@ function CategoryFormModal({
     if (iconLevel === 1) {
       return (
         <div className={styles.iconGrid}>
-          {DEFAULT_ICONS.map((iconName) => (
+          {DEFAULT_ICONS.map((iconName: IconName) => (
             <div
               key={iconName}
               className={`${styles.iconOption} ${
@@ -122,7 +122,7 @@ function CategoryFormModal({
     if (iconLevel === 2) {
       return (
         <div className={styles.iconGrid}>
-          {LEVEL_2_ICONS.map((iconName) => (
+          {LEVEL_2_ICONS.map((iconName: IconName) => (
             <div
               key={iconName}
               className={`${styles.iconOption} ${
@@ -136,24 +136,26 @@ function CategoryFormModal({
         </div>
       );
     }
-    return ICON_CATEGORIES.map((category) => (
-      <div key={category.title}>
-        <h4 className={styles.iconCategoryTitle}>{category.title}</h4>
-        <div className={styles.iconGrid}>
-          {category.icons.map((iconName) => (
-            <div
-              key={iconName}
-              className={`${styles.iconOption} ${
-                selectedIcon === iconName ? styles.selected : ''
-              }`}
-              onClick={() => setSelectedIcon(iconName)}
-            >
-              <Icon name={iconName} size={20} />
-            </div>
-          ))}
+    return ICON_CATEGORIES.map(
+      (category: { title: string; icons: IconName[] }) => (
+        <div key={category.title}>
+          <h4 className={styles.iconCategoryTitle}>{category.title}</h4>
+          <div className={styles.iconGrid}>
+            {category.icons.map((iconName: IconName) => (
+              <div
+                key={iconName}
+                className={`${styles.iconOption} ${
+                  selectedIcon === iconName ? styles.selected : ''
+                }`}
+                onClick={() => setSelectedIcon(iconName)}
+              >
+                <Icon name={iconName} size={20} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    ));
+      )
+    );
   };
 
   return (
