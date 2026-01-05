@@ -1,4 +1,4 @@
-import { useState, Suspense, lazy } from 'react';
+import { useState, Suspense, lazy, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
@@ -52,16 +52,28 @@ const LoadingIndicator = () => (
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   const isFullScreenPage =
     location.pathname.startsWith('/invite') ||
     location.pathname.startsWith('/categories');
 
+  // 페이지 이동 시 스크롤 최상단으로 이동
+  useEffect(() => {
+    // window 스크롤 초기화
+    window.scrollTo(0, 0);
+
+    // mainContent 내부 스크롤 초기화
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
+
   return (
     <div className="appContainer">
       {!isFullScreenPage && <Header />}
 
-      <main className="mainContent">
+      <main className="mainContent" ref={mainContentRef}>
         <Suspense fallback={<LoadingIndicator />}>
           <Routes>
             <Route path="/" element={<DashboardPage />} />

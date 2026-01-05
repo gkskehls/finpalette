@@ -33,10 +33,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(ux): 모든 페이지 이동 시 스크롤을 최상단으로 강제
+fix(app): 페이지 이동 시 스크롤 초기화 문제 수정
 
-- ScrollToTop 컴포넌트의 예외 처리 로직을 제거하여 모든 페이지 이동 시 스크롤을 초기화하도록 수정
-- 스크롤 위치 복원 기능(useScrollRestoration) 관련 코드를 모두 제거하여 스크롤 동작을 단일화하고 충돌 문제 해결
+mainContent 영역의 내부 스크롤이 초기화되지 않는 문제를 해결하기 위해 useRef를 사용하여 경로 변경 시 스크롤 위치를 0으로 설정함
+앱 버전을 v1.1.8로 업데이트함
 "
 git push origin main
 
