@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
-import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import type { Transaction } from '../types/transaction';
 import type { Category } from '../types/category';
 import { Icon } from '../components/common/Icon';
@@ -160,8 +159,6 @@ const TransactionListPage = () => {
 
   const isLoading = isLoadingTransactions || isLoadingCategories;
   const error = transactionsError || categoriesError;
-
-  useScrollRestoration('transactions', isLoading);
 
   const loadMoreRef = useIntersectionObserver({
     onIntersect: fetchNextPage,
