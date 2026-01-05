@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './TransactionFormModal.module.css';
-import { X, Lock, Trash2, MessageSquareText } from 'lucide-react';
+import { X, Lock, Trash2, MessageSquareText, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCategoriesQuery } from '../../hooks/queries/useCategoriesQuery';
 import type { Transaction } from '../../types/transaction';
@@ -185,118 +185,140 @@ export function TransactionFormModal({
   return (
     <div className={styles.modalBackdrop}>
       <div className={styles.modalContent}>
-        <div className={styles.modalHeader}>
-          <h2>{isEditMode ? '내역 수정' : '내역 추가'}</h2>
-          <button onClick={onClose} className={styles.closeButton}>
-            <X size={24} />
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div className={styles.typeSelector}>
+        <form onSubmit={handleSubmit} className={styles.formContainer}>
+          <div className={styles.modalHeader}>
             <button
               type="button"
-              className={`${styles.typeButton} ${type === 'exp' ? styles.active : ''}`}
-              onClick={() => handleTypeChange('exp')}
+              onClick={onClose}
+              className={styles.closeButton}
             >
-              지출
+              <X size={24} />
             </button>
+            <h2 className={styles.modalTitle}>
+              {isEditMode ? '내역 수정' : '내역 추가'}
+            </h2>
             <button
-              type="button"
-              className={`${styles.typeButton} ${type === 'inc' ? styles.active : ''}`}
-              onClick={() => handleTypeChange('inc')}
+              type="submit"
+              className={styles.saveButton}
+              disabled={
+                addMutation.isPending ||
+                updateMutation.isPending ||
+                deleteMutation.isPending
+              }
             >
-              수입
+              <Check size={20} />
+              저장
             </button>
           </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="amount">금액</label>
-            <input
-              type="number"
-              id="amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0"
-              required
-            />
-          </div>
+          <div className={styles.scrollableContent}>
+            <div className={styles.typeSelector}>
+              <button
+                type="button"
+                className={`${styles.typeButton} ${type === 'exp' ? styles.active : ''}`}
+                onClick={() => handleTypeChange('exp')}
+              >
+                지출
+              </button>
+              <button
+                type="button"
+                className={`${styles.typeButton} ${type === 'inc' ? styles.active : ''}`}
+                onClick={() => handleTypeChange('inc')}
+              >
+                수입
+              </button>
+            </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="category">카테고리</label>
-            <select
-              id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              required
-              disabled={isLoadingCategories}
-            >
-              <option value="" disabled>
-                {isLoadingCategories ? '카테고리 로딩 중...' : '카테고리 선택'}
-              </option>
-              {currentCategories.map((cat) => (
-                <option key={cat.code} value={cat.code}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className={styles.compactRow}>
+              <div className={styles.formGroup} style={{ flex: 1 }}>
+                <label htmlFor="date">날짜</label>
+                <div className={styles.dateInputWrapper}>
+                  <input
+                    type="date"
+                    id="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    required
+                  />
+                  <span className={styles.dayOfWeek}>{dayOfWeek}</span>
+                </div>
+              </div>
+              <div className={styles.formGroup} style={{ flex: 1 }}>
+                <label htmlFor="amount">금액</label>
+                <input
+                  type="number"
+                  id="amount"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0"
+                  required
+                />
+              </div>
+            </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="date">날짜</label>
-            <div className={styles.dateInputWrapper}>
-              <input
-                type="date"
-                id="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
+            <div className={styles.formGroup}>
+              <label htmlFor="category">카테고리</label>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
                 required
-              />
-              <span className={styles.dayOfWeek}>{dayOfWeek}</span>
+                disabled={isLoadingCategories}
+              >
+                <option value="" disabled>
+                  {isLoadingCategories
+                    ? '카테고리 로딩 중...'
+                    : '카테고리 선택'}
+                </option>
+                {currentCategories.map((cat) => (
+                  <option key={cat.code} value={cat.code}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="description">내용 (핵심 요약)</label>
-            <input
-              type="text"
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="예: 중식 (짜장면, 짬뽕)"
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="publicMemo">공개 메모 (추가 정보)</label>
-            <div className={styles.memoContainer}>
-              <MessageSquareText size={16} className={styles.memoIcon} />
+            <div className={styles.formGroup}>
+              <label htmlFor="description">내용</label>
               <input
                 type="text"
-                id="publicMemo"
-                className={styles.memoInput}
-                value={publicMemo}
-                onChange={(e) => setPublicMemo(e.target.value)}
-                placeholder="모든 멤버에게 보여지는 내용"
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="내용 입력 (선택)"
               />
             </div>
-          </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="privateMemo">나만 보기 메모 (비공개)</label>
-            <div className={styles.memoContainer}>
-              <Lock size={16} className={styles.memoIcon} />
-              <input
-                type="text"
-                id="privateMemo"
-                className={styles.memoInput}
-                value={privateMemo}
-                onChange={(e) => setPrivateMemo(e.target.value)}
-                placeholder="나만 볼 수 있는 상세 내용"
-              />
+            <div className={styles.formGroup}>
+              <label htmlFor="publicMemo">공개 메모</label>
+              <div className={styles.memoContainer}>
+                <MessageSquareText size={16} className={styles.memoIcon} />
+                <input
+                  type="text"
+                  id="publicMemo"
+                  className={styles.memoInput}
+                  value={publicMemo}
+                  onChange={(e) => setPublicMemo(e.target.value)}
+                  placeholder="멤버들과 공유할 메모"
+                />
+              </div>
             </div>
-          </div>
 
-          <div className={styles.formActions}>
+            <div className={styles.formGroup}>
+              <label htmlFor="privateMemo">나만 보기</label>
+              <div className={styles.memoContainer}>
+                <Lock size={16} className={styles.memoIcon} />
+                <input
+                  type="text"
+                  id="privateMemo"
+                  className={styles.memoInput}
+                  value={privateMemo}
+                  onChange={(e) => setPrivateMemo(e.target.value)}
+                  placeholder="나만 볼 수 있는 메모"
+                />
+              </div>
+            </div>
+
             {isEditMode && (
               <button
                 type="button"
@@ -304,28 +326,9 @@ export function TransactionFormModal({
                 onClick={handleDelete}
                 disabled={deleteMutation.isPending}
               >
-                <Trash2 size={16} />
-                삭제
+                <Trash2 size={16} />이 내역 삭제하기
               </button>
             )}
-            <button
-              type="button"
-              className={styles.cancelButton}
-              onClick={onClose}
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              className={styles.submitButton}
-              disabled={
-                addMutation.isPending ||
-                updateMutation.isPending ||
-                deleteMutation.isPending
-              }
-            >
-              {isEditMode ? '수정' : '저장'}
-            </button>
           </div>
         </form>
       </div>
