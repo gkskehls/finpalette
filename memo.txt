@@ -42,10 +42,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(ui): 테마 변경 즉시 적용 및 로딩 시 깜빡임 문제 해결
+fix(ui): 테마 즉시 적용 및 새로고침 유지 오류 해결
 
-- index.html에 초기 테마 설정 스크립트를 추가하여 페이지 로딩 시 테마 깜빡임 현상 제거
-- Header 컴포넌트의 테마 변경 로직을 표준 useEffect 방식으로 복원하여 안정성 확보
+- CSS 변수 시스템과 일치하도록 `data-theme` 속성 대신 `dark` 클래스를 사용하도록 수정
+- index.html의 초기 테마 설정 스크립트를 클래스 방식으로 변경하여 로딩 시 깜빡임 현상 해결
+- Header 컴포넌트의 테마 변경 로직을 클래스 토글 방식으로 수정하여 즉각적인 반응성 확보
 "
 git push origin main
 

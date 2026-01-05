@@ -11,11 +11,9 @@
         try {
           const theme = localStorage.getItem('theme');
           if (theme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-          } else if (theme === 'light') {
-            document.documentElement.setAttribute('data-theme', 'light');
+            document.documentElement.classList.add('dark');
           }
-          // If no theme is set, we don't do anything and let the CSS default (light) apply.
+          // No need for an 'else' block, as the default is light mode (no class)
         } catch (e) {
           console.error('Error applying theme from localStorage', e);
         }
