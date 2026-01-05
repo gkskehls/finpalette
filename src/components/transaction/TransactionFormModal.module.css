@@ -135,22 +135,30 @@
 .compactRow {
   display: flex;
   gap: 12px;
+  align-items: center; /* 라벨과 입력창 수직 정렬 */
 }
 
 .formGroup {
   margin-bottom: 0; /* gap으로 간격 조정하므로 제거 */
+  display: flex; /* 수정: 라벨과 입력창을 한 줄에 배치 */
+  align-items: center; /* 수정: 수직 중앙 정렬 */
+  gap: 12px; /* 수정: 라벨과 입력창 사이 간격 */
 }
 
 .formGroup label {
-  display: block;
-  font-size: 0.85rem;
+  flex-basis: 80px; /* 수정: 라벨의 고정 너비 */
+  flex-shrink: 0; /* 수정: 라벨 너비 고정 */
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
+  color: var(--text-primary);
+  margin-bottom: 0; /* flex로 정렬되므로 제거 */
+  text-align: left;
 }
 
 .formGroup input,
-.formGroup select {
+.formGroup select,
+.dateInputWrapper {
+  flex: 1; /* 수정: 입력창이 남은 공간을 모두 차지 */
   width: 100%;
   padding: 12px;
   border-radius: 12px;
@@ -167,15 +175,11 @@
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-secondary);
-  box-sizing: border-box; /* 패딩 포함 크기 계산 */
 }
 
 .dateInputWrapper input[type='date'] {
-  width: auto; /* 수정: 너비를 자동으로 조절 */
-  flex-shrink: 0; /* 수정: 내용에 맞게 줄어들도록 함 */
+  width: auto;
+  flex-shrink: 0;
   border: none;
   background-color: transparent;
   padding: 12px 0;
@@ -191,6 +195,7 @@
 
 .memoContainer {
   position: relative;
+  flex: 1; /* 수정: 메모 입력창이 남은 공간 차지 */
 }
 
 .memoIcon {

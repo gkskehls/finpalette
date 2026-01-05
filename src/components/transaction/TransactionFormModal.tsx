@@ -243,7 +243,7 @@ export function TransactionFormModal({
                   <span className={styles.dayOfWeek}>{dayOfWeek}</span>
                 </div>
               </div>
-              <div className={styles.formGroup} style={{ flex: 1 }}>
+              <div className={styles.formGroup}>
                 <label htmlFor="amount">금액</label>
                 <input
                   type="number"
