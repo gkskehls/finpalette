@@ -196,7 +196,14 @@ const TransactionListPage = () => {
       }
     });
 
-    return Array.from(groupMap.values());
+    // 날짜별 그룹을 내림차순(최신 날짜가 위로) 정렬
+    // Map.values()는 삽입 순서를 보장하지만, forEach 순서에 의존하므로
+    // 명시적으로 날짜 비교를 통해 정렬하는 것이 안전함
+    return Array.from(groupMap.values()).sort((a, b) => {
+      return (
+        new Date(b.originalDate).getTime() - new Date(a.originalDate).getTime()
+      );
+    });
   }, [allTransactions]);
 
   const renderContent = () => {

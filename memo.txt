@@ -30,6 +30,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 그리고 항목들이 너무 떨어저 있어서 아래로 스크롤이 너무 김.
 페이지가 위아래가 좀 더 좁아서 한눈에 보였으면 좋겠음.
 
+상단 테마버튼 바로 적용 안됨.
+새로고침하면 적용됨.
+
+전체 내역 최신항목이 위로 와야 햐는데 반대로 정렬이 되는듯.
+
+
 
 
 
@@ -38,9 +44,9 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(ui): 거래 내역 리스트 sticky 헤더 위치 오류 수정
+fix(ui): 거래 내역 리스트 정렬 순서 오류 수정
 
-- sticky 헤더의 기준점을 mainContent 상단(0px)으로 수정하여 헤더와의 간격 제거
+- 날짜별 그룹화 후 명시적으로 최신 날짜순(내림차순) 정렬 로직 추가
 "
 git push origin main
 
