@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sun, Moon, ChevronDown } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { usePalette } from '../../context/PaletteContext';
@@ -9,16 +9,9 @@ import type { Palette } from '../../types/palette';
 import styles from './Header.module.css';
 
 export function Header() {
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    // 페이지 로드 시 초기 테마 적용
-    if (savedTheme) {
-      document.documentElement.setAttribute('data-theme', savedTheme);
-      return savedTheme;
-    }
-    return 'light';
-  });
-
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('theme') || 'light'
+  );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [paletteForSetting, setPaletteForSetting] = useState<Palette | null>(
@@ -27,12 +20,14 @@ export function Header() {
   const { currentPalette, isLoading } = usePalette();
   const location = useLocation();
 
+  // 테마 변경을 처리하는 useEffect
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    // React 상태 업데이트 전에 DOM 속성을 즉시 변경
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    setTheme(newTheme);
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
   const handleTitleClick = () => {
