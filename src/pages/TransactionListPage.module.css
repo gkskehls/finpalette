@@ -19,7 +19,7 @@
 
 .dateHeader {
   position: sticky;
-  top: 60px; /* 수정: 헤더 높이(60px)만큼 아래에 고정 */
+  top: 59px; /* 수정: 헤더 높이(60px)보다 1px 작게 설정하여 틈새 방지 */
   background-color: var(--bg-primary);
   padding: 12px 0;
   font-size: 0.9rem;
@@ -31,6 +31,8 @@
   align-items: center;
   border-bottom: 1px solid var(--border-color);
   margin-top: 0;
+  /* iOS Safari에서 sticky 요소가 부드럽게 동작하도록 힌트 제공 */
+  will-change: transform;
 }
 
 .dailySummary {

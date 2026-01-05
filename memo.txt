@@ -33,12 +33,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(ui): 스켈레톤 UI 적용 및 스크롤 위치 복원 로직 개선
+fix(ui): iOS 스크롤 이슈 해결 및 헤더 위치 미세 조정
 
-- 대시보드, 거래 내역 리스트, 프로필 페이지에 스켈레톤 UI 적용하여 로딩 경험 개선
-- 거래 내역 리스트의 날짜 헤더가 상단 헤더 아래에 고정되도록 sticky 위치 조정
-- 페이지 진입 시 스크롤 최상단 이동 로직 추가 (대시보드, 카테고리 설정)
-- useScrollRestoration 훅 개선: 저장된 위치가 없을 경우 최상단으로 이동하도록 수정
+- iOS Safari에서 페이지 진입 시 스크롤이 즉시 동작하지 않는 문제 해결 (setTimeout 적용)
+- 거래 내역 리스트의 sticky 헤더 위치를 1px 조정하여 틈새 제거 (top: 59px)
+- 스크롤 성능 최적화를 위해 will-change 속성 추가
 "
 git push origin main
 

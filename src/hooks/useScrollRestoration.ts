@@ -34,7 +34,10 @@ export function useScrollRestoration(pageKey: string, isLoading: boolean) {
         });
       } else {
         // 저장된 위치가 없으면 최상단으로 이동 (다른 페이지에서 진입 시)
-        window.scrollTo(0, 0);
+        // setTimeout을 사용하여 확실하게 스크롤을 이동시킴 (iOS Safari 대응)
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 0);
       }
     }
   }, [isLoading, storageKey]);
