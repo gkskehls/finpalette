@@ -229,31 +229,30 @@ export function TransactionFormModal({
               </button>
             </div>
 
-            <div className={styles.compactRow}>
-              <div className={styles.formGroup}>
-                <label htmlFor="date">날짜</label>
-                <div className={styles.dateInputWrapper}>
-                  <input
-                    type="date"
-                    id="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    required
-                  />
-                  <span className={styles.dayOfWeek}>{dayOfWeek}</span>
-                </div>
-              </div>
-              <div className={styles.formGroup}>
-                <label htmlFor="amount">금액</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="date">날짜</label>
+              <div className={styles.dateInputWrapper}>
                 <input
-                  type="number"
-                  id="amount"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0"
+                  type="date"
+                  id="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
                   required
                 />
+                <span className={styles.dayOfWeek}>{dayOfWeek}</span>
               </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="amount">금액</label>
+              <input
+                type="number"
+                id="amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="0"
+                required
+              />
             </div>
 
             <div className={styles.formGroup}>
