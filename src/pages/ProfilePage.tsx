@@ -28,6 +28,10 @@ export function ProfilePage() {
   const [newName, setNewName] = useState('');
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     // 페이지 로드 시 및 로컬 스토리지 변경 시 사용량 업데이트
     const updateUsage = () => {
       setLocalStorageUsage(getLocalStorageUsage());

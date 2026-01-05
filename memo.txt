@@ -25,13 +25,7 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 내역에 일반 메모도 있었으면 좋겠어.
 나만보기메모는 지출 내역 작성자가 아닌, 지금 작성하고 있는 나만 보이는 메모였으면 좋겠어.
 
-
-카테고리 새로 추가한거
-내역에는 아에 항목이 안보이고
-대시보드에는 아이콘이 ? 로 나옴
-
-
-
+통계, 마이페이지, 카테고리 추가화면은 진입시 무조건 화면 최상단으로 갔으면 좋겠어.
 
 
 
@@ -39,9 +33,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(build): Palette 타입 불일치로 인한 빌드 오류 해결
+feat(ux): 주요 페이지 진입 시 스크롤 최상단으로 이동
 
-- PaletteContext.tsx의 GUEST_PALETTE 객체에서 타입에 존재하지 않는 updated_at 속성을 제거하여 타입스크립트 빌드 오류를 수정함
+- StatsPage, ProfilePage, CategorySettingsPage 컴포넌트가 마운트될 때
+  'window.scrollTo(0, 0)'를 실행하도록 하여 항상 페이지 상단에서
+  콘텐츠를 볼 수 있도록 사용자 경험을 개선함
 "
 git push origin main
 
