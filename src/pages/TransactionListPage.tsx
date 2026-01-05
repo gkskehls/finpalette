@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
+import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import type { Transaction } from '../types/transaction';
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
+import type { Category } from '../types/category';
 import { Icon } from '../components/common/Icon';
 import styles from './TransactionListPage.module.css';
 import { Lock, MessageSquareText, Palette } from 'lucide-react';
@@ -12,23 +13,48 @@ import { useAuth } from '../hooks/useAuth';
 import { EmptyState } from '../components/common/EmptyState';
 import { Skeleton } from '../components/common/Skeleton';
 
-const ALL_CATEGORIES = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
-
 interface TransactionItemProps {
   transaction: Transaction;
+  category?: Category;
   onEdit: (_item: Transaction) => void;
 }
 
 const TransactionItem = (props: TransactionItemProps) => {
-  const { transaction, onEdit } = props;
+  const { transaction, category, onEdit } = props;
   const { user } = useAuth();
 
-  const category = ALL_CATEGORIES.find(
-    (c) => c.code === transaction.category_code
-  );
-
   if (!category) {
-    return null;
+    // 카테고리를 찾을 수 없는 경우, 기본 UI 렌더링
+    return (
+      <div
+        className={styles.transactionItem}
+        onClick={() => onEdit(transaction)}
+      >
+        <div className={styles.leftContent}>
+          <div
+            className={styles.categoryIcon}
+            style={{ backgroundColor: '#88888815' }}
+          >
+            <Icon name="HelpCircle" color="#888888" size={18} />
+          </div>
+          <div className={styles.transactionDetails}>
+            <span className={styles.description}>
+              {transaction.description || '미분류'}
+            </span>
+          </div>
+        </div>
+        <div className={styles.rightContent}>
+          <span
+            className={`${styles.amount} ${
+              transaction.type === 'inc' ? styles.income : styles.expense
+            }`}
+          >
+            {transaction.type === 'inc' ? '+' : '-'}
+            {transaction.amount.toLocaleString()}
+          </span>
+        </div>
+      </div>
+    );
   }
 
   const isIncome = transaction.type === 'inc';
@@ -118,13 +144,22 @@ const TransactionListSkeleton = () => {
 
 const TransactionListPage = () => {
   const {
-    data,
-    isLoading,
-    error,
+    data: transactionsData,
+    isLoading: isLoadingTransactions,
+    error: transactionsError,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useTransactionsQuery();
+
+  const {
+    data: categories = [],
+    isLoading: isLoadingCategories,
+    error: categoriesError,
+  } = useCategoriesQuery();
+
+  const isLoading = isLoadingTransactions || isLoadingCategories;
+  const error = transactionsError || categoriesError;
 
   useScrollRestoration('transactions', isLoading);
 
@@ -155,8 +190,12 @@ const TransactionListPage = () => {
   };
 
   const allTransactions = useMemo(() => {
-    return data?.pages.flatMap((page) => page) || [];
-  }, [data]);
+    return transactionsData?.pages.flatMap((page) => page) || [];
+  }, [transactionsData]);
+
+  const categoryMap = useMemo(() => {
+    return new Map(categories.map((cat) => [cat.code, cat]));
+  }, [categories]);
 
   const groupedTransactions = useMemo(() => {
     if (allTransactions.length === 0) return [];
@@ -196,9 +235,6 @@ const TransactionListPage = () => {
       }
     });
 
-    // 날짜별 그룹을 내림차순(최신 날짜가 위로) 정렬
-    // Map.values()는 삽입 순서를 보장하지만, forEach 순서에 의존하므로
-    // 명시적으로 날짜 비교를 통해 정렬하는 것이 안전함
     return Array.from(groupMap.values()).sort((a, b) => {
       return (
         new Date(b.originalDate).getTime() - new Date(a.originalDate).getTime()
@@ -247,6 +283,7 @@ const TransactionListPage = () => {
                 <TransactionItem
                   key={tx.localId}
                   transaction={tx}
+                  category={categoryMap.get(tx.category_code)}
                   onEdit={handleOpenEditModal}
                 />
               ))}

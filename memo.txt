@@ -26,9 +26,6 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 나만보기메모는 지출 내역 작성자가 아닌, 지금 작성하고 있는 나만 보이는 메모였으면 좋겠어.
 
 
-상단 테마버튼 바로 적용 안됨.
-새로고침하면 적용됨.
-
 카테고리 새로 추가한거
 내역에는 아에 항목이 안보이고
 대시보드에는 아이콘이 ? 로 나옴
@@ -42,11 +39,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(ui): 테마 즉시 적용 및 새로고침 유지 오류 해결
+feat(category): 게스트 모드 카테고리 로컬 저장 및 동적 로딩 구현
 
-- CSS 변수 시스템과 일치하도록 `data-theme` 속성 대신 `dark` 클래스를 사용하도록 수정
-- index.html의 초기 테마 설정 스크립트를 클래스 방식으로 변경하여 로딩 시 깜빡임 현상 해결
-- Header 컴포넌트의 테마 변경 로직을 클래스 토글 방식으로 수정하여 즉각적인 반응성 확보
+- useCategoriesQuery, useCategoryMutation 훅에 게스트 모드 로직 추가
+- 게스트 모드에서 카테고리 데이터를 로컬 스토리지 'categories' 키에 저장 및 관리
+- DashboardPage, TransactionListPage, StatsPage에서 constants.ts 대신 useCategoriesQuery를 통해 카테고리 동적 로딩
+- 카테고리 정보를 찾지 못할 경우 '미분류'로 표시하는 예외 처리 추가
 "
 git push origin main
 

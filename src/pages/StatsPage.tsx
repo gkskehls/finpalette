@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
-import { EXPENSE_CATEGORIES } from '../config/constants';
+import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import {
   PieChart,
   Pie,
@@ -26,13 +26,25 @@ interface MonthlySummary {
 }
 
 export function StatsPage() {
-  const { data } = useTransactionsQuery();
+  const { data: transactionsData } = useTransactionsQuery();
+  const { data: categories = [] } = useCategoriesQuery();
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // InfiniteData를 평탄화하여 하나의 배열로 만듦
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const transactions = useMemo(() => {
-    return data?.pages.flatMap((page) => page) || [];
-  }, [data]);
+    return transactionsData?.pages.flatMap((page) => page) || [];
+  }, [transactionsData]);
+
+  const expenseCategoryMap = useMemo(() => {
+    return new Map(
+      categories
+        .filter((c) => !c.code.startsWith('i'))
+        .map((cat) => [cat.code, cat])
+    );
+  }, [categories]);
 
   const handlePrevMonth = () => {
     setSelectedDate((prevDate) => {
@@ -74,12 +86,14 @@ export function StatsPage() {
       {} as Record<string, number>
     );
 
-    return EXPENSE_CATEGORIES.map((category) => ({
-      name: category.name,
-      value: amountByCategory[category.code] || 0,
-      color: category.color,
-    })).filter((item) => item.value > 0);
-  }, [transactions, selectedDate]);
+    return Array.from(expenseCategoryMap.values())
+      .map((category) => ({
+        name: category.name,
+        value: amountByCategory[category.code] || 0,
+        color: category.color,
+      }))
+      .filter((item) => item.value > 0);
+  }, [transactions, selectedDate, expenseCategoryMap]);
 
   const monthlySummaryData: MonthlySummary[] = useMemo(() => {
     const summaryMap = new Map<string, { income: number; expense: number }>();
@@ -88,7 +102,9 @@ export function StatsPage() {
 
     for (let i = 5; i >= 0; i--) {
       const date = new Date(currentYear, currentMonth - i, 1);
-      const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+      const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}`;
       summaryMap.set(monthKey, { income: 0, expense: 0 });
     }
 
@@ -121,9 +137,12 @@ export function StatsPage() {
       });
   }, [transactions, selectedDate]);
 
-  const formattedMonth = `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}`;
+  const formattedMonth = `${selectedDate.getFullYear()}.${(
+    selectedDate.getMonth() + 1
+  )
+    .toString()
+    .padStart(2, '0')}`;
 
-  // 데이터가 아예 없을 때 Empty State 표시
   if (transactions.length === 0) {
     return (
       <div className={styles.container} style={{ justifyContent: 'center' }}>

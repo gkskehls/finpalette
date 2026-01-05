@@ -3,9 +3,8 @@ import { SummaryCard } from '../components/dashboard/SummaryCard';
 import { CategorySection } from '../components/dashboard/CategorySection';
 import { TransactionSection } from '../components/dashboard/TransactionSection';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
+import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import type { TransactionItem } from '../types/ui';
-import type { Category } from '../types/category';
 import { Skeleton } from '../components/common/Skeleton';
 
 import './DashboardPage.css';
@@ -27,15 +26,6 @@ const groupTransactionsByDate = (transactions: TransactionItem[]) => {
     .map(([date, transactions]) => ({ date, transactions }))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
-
-// UI용 카테고리 목록에 임시 palette_id 추가
-const allCategories: Category[] = [
-  ...INCOME_CATEGORIES,
-  ...EXPENSE_CATEGORIES,
-].map((c) => ({
-  ...c,
-  palette_id: 'ui-default', // UI 표시용 기본값
-}));
 
 const DashboardSkeleton = () => {
   return (
@@ -74,24 +64,30 @@ const DashboardSkeleton = () => {
 };
 
 export function DashboardPage() {
-  // TODO: 월 이동 기능을 위해 현재 날짜 상태 관리 필요
   const [currentDate] = useState(new Date());
 
-  const { data, isLoading, error } = useTransactionsQuery();
+  const {
+    data: transactionsData,
+    isLoading: isLoadingTransactions,
+    error: transactionsError,
+  } = useTransactionsQuery();
+  const {
+    data: categories = [],
+    isLoading: isLoadingCategories,
+    error: categoriesError,
+  } = useCategoriesQuery();
 
-  // 페이지 진입 시 스크롤 최상단으로 이동
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // InfiniteData를 평탄화하여 하나의 배열로 만듦
   const transactions = useMemo(() => {
-    return data?.pages.flatMap((page) => page) || [];
-  }, [data]);
+    return transactionsData?.pages.flatMap((page) => page) || [];
+  }, [transactionsData]);
 
   const categoryMap = useMemo(() => {
-    return new Map(allCategories.map((cat) => [cat.code, cat]));
-  }, []);
+    return new Map(categories.map((cat) => [cat.code, cat]));
+  }, [categories]);
 
   const enrichedTransactions: TransactionItem[] = useMemo(() => {
     return transactions.map((t) => ({
@@ -106,7 +102,6 @@ export function DashboardPage() {
     }));
   }, [transactions, categoryMap]);
 
-  // '이번 달' 거래 내역만 필터링
   const monthlyTransactions = useMemo(() => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -119,7 +114,6 @@ export function DashboardPage() {
     });
   }, [transactions, currentDate]);
 
-  // '이번 달' 요약 정보 계산
   const summary = useMemo(() => {
     return monthlyTransactions.reduce(
       (acc, t) => {
@@ -137,6 +131,9 @@ export function DashboardPage() {
     [enrichedTransactions]
   );
 
+  const isLoading = isLoadingTransactions || isLoadingCategories;
+  const error = transactionsError || categoriesError;
+
   if (isLoading) return <DashboardSkeleton />;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -144,8 +141,8 @@ export function DashboardPage() {
     <>
       <SummaryCard {...summary} />
       <CategorySection
-        categories={allCategories}
-        transactions={monthlyTransactions} // 이번 달 데이터 전달
+        categories={categories}
+        transactions={monthlyTransactions}
       />
       <TransactionSection transactionGroups={transactionGroups} />
     </>
