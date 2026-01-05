@@ -318,7 +318,9 @@ export function TransactionFormModal({
                 />
               </div>
             </div>
+          </div>
 
+          <div className={styles.formActions}>
             {isEditMode && (
               <button
                 type="button"
@@ -326,9 +328,28 @@ export function TransactionFormModal({
                 onClick={handleDelete}
                 disabled={deleteMutation.isPending}
               >
-                <Trash2 size={16} />이 내역 삭제하기
+                <Trash2 size={16} />
+                삭제
               </button>
             )}
+            <button
+              type="button"
+              className={styles.cancelButton}
+              onClick={onClose}
+            >
+              취소
+            </button>
+            <button
+              type="submit"
+              className={styles.submitButton}
+              disabled={
+                addMutation.isPending ||
+                updateMutation.isPending ||
+                deleteMutation.isPending
+              }
+            >
+              저장
+            </button>
           </div>
         </form>
       </div>
