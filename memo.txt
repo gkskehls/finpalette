@@ -25,6 +25,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 내역에 일반 메모도 있었으면 좋겠어.
 나만보기메모는 지출 내역 작성자가 아닌, 지금 작성하고 있는 나만 보이는 메모였으면 좋겠어.
 
+내역 저장할떄 위에만 입력하고 저장하고 싶은데 아래로 내려가해야서 불편함.
+위쪽에 저장버튼이 있었으면 좋겠음.
+그리고 항목들이 너무 떨어저 있어서 아래로 스크롤이 너무 김.
+페이지가 위아래가 좀 더 좁아서 한눈에 보였으면 좋겠음.
+
 
 
 
@@ -33,11 +38,9 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(ui): iOS 스크롤 이슈 해결 및 헤더 위치 미세 조정
+fix(ui): 거래 내역 리스트 sticky 헤더 위치 오류 수정
 
-- iOS Safari에서 페이지 진입 시 스크롤이 즉시 동작하지 않는 문제 해결 (setTimeout 적용)
-- 거래 내역 리스트의 sticky 헤더 위치를 1px 조정하여 틈새 제거 (top: 59px)
-- 스크롤 성능 최적화를 위해 will-change 속성 추가
+- sticky 헤더의 기준점을 mainContent 상단(0px)으로 수정하여 헤더와의 간격 제거
 "
 git push origin main
 

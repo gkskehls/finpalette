@@ -19,7 +19,7 @@
 
 .dateHeader {
   position: sticky;
-  top: 59px; /* 수정: 헤더 높이(60px)보다 1px 작게 설정하여 틈새 방지 */
+  top: 0; /* 수정: mainContent 내부에서의 상대적 위치이므로 0으로 설정 */
   background-color: var(--bg-primary);
   padding: 12px 0;
   font-size: 0.9rem;
