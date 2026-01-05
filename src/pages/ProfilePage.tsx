@@ -28,10 +28,6 @@ export function ProfilePage() {
   const [newName, setNewName] = useState('');
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
     // 페이지 로드 시 및 로컬 스토리지 변경 시 사용량 업데이트
     const updateUsage = () => {
       setLocalStorageUsage(getLocalStorageUsage());
@@ -153,7 +149,7 @@ export function ProfilePage() {
           fontFamily: 'monospace',
         }}
       >
-        v1.1.3
+        v1.1.5
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>

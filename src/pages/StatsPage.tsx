@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import {
@@ -29,10 +29,6 @@ export function StatsPage() {
   const { data: transactionsData } = useTransactionsQuery();
   const { data: categories = [] } = useCategoriesQuery();
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const transactions = useMemo(() => {
     return transactionsData?.pages.flatMap((page) => page) || [];

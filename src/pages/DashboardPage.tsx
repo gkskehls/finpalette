@@ -1,9 +1,10 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { SummaryCard } from '../components/dashboard/SummaryCard';
 import { CategorySection } from '../components/dashboard/CategorySection';
 import { TransactionSection } from '../components/dashboard/TransactionSection';
 import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
+import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import type { TransactionItem } from '../types/ui';
 import { Skeleton } from '../components/common/Skeleton';
 
@@ -77,9 +78,10 @@ export function DashboardPage() {
     error: categoriesError,
   } = useCategoriesQuery();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  const isLoading = isLoadingTransactions || isLoadingCategories;
+  const error = transactionsError || categoriesError;
+
+  useScrollRestoration('dashboard', isLoading);
 
   const transactions = useMemo(() => {
     return transactionsData?.pages.flatMap((page) => page) || [];
@@ -130,9 +132,6 @@ export function DashboardPage() {
     () => groupTransactionsByDate(enrichedTransactions),
     [enrichedTransactions]
   );
-
-  const isLoading = isLoadingTransactions || isLoadingCategories;
-  const error = transactionsError || categoriesError;
 
   if (isLoading) return <DashboardSkeleton />;
   if (error) return <div>Error: {error.message}</div>;
