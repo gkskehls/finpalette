@@ -10,6 +10,7 @@ import { Lock, MessageSquareText, Palette } from 'lucide-react';
 import { TransactionFormModal } from '../components/transaction/TransactionFormModal';
 import { useAuth } from '../hooks/useAuth';
 import { EmptyState } from '../components/common/EmptyState';
+import { Skeleton } from '../components/common/Skeleton';
 
 const ALL_CATEGORIES = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
@@ -68,6 +69,49 @@ const TransactionItem = (props: TransactionItemProps) => {
           {transaction.amount.toLocaleString()}
         </span>
       </div>
+    </div>
+  );
+};
+
+const TransactionListSkeleton = () => {
+  return (
+    <div className={styles.listContainer}>
+      {[1, 2].map((groupIndex) => (
+        <div key={groupIndex} className={styles.dateGroup}>
+          <div className={styles.dateHeaderSkeleton}>
+            <Skeleton width={120} height={20} />
+            <Skeleton width={100} height={16} />
+          </div>
+          <div className={styles.groupList}>
+            {[1, 2, 3].map((itemIndex) => (
+              <div key={itemIndex} className={styles.transactionItem}>
+                <div className={styles.leftContent}>
+                  <Skeleton
+                    width={36}
+                    height={36}
+                    borderRadius={8}
+                    style={{ flexShrink: 0 }}
+                  />
+                  <div
+                    className={styles.transactionDetails}
+                    style={{ width: '100%' }}
+                  >
+                    <Skeleton width="60%" height={16} />
+                    <Skeleton
+                      width="40%"
+                      height={12}
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
+                </div>
+                <div className={styles.rightContent}>
+                  <Skeleton width={60} height={18} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
@@ -156,7 +200,7 @@ const TransactionListPage = () => {
   }, [allTransactions]);
 
   const renderContent = () => {
-    if (isLoading) return <p className={styles.loadingText}>로딩 중...</p>;
+    if (isLoading) return <TransactionListSkeleton />;
     if (error)
       return (
         <p className={styles.errorText}>에러가 발생했습니다: {error.message}</p>

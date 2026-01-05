@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { SummaryCard } from '../components/dashboard/SummaryCard';
 import { CategorySection } from '../components/dashboard/CategorySection';
 import { TransactionSection } from '../components/dashboard/TransactionSection';
@@ -6,6 +6,7 @@ import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
 import type { TransactionItem } from '../types/ui';
 import type { Category } from '../types/category';
+import { Skeleton } from '../components/common/Skeleton';
 
 import './DashboardPage.css';
 
@@ -36,11 +37,52 @@ const allCategories: Category[] = [
   palette_id: 'ui-default', // UI 표시용 기본값
 }));
 
+const DashboardSkeleton = () => {
+  return (
+    <div
+      style={{
+        padding: '16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '24px',
+      }}
+    >
+      {/* Summary Card Skeleton */}
+      <Skeleton width="100%" height={180} borderRadius={20} />
+
+      {/* Category Section Skeleton */}
+      <div>
+        <Skeleton width={120} height={24} style={{ marginBottom: '16px' }} />
+        <div style={{ display: 'flex', gap: '12px', overflowX: 'hidden' }}>
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} width={80} height={100} borderRadius={12} />
+          ))}
+        </div>
+      </div>
+
+      {/* Transaction Section Skeleton */}
+      <div>
+        <Skeleton width={120} height={24} style={{ marginBottom: '16px' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} width="100%" height={70} borderRadius={12} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export function DashboardPage() {
   // TODO: 월 이동 기능을 위해 현재 날짜 상태 관리 필요
   const [currentDate] = useState(new Date());
 
   const { data, isLoading, error } = useTransactionsQuery();
+
+  // 페이지 진입 시 스크롤 최상단으로 이동
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // InfiniteData를 평탄화하여 하나의 배열로 만듦
   const transactions = useMemo(() => {
@@ -95,7 +137,7 @@ export function DashboardPage() {
     [enrichedTransactions]
   );
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <DashboardSkeleton />;
   if (error) return <div>Error: {error.message}</div>;
 
   return (

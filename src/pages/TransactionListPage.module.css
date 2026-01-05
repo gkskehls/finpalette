@@ -19,7 +19,7 @@
 
 .dateHeader {
   position: sticky;
-  top: 0; /* 수정: mainContent의 최상단에 고정 */
+  top: 60px; /* 수정: 헤더 높이(60px)만큼 아래에 고정 */
   background-color: var(--bg-primary);
   padding: 12px 0;
   font-size: 0.9rem;
@@ -30,6 +30,7 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
+  margin-top: 0;
 }
 
 .dailySummary {
@@ -148,4 +149,14 @@
   text-align: center;
   padding: 20px;
   color: var(--text-secondary);
+}
+
+/* Skeleton Styles */
+.dateHeaderSkeleton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 8px;
 }

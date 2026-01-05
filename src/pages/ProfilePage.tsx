@@ -15,6 +15,7 @@ import {
   LOCAL_STORAGE_DANGER_THRESHOLD_BYTES,
 } from '../utils/storage';
 import styles from './ProfilePage.module.css';
+import { Skeleton } from '../components/common/Skeleton';
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -112,7 +113,26 @@ export function ProfilePage() {
   };
 
   if (isLoading) {
-    return <div className={styles.profileContainer}>로딩 중...</div>;
+    return (
+      <div className={styles.profileContainer}>
+        <h2 className={styles.sectionTitle}>계정 정보</h2>
+        <div className={styles.authSection}>
+          <div className={styles.profileHeader}>
+            <Skeleton width={64} height={64} borderRadius="50%" />
+            <div className={styles.profileInfo} style={{ width: '100%' }}>
+              <div className={styles.profileRow}>
+                <Skeleton width={50} height={16} />
+                <Skeleton width={150} height={16} />
+              </div>
+              <div className={styles.profileRow}>
+                <Skeleton width={50} height={16} />
+                <Skeleton width={100} height={16} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -129,7 +149,7 @@ export function ProfilePage() {
           fontFamily: 'monospace',
         }}
       >
-        v1.0.86
+        v1.0.87
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>

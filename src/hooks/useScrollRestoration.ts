@@ -32,6 +32,9 @@ export function useScrollRestoration(pageKey: string, isLoading: boolean) {
         requestAnimationFrame(() => {
           window.scrollTo(0, parseInt(savedPosition, 10));
         });
+      } else {
+        // 저장된 위치가 없으면 최상단으로 이동 (다른 페이지에서 진입 시)
+        window.scrollTo(0, 0);
       }
     }
   }, [isLoading, storageKey]);

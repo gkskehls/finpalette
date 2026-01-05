@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, X, Edit2, EyeOff, Pipette } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -261,6 +261,11 @@ export function CategorySettingsPage() {
   );
 
   const { data: categories = [] } = useCategoriesQuery();
+
+  // 페이지 진입 시 스크롤 최상단으로 이동
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const filteredCategories = useMemo(() => {
     return categories.filter((c) =>
