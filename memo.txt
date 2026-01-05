@@ -39,12 +39,9 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(category): 게스트 모드 카테고리 로컬 저장 및 동적 로딩 구현
+fix(build): Palette 타입 불일치로 인한 빌드 오류 해결
 
-- useCategoriesQuery, useCategoryMutation 훅에 게스트 모드 로직 추가
-- 게스트 모드에서 카테고리 데이터를 로컬 스토리지 'categories' 키에 저장 및 관리
-- DashboardPage, TransactionListPage, StatsPage에서 constants.ts 대신 useCategoriesQuery를 통해 카테고리 동적 로딩
-- 카테고리 정보를 찾지 못할 경우 '미분류'로 표시하는 예외 처리 추가
+- PaletteContext.tsx의 GUEST_PALETTE 객체에서 타입에 존재하지 않는 updated_at 속성을 제거하여 타입스크립트 빌드 오류를 수정함
 "
 git push origin main
 
