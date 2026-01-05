@@ -174,7 +174,8 @@
 }
 
 .dateInputWrapper input[type='date'] {
-  width: 100%;
+  width: auto; /* 수정: 너비를 자동으로 조절 */
+  flex-shrink: 0; /* 수정: 내용에 맞게 줄어들도록 함 */
   border: none;
   background-color: transparent;
   padding: 12px 0;

@@ -230,7 +230,7 @@ export function TransactionFormModal({
             </div>
 
             <div className={styles.compactRow}>
-              <div className={styles.formGroup} style={{ flex: 1 }}>
+              <div className={styles.formGroup}>
                 <label htmlFor="date">날짜</label>
                 <div className={styles.dateInputWrapper}>
                   <input

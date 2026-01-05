@@ -43,11 +43,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(ui): 내역 입력 모달 레이아웃 및 버튼 복구
+fix(ui): 내역 입력 모달 날짜/금액 필드 레이아웃 수정
 
-- 모달 하단에 삭제, 취소, 저장 버튼을 다시 추가하고 재배치
-- 상단 저장 버튼은 유지하여 편의성 확보
-- 입력 필드가 화면 밖으로 벗어나는 레이아웃 깨짐 문제 수정 (box-sizing)
+- 날짜 필드는 내용에 맞게 너비를 줄이고, 금액 필드가 남은 공간을 채우도록 수정
+- flexbox와 width 속성을 조정하여 필드가 화면 밖으로 벗어나는 문제 해결
 "
 git push origin main
 
