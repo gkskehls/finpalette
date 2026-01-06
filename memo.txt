@@ -31,10 +31,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(transaction): 수정 모드에서 자동 높이 조절 textarea 사용
+feat(transaction): 금액 입력 시 쉼표 자동 포맷팅 기능 추가
 
-- 내역 수정 시 긴 메모 작성이 불편했던 문제를 해결하기 위해, input을 자동 높이 조절 textarea로 교체
-- 앱 버전 v1.1.24로 업데이트 및 문서 최신화
+- 사용자가 금액 필드에서 포커스를 잃으면, 숫자에 자동으로 쉼표(,)를 추가하여 가독성 향상
+- 입력 중에는 쉼표를 제거하여 편집이 용이하도록 UX 개선
+- 앱 버전 v1.1.25로 업데이트 및 문서 최신화
 "
 git push origin main
 

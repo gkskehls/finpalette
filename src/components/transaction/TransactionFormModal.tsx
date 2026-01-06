@@ -82,6 +82,7 @@ export function TransactionFormModal({
   const [amount, setAmount] = useState(
     transactionToEdit?.amount.toString() || ''
   );
+  const [isAmountFocused, setIsAmountFocused] = useState(false);
   const [category, setCategory] = useState(
     transactionToEdit?.category_code || ''
   );
@@ -288,10 +289,22 @@ export function TransactionFormModal({
             <div className={styles.formGroup}>
               <label htmlFor="amount">금액</label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 id="amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                value={
+                  isAmountFocused
+                    ? amount
+                    : amount
+                      ? Number(amount).toLocaleString()
+                      : ''
+                }
+                onChange={(e) => {
+                  const numericValue = e.target.value.replace(/[^0-9]/g, '');
+                  setAmount(numericValue);
+                }}
+                onFocus={() => setIsAmountFocused(true)}
+                onBlur={() => setIsAmountFocused(false)}
                 placeholder="0"
                 required
                 disabled={!canSubmit}
