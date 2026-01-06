@@ -31,11 +31,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(auth): 상세 보기 UI 개선 및 게스트 모드 권한 오류 수정
+feat(transaction): 수정 모드에서 자동 높이 조절 textarea 사용
 
-- 권한 없는 사용자가 긴 메모를 볼 수 없던 문제를 해결하기 위해, 읽기 전용 모드에서 텍스트 필드를 input 대신 div로 렌더링하도록 변경
-- 게스트 모드에서 수정/삭제가 불가능하던 권한 오류를 전면 수정
-- 앱 버전 v1.1.23으로 업데이트 및 문서 최신화
+- 내역 수정 시 긴 메모 작성이 불편했던 문제를 해결하기 위해, input을 자동 높이 조절 textarea로 교체
+- 앱 버전 v1.1.24로 업데이트 및 문서 최신화
 "
 git push origin main
 

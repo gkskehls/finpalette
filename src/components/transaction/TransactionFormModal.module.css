@@ -150,6 +150,7 @@
 
 .formGroup input,
 .formGroup select,
+.formGroup textarea,
 .dateInputWrapper {
   flex: 1;
   width: 100%;
@@ -159,8 +160,15 @@
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   font-size: 1rem;
+  font-family: inherit; /* 폰트 상속 */
   -webkit-appearance: none;
   box-sizing: border-box;
+}
+
+.formGroup textarea {
+  resize: none; /* 사용자가 크기 조절 못하게 */
+  min-height: 46px; /* 최소 높이 */
+  line-height: 1.5;
 }
 
 .dateInputWrapper {
@@ -191,13 +199,13 @@
 .memoContainer {
   position: relative;
   flex: 1;
+  display: flex;
 }
 
 .memoIcon {
   position: absolute;
   left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 14px; /* textarea 높이에 맞게 조정 */
   color: var(--text-secondary);
 }
 

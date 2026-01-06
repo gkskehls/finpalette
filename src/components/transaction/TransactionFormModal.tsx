@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './TransactionFormModal.module.css';
 import { X, Lock, Trash2, MessageSquareText, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -16,6 +16,31 @@ import type {
 import { useAuth } from '../../hooks/useAuth';
 import { useCurrentPaletteRole } from '../../hooks/useCurrentPaletteRole';
 import { CategorySelector } from './CategorySelector';
+
+// --- Auto-resizing Textarea 컴포넌트 ---
+const AutoResizingTextarea = (
+  props: React.TextareaHTMLAttributes<HTMLTextAreaElement>
+) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [props.value]);
+
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    e.target.style.height = 'auto';
+    e.target.style.height = `${e.target.scrollHeight}px`;
+    if (props.onChange) {
+      props.onChange(e);
+    }
+  };
+
+  return <textarea ref={textareaRef} {...props} onInput={handleInput} />;
+};
 
 interface TransactionFormModalProps {
   onClose: () => void;
@@ -295,12 +320,12 @@ export function TransactionFormModal({
                   {description || '내용 없음'}
                 </div>
               ) : (
-                <input
-                  type="text"
+                <AutoResizingTextarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="내용 입력 (선택)"
+                  rows={1}
                 />
               )}
             </div>
@@ -316,13 +341,13 @@ export function TransactionFormModal({
               ) : (
                 <div className={styles.memoContainer}>
                   <MessageSquareText size={16} className={styles.memoIcon} />
-                  <input
-                    type="text"
+                  <AutoResizingTextarea
                     id="publicMemo"
                     className={styles.memoInput}
                     value={publicMemo}
                     onChange={(e) => setPublicMemo(e.target.value)}
                     placeholder="멤버들과 공유할 메모"
+                    rows={1}
                   />
                 </div>
               )}
@@ -339,13 +364,13 @@ export function TransactionFormModal({
               ) : (
                 <div className={styles.memoContainer}>
                   <Lock size={16} className={styles.memoIcon} />
-                  <input
-                    type="text"
+                  <AutoResizingTextarea
                     id="privateMemo"
                     className={styles.memoInput}
                     value={privateMemo}
                     onChange={(e) => setPrivateMemo(e.target.value)}
                     placeholder="나만 볼 수 있는 메모"
+                    rows={1}
                   />
                 </div>
               )}
