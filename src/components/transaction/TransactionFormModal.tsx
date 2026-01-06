@@ -72,20 +72,19 @@ export function TransactionFormModal({
     return ['일', '월', '화', '수', '목', '금', '토'][utcDate.getDay()];
   }, [date]);
 
+  // [수정] 오직 '추가 모드'에서만 기본 카테고리를 설정하도록 로직 변경
   useEffect(() => {
-    const currentList = type === 'inc' ? incomeCategories : expenseCategories;
-    if (currentList.length > 0) {
-      const isCategoryValid = currentList.some((c) => c.code === category);
-      if (!isCategoryValid) {
-        // setTimeout을 사용하여 동기적인 상태 업데이트를 방지하고,
-        // react-hooks/set-state-in-effect ESLint 오류를 해결합니다.
-        const timer = setTimeout(() => {
-          setCategory(currentList[0].code);
-        }, 0);
-        return () => clearTimeout(timer);
-      }
+    if (isEditMode) return;
+
+    if (!category && expenseCategories.length > 0) {
+      // setTimeout을 사용하여 동기적인 상태 업데이트를 방지하고,
+      // react-hooks/set-state-in-effect ESLint 오류를 해결합니다.
+      const timer = setTimeout(() => {
+        setCategory(expenseCategories[0].code);
+      }, 0);
+      return () => clearTimeout(timer);
     }
-  }, [incomeCategories, expenseCategories, type, category]);
+  }, [isEditMode, category, expenseCategories]);
 
   const handleTypeChange = (newType: 'inc' | 'exp') => {
     setType(newType);

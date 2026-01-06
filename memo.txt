@@ -31,13 +31,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(auth): 역할 기반 접근 제어(RBAC) 및 권한 오류 처리 구현
+fix(transaction): 수정 모드 진입 시 카테고리 초기화 오류 수정
 
-- useCurrentPaletteRole 훅을 신설하여 사용자의 현재 팔레트 역할을 파악하는 로직 구현
-- 카테고리 및 팔레트 설정 페이지에 역할 기반 UI 제어(버튼 숨김/비활성화) 적용
-- 모든 Mutation 훅에 onError 핸들러를 추가하여, 권한 없는 요청 시 명확한 에러 토스트 메시지를 표시하도록 개선
-- 존재하지 않는 타입 참조로 인한 빌드 오류 수정
-- 앱 버전 v1.1.19로 업데이트 및 관련 문서 최신화
+- 내역 수정 모달이 열릴 때, 기존에 저장된 카테고리가 아닌 기본값(식비)으로 강제 변경되던 useEffect 로직 수정
+- 이제 수정 모드에서는 기존 카테고리 값을 정상적으로 유지함
+- useEffect 내에서 setState를 동기적으로 호출하여 발생하던 ESLint 오류 수정
+- 앱 버전 v1.1.20으로 업데이트 및 문서 최신화
 "
 git push origin main
 
