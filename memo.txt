@@ -22,10 +22,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-refactor(category): 기본 카테고리 정의 일원화
+docs: 카테고리 순서 변경 및 게스트 모드 동기화 기능 명세 구체화
 
-- constants.ts를 기준으로 supabase_schema.sql 및 관련 문서의 기본 카테고리 목록을 통일하여 데이터 정합성 확보
-- 앱 버전 v1.1.26으로 업데이트 및 문서 최신화
+- 드래그 앤 드롭 방식의 카테고리 순서 변경 기능의 상세 구현 계획 문서화
+- 게스트 모드와 로그인 모드의 기능을 완전히 일치시키는 '저장소 추상화' 원칙 및 적용 방안 명시
+- APP_SPECIFICATION.md 및 PROJECT_PLAN.md 업데이트
 "
 git push origin main
 
