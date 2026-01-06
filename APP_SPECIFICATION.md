@@ -199,7 +199,7 @@
 
 - **상세 구현 계획 (단계별):**
   1.  **[DB] `get_default_categories` 함수 신설:**
-      - **역할:** `create_palette` 함수 내에 하드코딩된 기본 카테고리 목록(코드, 이름, 색상, 아이콘)을 그대로 반환하는 RPC 함수를 생성합니다.
+      - **역할:** 표준화된 기본 카테고리 목록을 반환하는 RPC 함수를 생성합니다. 이 함수가 모든 기본 카테고리의 '진실의 원천'이 됩니다.
       - **권한:** 인증되지 않은 사용자(게스트)도 호출할 수 있도록 `public` 권한을 부여합니다.
       - **예상 쿼리:**
         ```sql
@@ -207,12 +207,22 @@
         RETURNS TABLE(code text, name text, color text, icon text) AS $$
         BEGIN
           RETURN QUERY VALUES
-            ('inc', '수입', '#10B981', 'PiggyBank'),
-            ('c01', '식비', '#EF4444', 'Utensils'),
-            ('c02', '교통', '#3B82F6', 'Bus'),
-            ('c03', '쇼핑', '#F59E0B', 'ShoppingBag'),
-            ('c04', '생활', '#8B5CF6', 'Home'),
-            ('c05', '기타', '#64748B', 'MoreHorizontal');
+            ('i01', '월급', '#4CAF50', 'Briefcase'),
+            ('i02', '용돈', '#81C784', 'Coins'),
+            ('i03', '금융소득', '#66BB6A', 'Landmark'),
+            ('i04', '사업소득', '#A5D6A7', 'Store'),
+            ('i99', '기타', '#C8E6C9', 'PlusSquare'),
+            ('c01', '식비', '#FF7043', 'Utensils'),
+            ('c02', '교통', '#5C6BC0', 'Bus'),
+            ('c03', '통신', '#26A69A', 'Smartphone'),
+            ('c04', '쇼핑', '#FFCA28', 'ShoppingBag'),
+            ('c05', '주거', '#78909C', 'Home'),
+            ('c06', '의료/건강', '#EF5350', 'HeartPulse'),
+            ('c07', '여가/문화', '#AB47BC', 'Film'),
+            ('c08', '교육', '#42A5F5', 'GraduationCap'),
+            ('c09', '경조사', '#8D6E63', 'Users'),
+            ('c10', '저축/투자', '#66BB6A', 'PiggyBank'),
+            ('c99', '기타', '#BDBDBD', 'PlusSquare');
         END;
         $$ LANGUAGE plpgsql;
         ```

@@ -261,12 +261,22 @@ BEGIN
 
   INSERT INTO public.categories (palette_id, code, name, color, icon, user_id)
   VALUES
-    (new_palette_id, 'inc', '수입', '#10B981', 'PiggyBank', auth.uid()),
-    (new_palette_id, 'c01', '식비', '#EF4444', 'Utensils', auth.uid()),
-    (new_palette_id, 'c02', '교통', '#3B82F6', 'Bus', auth.uid()),
-    (new_palette_id, 'c03', '쇼핑', '#F59E0B', 'ShoppingBag', auth.uid()),
-    (new_palette_id, 'c04', '생활', '#8B5CF6', 'Home', auth.uid()),
-    (new_palette_id, 'c05', '기타', '#64748B', 'MoreHorizontal', auth.uid());
+    (new_palette_id, 'i01', '월급', '#4CAF50', 'Briefcase', auth.uid()),
+    (new_palette_id, 'i02', '용돈', '#81C784', 'Coins', auth.uid()),
+    (new_palette_id, 'i03', '금융소득', '#66BB6A', 'Landmark', auth.uid()),
+    (new_palette_id, 'i04', '사업소득', '#A5D6A7', 'Store', auth.uid()),
+    (new_palette_id, 'i99', '기타', '#C8E6C9', 'PlusSquare', auth.uid()),
+    (new_palette_id, 'c01', '식비', '#FF7043', 'Utensils', auth.uid()),
+    (new_palette_id, 'c02', '교통', '#5C6BC0', 'Bus', auth.uid()),
+    (new_palette_id, 'c03', '통신', '#26A69A', 'Smartphone', auth.uid()),
+    (new_palette_id, 'c04', '쇼핑', '#FFCA28', 'ShoppingBag', auth.uid()),
+    (new_palette_id, 'c05', '주거', '#78909C', 'Home', auth.uid()),
+    (new_palette_id, 'c06', '의료/건강', '#EF5350', 'HeartPulse', auth.uid()),
+    (new_palette_id, 'c07', '여가/문화', '#AB47BC', 'Film', auth.uid()),
+    (new_palette_id, 'c08', '교육', '#42A5F5', 'GraduationCap', auth.uid()),
+    (new_palette_id, 'c09', '경조사', '#8D6E63', 'Users', auth.uid()),
+    (new_palette_id, 'c10', '저축/투자', '#66BB6A', 'PiggyBank', auth.uid()),
+    (new_palette_id, 'c99', '기타', '#BDBDBD', 'PlusSquare', auth.uid());
 
   RETURN new_palette_id;
 END;
