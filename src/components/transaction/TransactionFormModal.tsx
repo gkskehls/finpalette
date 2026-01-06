@@ -39,8 +39,9 @@ export function TransactionFormModal({
     return false;
   }, [isEditMode, user, role, transactionToEdit]);
 
-  const canDelete = canEdit; // 수정 권한과 삭제 권한은 동일
+  const canDelete = canEdit;
   const canSubmit = isEditMode ? canEdit : role !== 'viewer';
+  const isReadOnly = isEditMode && !canEdit;
 
   const { data: categories, isLoading: isLoadingCategories } =
     useCategoriesQuery();
@@ -201,7 +202,11 @@ export function TransactionFormModal({
               <X size={24} />
             </button>
             <h2 className={styles.modalTitle}>
-              {isEditMode ? '내역 상세' : '내역 추가'}
+              {isEditMode
+                ? isReadOnly
+                  ? '내역 상세'
+                  : '내역 수정'
+                : '내역 추가'}
             </h2>
             {canSubmit && (
               <button
@@ -224,7 +229,7 @@ export function TransactionFormModal({
               <button
                 type="button"
                 className={`${styles.typeButton} ${type === 'exp' ? styles.active : ''}`}
-                onClick={() => canSubmit && handleTypeChange('exp')}
+                onClick={() => handleTypeChange('exp')}
                 disabled={!canSubmit}
               >
                 지출
@@ -232,7 +237,7 @@ export function TransactionFormModal({
               <button
                 type="button"
                 className={`${styles.typeButton} ${type === 'inc' ? styles.active : ''}`}
-                onClick={() => canSubmit && handleTypeChange('inc')}
+                onClick={() => handleTypeChange('inc')}
                 disabled={!canSubmit}
               >
                 수입

@@ -31,12 +31,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(auth): 거래 내역에 대한 역할 기반 접근 제어(RBAC) 적용
+fix(auth): 내역 상세 보기와 수정/삭제 모드 분리
 
-- TransactionFormModal에서 역할 및 소유권에 따라 수정/삭제 UI 제어
-- TransactionListPage에서 권한 없는 내역은 수정 모달이 열리지 않도록 수정
-- useTransactionsMutation에 onError 핸들러를 추가하여 권한 오류 피드백 강화
-- 앱 버전 v1.1.21로 업데이트 및 문서 최신화
+- 권한 없는 사용자도 내역 상세 정보를 볼 수 있도록, 모든 내역 클릭 시 모달이 열리도록 수정
+- TransactionFormModal에 '읽기 전용' 모드를 도입하여, 권한에 따라 입력 필드 비활성화 및 버튼 숨김 처리
+- 앱 버전 v1.1.22로 업데이트 및 문서 최신화
 "
 git push origin main
 
