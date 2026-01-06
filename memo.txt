@@ -31,12 +31,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(transaction): 카테고리 선택기 UI 및 동작 방식 수정
+docs: 카테고리 생성 로직 및 새 팔레트 기능 명세 구체화
 
-- 선택기를 팝업이 아닌 인라인 아코디언 방식으로 변경
-- 버튼은 콘텐츠 크기에 맞게, 그리드는 부모 너비에 맞게 반응형으로 조절
-- 불필요한 너비 계산 로직 제거 및 코드 정리
-- 앱 버전 v1.1.18로 업데이트 및 문서 최신화
+- 기본 카테고리 정의를 DB로 단일화하는 아키텍처 개선 계획 문서화
+- 모든 사용자가 개인 팔레트를 갖도록 하는 온보딩 경험 개선안 명시
+- 새 팔레트 생성 시, 기존 카테고리를 복사하는 옵션 제공 기능 상세 명세
+- APP_SPECIFICATION.md 및 PROJECT_PLAN.md 업데이트
 "
 git push origin main
 

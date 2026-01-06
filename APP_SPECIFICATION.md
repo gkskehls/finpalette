@@ -180,3 +180,85 @@
 - **라이브러리**: `lucide-react`를 기본 아이콘 라이브러리로 사용합니다.
 - **일관성**: 앱 전체에서 아이콘의 스타일이 일관되도록 `lucide-react` 내의 아이콘을 우선적으로 사용합니다.
 - **커스텀 아이콘**: 필요한 아이콘이 라이브러리에 없을 경우에만 SVG 파일을 직접 프로젝트에 추가하여 사용합니다.
+
+---
+
+## 5. 추후 논의 및 개선 사항 (Backlog)
+
+이 섹션은 당장 구현하지는 않지만, 향후 프로젝트의 완성도를 높이기 위해 계획된 기능 및 개선 사항을 상세히 기술합니다.
+
+### 5.1. 카테고리 생성 로직 개선 및 사용자 경험 일원화
+
+- **현황 및 문제점:**
+  - **중복된 정의:** '기본 카테고리' 목록이 클라이언트 코드(게스트 모드용)와 데이터베이스 함수(`create_palette`) 두 곳에 중복으로 하드코딩되어 있어 유지보수가 어렵습니다.
+  - **일관성 없는 경험:** 사용자가 앱을 시작하는 방식(게스트, 직접 가입, 초대)에 따라 초기 팔레트 소유 여부가 달라지는 문제가 있습니다. 특히 초대로 가입한 사용자는 개인 팔레트 없이 공유 팔레트만 갖게 됩니다.
+
+- **개선 목표:**
+  1.  **'진실의 원천' 단일화:** 기본 카테고리 정의를 데이터베이스 한 곳으로 통합합니다.
+  2.  **일관된 온보딩 경험:** 모든 사용자가 가입 경로와 무관하게 자신만의 개인 팔레트를 소유하도록 보장합니다.
+
+- **상세 구현 계획 (단계별):**
+  1.  **[DB] `get_default_categories` 함수 신설:**
+      - **역할:** `create_palette` 함수 내에 하드코딩된 기본 카테고리 목록(코드, 이름, 색상, 아이콘)을 그대로 반환하는 RPC 함수를 생성합니다.
+      - **권한:** 인증되지 않은 사용자(게스트)도 호출할 수 있도록 `public` 권한을 부여합니다.
+      - **예상 쿼리:**
+        ```sql
+        CREATE OR REPLACE FUNCTION get_default_categories()
+        RETURNS TABLE(code text, name text, color text, icon text) AS $$
+        BEGIN
+          RETURN QUERY VALUES
+            ('inc', '수입', '#10B981', 'PiggyBank'),
+            ('c01', '식비', '#EF4444', 'Utensils'),
+            ('c02', '교통', '#3B82F6', 'Bus'),
+            ('c03', '쇼핑', '#F59E0B', 'ShoppingBag'),
+            ('c04', '생활', '#8B5CF6', 'Home'),
+            ('c05', '기타', '#64748B', 'MoreHorizontal');
+        END;
+        $$ LANGUAGE plpgsql;
+        ```
+
+  2.  **[DB] `create_palette` 함수 수정:**
+      - 기존에 하드코딩된 `INSERT` 구문을 제거하고, 신설된 `get_default_categories()` 함수를 호출하여 카테고리를 생성하도록 로직을 변경합니다.
+
+  3.  **[Client] 게스트 모드 로직 수정:**
+      - 최초 방문 시, 클라이언트 코드에 하드코딩된 값을 사용하는 대신 `get_default_categories` RPC를 호출합니다.
+      - 서버로부터 받은 기본 카테고리 목록을 사용하여 로컬 팔레트를 생성하고 `localStorage`에 저장합니다.
+
+  4.  **[DB] `handle_new_user` 트리거 수정:**
+      - **목표:** 신규 가입 시 모든 사용자에게 개인 팔레트를 자동으로 생성해줍니다.
+      - **로직:** `profiles` 테이블에 유저 정보를 `INSERT`한 후, `PERFORM create_palette('마이 팔레트', '#6366F1');` 구문을 추가하여 해당 유저 ID로 개인 팔레트를 생성하는 함수를 호출합니다.
+
+### 5.2. 새 팔레트 생성 시 카테고리 복사 기능
+
+- **현황 및 문제점:**
+  - 현재 새 팔레트를 생성하면 항상 시스템 기본 카테고리로만 시작됩니다. 사용자가 기존 팔레트에서 직접 설정한 카테고리(예: '반려동물')를 재사용하려면 수동으로 다시 만들어야 하는 불편함이 있습니다.
+
+- **개선 목표:**
+  - 사용자가 새 팔레트를 만들 때, ①깨끗한 기본 카테고리로 시작할지, ②기존에 사용하던 다른 팔레트의 카테고리 구성을 그대로 복사해올지 직접 선택할 수 있는 옵션을 제공하여 편의성을 극대화합니다.
+
+- **상세 구현 계획 (단계별):**
+  1.  **[Client] `PaletteFormModal.tsx` UI/상태 수정:**
+      - **UI 추가:** '팔레트 이름', '테마 색상' 입력 필드 아래에 '카테고리 설정' 섹션을 추가합니다.
+        - `◎ 기본 카테고리로 시작하기` 라디오 버튼 (기본값으로 선택)
+        - `◉ 기존 팔레트에서 복사하기` 라디오 버튼
+      - **조건부 UI:** '복사하기' 선택 시에만, 사용자가 속한 팔레트 목록을 보여주는 드롭다운 메뉴가 활성화됩니다.
+      - **상태 추가:** `useState`를 사용하여 선택된 옵션(`'default'` 또는 `'copy'`)과 복사할 팔레트 ID(`sourcePaletteId`)를 관리합니다.
+        ```tsx
+        const [categoryOption, setCategoryOption] = useState('default');
+        const [sourcePaletteId, setSourcePaletteId] = useState<string | null>(
+          null
+        );
+        ```
+
+  2.  **[DB] `create_palette` 함수 시그니처 변경:**
+      - **목표:** 카테고리 복사 기능을 처리할 수 있도록 함수가 받는 인자를 확장합니다.
+      - **변경 전:** `create_palette(name TEXT, theme_color TEXT)`
+      - **변경 후:** `create_palette(name TEXT, theme_color TEXT, source_palette_id UUID DEFAULT NULL)`
+      - `source_palette_id`가 `NULL`이면 기존처럼 기본 카테고리를 생성하고, `UUID` 값이 있으면 해당 팔레트의 카테고리를 복사해옵니다.
+
+  3.  **[DB] `create_palette` 함수 로직 수정:**
+      - 함수 상단에 `IF source_palette_id IS NOT NULL THEN ... ELSE ... END IF;` 분기문을 추가합니다.
+      - `source_palette_id`가 있으면, `categories` 테이블에서 해당 ID의 카테고리들을 `SELECT`하여 새 팔레트 ID로 `INSERT`하는 로직을 구현합니다.
+
+  4.  **[Client] `useAddPaletteMutation` 훅 수정:**
+      - `PaletteFormModal`에서 관리하는 새로운 상태(`categoryOption`, `sourcePaletteId`)를 `create_palette` RPC 호출 시 인자로 전달하도록 수정합니다.
