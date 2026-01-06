@@ -73,27 +73,28 @@ export function TransactionFormModal({
   }, [date]);
 
   useEffect(() => {
-    if (isEditMode && category) return;
     const currentList = type === 'inc' ? incomeCategories : expenseCategories;
     if (currentList.length > 0) {
-      const isValid = currentList.some((c) => c.code === category);
-      if (!category || !isValid) {
+      const isCategoryValid = currentList.some((c) => c.code === category);
+      if (!isCategoryValid) {
+        // setTimeout을 사용하여 동기적인 상태 업데이트를 방지하고,
+        // react-hooks/set-state-in-effect ESLint 오류를 해결합니다.
         const timer = setTimeout(() => {
           setCategory(currentList[0].code);
         }, 0);
         return () => clearTimeout(timer);
       }
     }
-  }, [incomeCategories, expenseCategories, type, category, isEditMode]);
+  }, [incomeCategories, expenseCategories, type, category]);
 
   const handleTypeChange = (newType: 'inc' | 'exp') => {
     setType(newType);
-    if (!isEditMode) {
-      setCategory(
-        newType === 'inc'
-          ? incomeCategories[0]?.code || ''
-          : expenseCategories[0]?.code || ''
-      );
+    const targetCategories =
+      newType === 'inc' ? incomeCategories : expenseCategories;
+    if (targetCategories.length > 0) {
+      setCategory(targetCategories[0].code);
+    } else {
+      setCategory('');
     }
   };
 
