@@ -93,6 +93,8 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
   - **📄 PaletteSettingsModal.module.css**: `PaletteSettingsModal` 컴포넌트의 전용 CSS 모듈 파일입니다.
 
 - **📁 transaction/**: 거래(수입/지출)와 관련된 컴포넌트 폴더입니다.
+  - **📄 CategorySelector.tsx**: 카테고리 선택을 위한 아코디언 그리드 컴포넌트입니다.
+  - **📄 CategorySelector.module.css**: `CategorySelector` 컴포넌트의 전용 CSS 모듈 파일입니다.
   - **📄 TransactionFormModal.tsx**: 거래 내역을 추가하거나 수정하는 폼이 담긴 모달 컴포넌트입니다.
   - **📄 TransactionFormModal.module.css**: `TransactionFormModal` 컴포넌트의 전용 CSS 모듈 파일입니다.
 

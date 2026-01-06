@@ -31,12 +31,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(profile): 프로필 이미지 동기화 문제 해결 및 세션 자동 갱신 구현
+feat(transaction): 카테고리 선택 UI 개선 및 문서 업데이트
 
-- 프로필 수정 시 Auth 세션 메타데이터도 함께 업데이트하여 FOUC(Flash of Unstyled Content) 현상 방지
-- 프로필 페이지 진입 시 DB 데이터와 세션 데이터를 비교하여 불일치 시 자동 동기화(Self-Healing) 로직 추가
-- 앱 버전 v1.1.13으로 업데이트
-- PROJECT_PLAN.md 진행 상황 업데이트
+- 내역 입력 폼의 카테고리 선택 UI를 아코디언 방식의 아이콘 그리드로 개선
+- CategorySelector 컴포넌트 신규 생성 및 관련 스타일 적용
+- file_list.md, APP_SPECIFICATION.md, PROJECT_PLAN.md 등 관련 문서 최신화
+- 앱 버전 v1.1.14로 업데이트
 "
 git push origin main
 

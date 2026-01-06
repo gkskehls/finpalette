@@ -14,6 +14,7 @@ import type {
   UpdateTransactionPayload,
 } from '../../hooks/queries/useTransactionsMutation';
 import { useAuth } from '../../hooks/useAuth';
+import { CategorySelector } from './CategorySelector';
 
 interface TransactionFormModalProps {
   onClose: () => void;
@@ -255,26 +256,17 @@ export function TransactionFormModal({
               />
             </div>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="category">카테고리</label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
+            <div
+              className={styles.formGroup}
+              style={{ alignItems: 'flex-start' }}
+            >
+              <label style={{ marginTop: '12px' }}>카테고리</label>
+              <CategorySelector
+                categories={currentCategories}
+                selectedCode={category}
+                onSelect={setCategory}
                 disabled={isLoadingCategories}
-              >
-                <option value="" disabled>
-                  {isLoadingCategories
-                    ? '카테고리 로딩 중...'
-                    : '카테고리 선택'}
-                </option>
-                {currentCategories.map((cat) => (
-                  <option key={cat.code} value={cat.code}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div className={styles.formGroup}>
