@@ -3,6 +3,7 @@ import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useProfileQuery } from '../hooks/queries/useProfileQuery';
 import { useUpdateProfileMutation } from '../hooks/queries/useProfileMutation';
@@ -26,6 +27,38 @@ export function ProfilePage() {
   const { uploadAvatar, isUploading } = useAvatarUpload();
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState('');
+
+  // 세션 메타데이터와 DB 프로필 데이터 동기화 (Self-Healing)
+  useEffect(() => {
+    if (!user || !profile) return;
+
+    const { full_name: metaName, avatar_url: metaAvatar } =
+      user.user_metadata || {};
+    const { full_name: dbName, avatar_url: dbAvatar } = profile;
+
+    // DB 데이터가 존재하고, 메타데이터와 다를 경우에만 업데이트
+    // (다른 기기에서 변경된 정보를 현재 기기의 세션에 반영하기 위함)
+    const shouldUpdateName = dbName && dbName !== metaName;
+    const shouldUpdateAvatar = dbAvatar && dbAvatar !== metaAvatar;
+
+    if (shouldUpdateName || shouldUpdateAvatar) {
+      supabase.auth
+        .updateUser({
+          data: {
+            ...(shouldUpdateName && { full_name: dbName }),
+            ...(shouldUpdateAvatar && { avatar_url: dbAvatar }),
+          },
+        })
+        .then(({ error }) => {
+          if (error) {
+            console.error('세션 동기화 실패:', error);
+          } else {
+            // 동기화 성공 시 로그 (개발 모드 확인용)
+            // console.log('세션 데이터가 최신 프로필로 동기화되었습니다.');
+          }
+        });
+    }
+  }, [user, profile]);
 
   useEffect(() => {
     // 페이지 로드 시 및 로컬 스토리지 변경 시 사용량 업데이트
@@ -135,6 +168,23 @@ export function ProfilePage() {
     );
   }
 
+  // 프로필 이미지 URL 결정 로직
+  const getAvatarUrl = () => {
+    if (profile?.avatar_url) {
+      // 캐시 버스팅을 위해 updated_at 타임스탬프를 쿼리 파라미터로 추가
+      const timestamp = profile.updated_at
+        ? new Date(profile.updated_at).getTime()
+        : 0;
+      return `${profile.avatar_url}?t=${timestamp}`;
+    }
+    if (user?.user_metadata?.avatar_url) {
+      return user.user_metadata.avatar_url;
+    }
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      profile?.full_name || user?.email || 'User'
+    )}&background=random`;
+  };
+
   return (
     <div className={styles.profileContainer} style={{ position: 'relative' }}>
       {/* 앱 버전 표시 (우측 상단) */}
@@ -149,7 +199,7 @@ export function ProfilePage() {
           fontFamily: 'monospace',
         }}
       >
-        v1.1.8
+        v1.1.13
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>
@@ -158,15 +208,16 @@ export function ProfilePage() {
           <div className={styles.profileHeader}>
             <div className={styles.avatarWrapper}>
               <img
-                src={
-                  profile?.avatar_url ||
-                  user.user_metadata?.avatar_url ||
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    profile?.full_name || user.email || 'User'
-                  )}&background=random`
-                }
+                src={getAvatarUrl()}
                 alt="Profile"
                 className={styles.avatar}
+                // 이미지 로드 실패 시 대체 이미지 처리 (선택 사항)
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    profile?.full_name || user.email || 'User'
+                  )}&background=random`;
+                }}
               />
               <label
                 htmlFor="avatar-upload"

@@ -25,18 +25,18 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 내역에 일반 메모도 있었으면 좋겠어.
 나만보기메모는 지출 내역 작성자가 아닌, 지금 작성하고 있는 나만 보이는 메모였으면 좋겠어.
 
-통계, 마이페이지, 카테고리 추가화면은 진입시 무조건 화면 최상단으로 갔으면 좋겠어.
-
 
 
 # GitHub 저장소를 원격(remote)으로 추가 (YOUR_USERNAME을 실제 GitHub 아이디로 변경)
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(app): 페이지 이동 시 스크롤 초기화 문제 수정
+fix(profile): 프로필 이미지 동기화 문제 해결 및 세션 자동 갱신 구현
 
-mainContent 영역의 내부 스크롤이 초기화되지 않는 문제를 해결하기 위해 useRef를 사용하여 경로 변경 시 스크롤 위치를 0으로 설정함
-앱 버전을 v1.1.8로 업데이트함
+- 프로필 수정 시 Auth 세션 메타데이터도 함께 업데이트하여 FOUC(Flash of Unstyled Content) 현상 방지
+- 프로필 페이지 진입 시 DB 데이터와 세션 데이터를 비교하여 불일치 시 자동 동기화(Self-Healing) 로직 추가
+- 앱 버전 v1.1.13으로 업데이트
+- PROJECT_PLAN.md 진행 상황 업데이트
 "
 git push origin main
 
