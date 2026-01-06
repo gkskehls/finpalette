@@ -32,7 +32,8 @@ export function TransactionFormModal({
 
   // --- 권한 제어 로직 ---
   const canEdit = useMemo(() => {
-    if (!isEditMode || !user || !role) return false;
+    if (!user) return true; // 게스트 모드는 항상 수정 가능
+    if (!isEditMode || !role) return false;
     if (role === 'owner' || role === 'admin') return true;
     if (role === 'editor' && transactionToEdit?.user_id === user.id)
       return true;
@@ -40,7 +41,7 @@ export function TransactionFormModal({
   }, [isEditMode, user, role, transactionToEdit]);
 
   const canDelete = canEdit;
-  const canSubmit = isEditMode ? canEdit : role !== 'viewer';
+  const canSubmit = isEditMode ? canEdit : !user || role !== 'viewer';
   const isReadOnly = isEditMode && !canEdit;
 
   const { data: categories, isLoading: isLoadingCategories } =

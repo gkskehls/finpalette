@@ -8,7 +8,8 @@ import {
   useUpdateCategoryMutation,
 } from '../hooks/queries/useCategoryMutation';
 import { usePalette } from '../context/PaletteContext';
-import { useCurrentPaletteRole } from '../hooks/useCurrentPaletteRole'; // 권한 훅 임포트
+import { useAuth } from '../hooks/useAuth';
+import { useCurrentPaletteRole } from '../hooks/useCurrentPaletteRole';
 import { Icon } from '../components/common/Icon';
 import {
   DEFAULT_ICONS,
@@ -47,8 +48,9 @@ function CategoryFormModal({
 }: CategoryFormModalProps) {
   const isEditMode = !!initialData;
   const { currentPalette } = usePalette();
-  const { role } = useCurrentPaletteRole(); // 역할 가져오기
-  const isAdmin = role === 'owner' || role === 'admin'; // 관리자 여부 확인
+  const { user } = useAuth();
+  const { role } = useCurrentPaletteRole();
+  const isAdmin = !user || role === 'owner' || role === 'admin';
 
   const addMutation = useAddCategoryMutation();
   const updateMutation = useUpdateCategoryMutation();
@@ -266,8 +268,9 @@ function CategoryFormModal({
 // --- Main Page Component ---
 export function CategorySettingsPage() {
   const navigate = useNavigate();
-  const { role } = useCurrentPaletteRole(); // 역할 가져오기
-  const isAdmin = role === 'owner' || role === 'admin'; // 관리자 여부 확인
+  const { user } = useAuth();
+  const { role } = useCurrentPaletteRole();
+  const isAdmin = !user || role === 'owner' || role === 'admin';
 
   const [activeTab, setActiveTab] = useState<'exp' | 'inc'>('exp');
   const [isModalOpen, setIsModalOpen] = useState(false);

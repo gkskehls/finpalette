@@ -220,14 +220,15 @@ export function PaletteSettingsModal({
   onClose,
   palette,
 }: PaletteSettingsModalProps) {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'members' | 'settings'>('members');
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
 
   const { role } = useCurrentPaletteRole();
-  const isAdmin = role === 'owner' || role === 'admin';
-  const isOwner = role === 'owner';
+  const isAdmin = !user || role === 'owner' || role === 'admin';
+  const isOwner = !user || role === 'owner';
 
   // 설정 탭 상태
   const [paletteName, setPaletteName] = useState(palette.name);

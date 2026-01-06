@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
-import type { PaletteMember } from '../../types/palette'; // PaletteMemberWithProfile 대신 PaletteMember 임포트
+import type { PaletteMember } from '../../types/palette';
 
 const getPaletteMembers = async (
   paletteId: string
 ): Promise<PaletteMember[]> => {
-  // 반환 타입도 PaletteMember로 변경
-  if (!paletteId || paletteId === 'local') {
+  // 'local' 팔레트는 DB에 존재하지 않으므로 빈 배열 반환
+  if (paletteId === 'local') {
     return [];
   }
 
@@ -25,7 +25,14 @@ const getPaletteMembers = async (
 export const usePaletteMembersQuery = (paletteId: string | undefined) => {
   return useQuery({
     queryKey: ['paletteMembers', paletteId],
-    queryFn: () => getPaletteMembers(paletteId!),
-    enabled: !!paletteId && paletteId !== 'local',
+    queryFn: () => {
+      // enabled 옵션으로 인해 이 코드는 실행되지 않지만,
+      // TypeScript 타입 추론을 위해 명시적인 가드를 추가합니다.
+      if (!paletteId) {
+        return Promise.resolve([]);
+      }
+      return getPaletteMembers(paletteId);
+    },
+    enabled: !!paletteId,
   });
 };
