@@ -31,11 +31,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(transaction): 내역 수정 모달의 카테고리 로직 버그 수정
+fix(transaction): 카테고리 선택기 너비 자동 조절 기능 구현
 
-- 수정 모드에서 수입/지출 탭 전환 시 카테고리 목록이 갱신되지 않던 문제 해결
-- useEffect 내에서 setState를 동기적으로 호출하여 발생하던 ESLint 오류 수정
-- 앱 버전 v1.1.16으로 업데이트 및 PROJECT_PLAN.md 수정
+- 모바일에서 선택기가 화면을 벗어나는 문제를 해결하기 위해 width: fit-content 적용
+- 버튼 너비를 측정하여 그리드 영역 너비와 동기화하는 로직 추가
+- 앱 버전 v1.1.17로 업데이트 및 문서 최신화
 "
 git push origin main
 

@@ -1,7 +1,6 @@
 .container {
-  flex: 1;
-  width: 100%;
-  min-width: 0; /* Flexbox 아이템이 부모를 넘어가지 않도록 설정 */
+  width: fit-content; /* 내부 콘텐츠 크기에 맞게 너비 조절 */
+  min-width: 150px; /* 최소 너비 지정으로 너무 작아지는 것 방지 */
 }
 
 .selectorButton {
@@ -60,10 +59,20 @@
 }
 
 .gridContainer {
+  /* 아코디언이 펼쳐질 때 버튼 너비에 맞춰지도록 설정 */
+  position: absolute;
+  width: var(--selector-width, 250px); /* JS에서 버튼 너비를 변수로 전달 */
+  background: var(--bg-primary);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  z-index: 10; /* 다른 요소 위에 보이도록 */
+
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 8px;
   animation: slideDown 0.2s ease-out;
   overflow: hidden;
 }

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import type { CSSProperties } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Icon } from '../common/Icon';
 import type { Category } from '../../types/category';
@@ -20,7 +21,15 @@ export function CategorySelector({
   disabled = false,
 }: CategorySelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [buttonWidth, setButtonWidth] = useState(0);
+  const buttonRef = useRef<HTMLDivElement>(null);
   const selectedCategory = categories.find((c) => c.code === selectedCode);
+
+  useEffect(() => {
+    if (buttonRef.current) {
+      setButtonWidth(buttonRef.current.offsetWidth);
+    }
+  }, [selectedCategory]); // 선택된 카테고리가 바뀌어 너비가 변경될 수 있으므로 의존성 추가
 
   const handleToggle = () => {
     if (!disabled) {
@@ -40,6 +49,7 @@ export function CategorySelector({
   return (
     <div className={styles.container}>
       <div
+        ref={buttonRef}
         className={styles.selectorButton}
         onClick={handleToggle}
         role="button"
@@ -65,7 +75,10 @@ export function CategorySelector({
       </div>
 
       {isOpen && (
-        <div className={styles.gridContainer}>
+        <div
+          className={styles.gridContainer}
+          style={{ '--selector-width': `${buttonWidth}px` } as CSSProperties}
+        >
           {categories.map((category) => (
             <div
               key={category.code}
