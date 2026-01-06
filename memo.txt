@@ -31,12 +31,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(transaction): 카테고리 선택 UI 개선 및 문서 업데이트
+fix(transaction): 내역 수정 모달 UI 버그 해결 및 문서 업데이트
 
-- 내역 입력 폼의 카테고리 선택 UI를 아코디언 방식의 아이콘 그리드로 개선
-- CategorySelector 컴포넌트 신규 생성 및 관련 스타일 적용
-- file_list.md, APP_SPECIFICATION.md, PROJECT_PLAN.md 등 관련 문서 최신화
-- 앱 버전 v1.1.14로 업데이트
+- 모달의 z-index를 조정하여 FAB가 위에 표시되는 문제 해결
+- 카테고리 선택기의 너비가 화면을 벗어나는 Flexbox 오류 수정
+- 앱 버전 v1.1.15로 업데이트 및 PROJECT_PLAN.md 수정
 "
 git push origin main
 

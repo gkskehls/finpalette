@@ -8,7 +8,7 @@
   display: flex;
   align-items: flex-end; /* 모바일 친화적: 하단에서 올라오거나 중앙 배치 */
   justify-content: center;
-  z-index: 1000;
+  z-index: 1100; /* FAB(1000)보다 높게 설정 */
   animation: fadeIn 0.2s ease-out;
 }
 

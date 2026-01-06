@@ -199,7 +199,7 @@ export function ProfilePage() {
           fontFamily: 'monospace',
         }}
       >
-        v1.1.14
+        v1.1.15
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>
