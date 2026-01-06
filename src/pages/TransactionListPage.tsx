@@ -9,6 +9,7 @@ import styles from './TransactionListPage.module.css';
 import { Lock, MessageSquareText, Palette } from 'lucide-react';
 import { TransactionFormModal } from '../components/transaction/TransactionFormModal';
 import { useAuth } from '../hooks/useAuth';
+import { useCurrentPaletteRole } from '../hooks/useCurrentPaletteRole';
 import { EmptyState } from '../components/common/EmptyState';
 import { Skeleton } from '../components/common/Skeleton';
 
@@ -21,13 +22,27 @@ interface TransactionItemProps {
 const TransactionItem = (props: TransactionItemProps) => {
   const { transaction, category, onEdit } = props;
   const { user } = useAuth();
+  const { role } = useCurrentPaletteRole();
+
+  const canEdit = useMemo(() => {
+    if (!user || !role) return false;
+    if (role === 'owner' || role === 'admin') return true;
+    if (role === 'editor' && transaction.user_id === user.id) return true;
+    return false;
+  }, [user, role, transaction]);
+
+  const handleClick = () => {
+    if (canEdit) {
+      onEdit(transaction);
+    }
+  };
 
   if (!category) {
-    // 카테고리를 찾을 수 없는 경우, 기본 UI 렌더링
     return (
       <div
         className={styles.transactionItem}
-        onClick={() => onEdit(transaction)}
+        onClick={handleClick}
+        style={{ cursor: canEdit ? 'pointer' : 'default' }}
       >
         <div className={styles.leftContent}>
           <div
@@ -60,7 +75,11 @@ const TransactionItem = (props: TransactionItemProps) => {
   const isMyMemo = transaction.private_memo && transaction.user_id === user?.id;
 
   return (
-    <div className={styles.transactionItem} onClick={() => onEdit(transaction)}>
+    <div
+      className={styles.transactionItem}
+      onClick={handleClick}
+      style={{ cursor: canEdit ? 'pointer' : 'default' }}
+    >
       <div className={styles.leftContent}>
         <div
           className={styles.categoryIcon}

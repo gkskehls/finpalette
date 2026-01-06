@@ -31,12 +31,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(transaction): 수정 모드 진입 시 카테고리 초기화 오류 수정
+fix(auth): 거래 내역에 대한 역할 기반 접근 제어(RBAC) 적용
 
-- 내역 수정 모달이 열릴 때, 기존에 저장된 카테고리가 아닌 기본값(식비)으로 강제 변경되던 useEffect 로직 수정
-- 이제 수정 모드에서는 기존 카테고리 값을 정상적으로 유지함
-- useEffect 내에서 setState를 동기적으로 호출하여 발생하던 ESLint 오류 수정
-- 앱 버전 v1.1.20으로 업데이트 및 문서 최신화
+- TransactionFormModal에서 역할 및 소유권에 따라 수정/삭제 UI 제어
+- TransactionListPage에서 권한 없는 내역은 수정 모달이 열리지 않도록 수정
+- useTransactionsMutation에 onError 핸들러를 추가하여 권한 오류 피드백 강화
+- 앱 버전 v1.1.21로 업데이트 및 문서 최신화
 "
 git push origin main
 

@@ -14,6 +14,7 @@ import type {
   UpdateTransactionPayload,
 } from '../../hooks/queries/useTransactionsMutation';
 import { useAuth } from '../../hooks/useAuth';
+import { useCurrentPaletteRole } from '../../hooks/useCurrentPaletteRole';
 import { CategorySelector } from './CategorySelector';
 
 interface TransactionFormModalProps {
@@ -27,6 +28,19 @@ export function TransactionFormModal({
 }: TransactionFormModalProps) {
   const isEditMode = !!transactionToEdit;
   const { user } = useAuth();
+  const { role } = useCurrentPaletteRole();
+
+  // --- 권한 제어 로직 ---
+  const canEdit = useMemo(() => {
+    if (!isEditMode || !user || !role) return false;
+    if (role === 'owner' || role === 'admin') return true;
+    if (role === 'editor' && transactionToEdit?.user_id === user.id)
+      return true;
+    return false;
+  }, [isEditMode, user, role, transactionToEdit]);
+
+  const canDelete = canEdit; // 수정 권한과 삭제 권한은 동일
+  const canSubmit = isEditMode ? canEdit : role !== 'viewer';
 
   const { data: categories, isLoading: isLoadingCategories } =
     useCategoriesQuery();
@@ -72,13 +86,10 @@ export function TransactionFormModal({
     return ['일', '월', '화', '수', '목', '금', '토'][utcDate.getDay()];
   }, [date]);
 
-  // [수정] 오직 '추가 모드'에서만 기본 카테고리를 설정하도록 로직 변경
   useEffect(() => {
     if (isEditMode) return;
 
     if (!category && expenseCategories.length > 0) {
-      // setTimeout을 사용하여 동기적인 상태 업데이트를 방지하고,
-      // react-hooks/set-state-in-effect ESLint 오류를 해결합니다.
       const timer = setTimeout(() => {
         setCategory(expenseCategories[0].code);
       }, 0);
@@ -99,6 +110,10 @@ export function TransactionFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canSubmit) {
+      toast.error('이 작업을 수행할 권한이 없습니다.');
+      return;
+    }
     if (!category) {
       toast.error('카테고리를 선택해주세요.');
       return;
@@ -116,66 +131,56 @@ export function TransactionFormModal({
 
     if (isEditMode && transactionToEdit) {
       const targetId = user ? transactionToEdit.id : transactionToEdit.localId;
-
       if (!targetId) {
         toast.error('수정할 대상을 찾을 수 없습니다.');
         return;
       }
-
       const payload: UpdateTransactionPayload = {
         id: targetId,
         data: formData,
       };
-
       const promise = updateMutation.mutateAsync(payload);
-
       toast
         .promise(promise, {
           loading: '내역을 수정하는 중...',
           success: '내역이 수정되었습니다!',
           error: '수정에 실패했습니다.',
         })
-        .then(() => {
-          onClose();
-        });
+        .then(() => onClose());
     } else {
       const promise = addMutation.mutateAsync(formData);
-
       toast
         .promise(promise, {
           loading: '내역을 저장하는 중...',
           success: '내역이 저장되었습니다!',
           error: '저장에 실패했습니다.',
         })
-        .then(() => {
-          onClose();
-        });
+        .then(() => onClose());
     }
   };
 
   const handleDelete = () => {
+    if (!canDelete) {
+      toast.error('이 내역을 삭제할 권한이 없습니다.');
+      return;
+    }
     if (isEditMode && transactionToEdit) {
       if (window.confirm('이 내역을 정말 삭제하시겠습니까?')) {
         const targetId = user
           ? transactionToEdit.id
           : transactionToEdit.localId;
-
         if (!targetId) {
           toast.error('삭제할 대상을 찾을 수 없습니다.');
           return;
         }
-
         const promise = deleteMutation.mutateAsync(targetId);
-
         toast
           .promise(promise, {
             loading: '내역을 삭제하는 중...',
             success: '내역이 삭제되었습니다.',
             error: '삭제에 실패했습니다.',
           })
-          .then(() => {
-            onClose();
-          });
+          .then(() => onClose());
       }
     }
   };
@@ -196,20 +201,22 @@ export function TransactionFormModal({
               <X size={24} />
             </button>
             <h2 className={styles.modalTitle}>
-              {isEditMode ? '내역 수정' : '내역 추가'}
+              {isEditMode ? '내역 상세' : '내역 추가'}
             </h2>
-            <button
-              type="submit"
-              className={styles.saveButton}
-              disabled={
-                addMutation.isPending ||
-                updateMutation.isPending ||
-                deleteMutation.isPending
-              }
-            >
-              <Check size={20} />
-              저장
-            </button>
+            {canSubmit && (
+              <button
+                type="submit"
+                className={styles.saveButton}
+                disabled={
+                  addMutation.isPending ||
+                  updateMutation.isPending ||
+                  deleteMutation.isPending
+                }
+              >
+                <Check size={20} />
+                저장
+              </button>
+            )}
           </div>
 
           <div className={styles.scrollableContent}>
@@ -217,14 +224,16 @@ export function TransactionFormModal({
               <button
                 type="button"
                 className={`${styles.typeButton} ${type === 'exp' ? styles.active : ''}`}
-                onClick={() => handleTypeChange('exp')}
+                onClick={() => canSubmit && handleTypeChange('exp')}
+                disabled={!canSubmit}
               >
                 지출
               </button>
               <button
                 type="button"
                 className={`${styles.typeButton} ${type === 'inc' ? styles.active : ''}`}
-                onClick={() => handleTypeChange('inc')}
+                onClick={() => canSubmit && handleTypeChange('inc')}
+                disabled={!canSubmit}
               >
                 수입
               </button>
@@ -239,6 +248,7 @@ export function TransactionFormModal({
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   required
+                  disabled={!canSubmit}
                 />
                 <span className={styles.dayOfWeek}>{dayOfWeek}</span>
               </div>
@@ -253,6 +263,7 @@ export function TransactionFormModal({
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0"
                 required
+                disabled={!canSubmit}
               />
             </div>
 
@@ -265,7 +276,7 @@ export function TransactionFormModal({
                 categories={currentCategories}
                 selectedCode={category}
                 onSelect={setCategory}
-                disabled={isLoadingCategories}
+                disabled={isLoadingCategories || !canSubmit}
               />
             </div>
 
@@ -277,6 +288,7 @@ export function TransactionFormModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="내용 입력 (선택)"
+                disabled={!canSubmit}
               />
             </div>
 
@@ -291,6 +303,7 @@ export function TransactionFormModal({
                   value={publicMemo}
                   onChange={(e) => setPublicMemo(e.target.value)}
                   placeholder="멤버들과 공유할 메모"
+                  disabled={!canSubmit}
                 />
               </div>
             </div>
@@ -306,13 +319,14 @@ export function TransactionFormModal({
                   value={privateMemo}
                   onChange={(e) => setPrivateMemo(e.target.value)}
                   placeholder="나만 볼 수 있는 메모"
+                  disabled={!canSubmit}
                 />
               </div>
             </div>
           </div>
 
           <div className={styles.formActions}>
-            {isEditMode && (
+            {isEditMode && canDelete && (
               <button
                 type="button"
                 className={styles.deleteButton}
@@ -330,17 +344,19 @@ export function TransactionFormModal({
             >
               취소
             </button>
-            <button
-              type="submit"
-              className={styles.submitButton}
-              disabled={
-                addMutation.isPending ||
-                updateMutation.isPending ||
-                deleteMutation.isPending
-              }
-            >
-              저장
-            </button>
+            {canSubmit && (
+              <button
+                type="submit"
+                className={styles.submitButton}
+                disabled={
+                  addMutation.isPending ||
+                  updateMutation.isPending ||
+                  deleteMutation.isPending
+                }
+              >
+                저장
+              </button>
+            )}
           </div>
         </form>
       </div>
