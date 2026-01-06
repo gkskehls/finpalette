@@ -288,46 +288,67 @@ export function TransactionFormModal({
 
             <div className={styles.formGroup}>
               <label htmlFor="description">내용</label>
-              <input
-                type="text"
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="내용 입력 (선택)"
-                disabled={!canSubmit}
-              />
+              {isReadOnly ? (
+                <div
+                  className={`${styles.readOnlyField} ${!description && styles.empty}`}
+                >
+                  {description || '내용 없음'}
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="내용 입력 (선택)"
+                />
+              )}
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="publicMemo">공개 메모</label>
-              <div className={styles.memoContainer}>
-                <MessageSquareText size={16} className={styles.memoIcon} />
-                <input
-                  type="text"
-                  id="publicMemo"
-                  className={styles.memoInput}
-                  value={publicMemo}
-                  onChange={(e) => setPublicMemo(e.target.value)}
-                  placeholder="멤버들과 공유할 메모"
-                  disabled={!canSubmit}
-                />
-              </div>
+              {isReadOnly ? (
+                <div
+                  className={`${styles.readOnlyField} ${!publicMemo && styles.empty}`}
+                >
+                  {publicMemo || '공개 메모 없음'}
+                </div>
+              ) : (
+                <div className={styles.memoContainer}>
+                  <MessageSquareText size={16} className={styles.memoIcon} />
+                  <input
+                    type="text"
+                    id="publicMemo"
+                    className={styles.memoInput}
+                    value={publicMemo}
+                    onChange={(e) => setPublicMemo(e.target.value)}
+                    placeholder="멤버들과 공유할 메모"
+                  />
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="privateMemo">나만 보기</label>
-              <div className={styles.memoContainer}>
-                <Lock size={16} className={styles.memoIcon} />
-                <input
-                  type="text"
-                  id="privateMemo"
-                  className={styles.memoInput}
-                  value={privateMemo}
-                  onChange={(e) => setPrivateMemo(e.target.value)}
-                  placeholder="나만 볼 수 있는 메모"
-                  disabled={!canSubmit}
-                />
-              </div>
+              {isReadOnly ? (
+                <div
+                  className={`${styles.readOnlyField} ${!privateMemo && styles.empty}`}
+                >
+                  {privateMemo || '비공개 메모 없음'}
+                </div>
+              ) : (
+                <div className={styles.memoContainer}>
+                  <Lock size={16} className={styles.memoIcon} />
+                  <input
+                    type="text"
+                    id="privateMemo"
+                    className={styles.memoInput}
+                    value={privateMemo}
+                    onChange={(e) => setPrivateMemo(e.target.value)}
+                    placeholder="나만 볼 수 있는 메모"
+                  />
+                </div>
+              )}
             </div>
           </div>
 

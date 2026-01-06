@@ -205,6 +205,29 @@
   padding-left: 38px !important;
 }
 
+/* 읽기 전용 필드 스타일 */
+.readOnlyField {
+  flex: 1;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  min-height: 46px; /* input과 높이 맞춤 */
+  word-break: break-all; /* 긴 텍스트 줄바꿈 */
+  white-space: pre-wrap; /* 공백 및 줄바꿈 유지 */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.readOnlyField.empty {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
 .formActions {
   display: flex;
   justify-content: flex-end;
