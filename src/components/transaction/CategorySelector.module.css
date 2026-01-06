@@ -1,10 +1,11 @@
 .container {
-  width: fit-content; /* 내부 콘텐츠 크기에 맞게 너비 조절 */
-  min-width: 150px; /* 최소 너비 지정으로 너무 작아지는 것 방지 */
+  /* flex: 1; 부모의 공간을 모두 차지하지 않도록 제거 */
+  width: 100%; /* 너비를 100%로 설정하여 부모에 맞춤 */
+  min-width: 0;
 }
 
 .selectorButton {
-  width: 100%;
+  width: fit-content; /* 버튼 자체는 내용물 크기에 맞춤 */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -15,6 +16,7 @@
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s;
+  min-width: 150px; /* 최소 너비 보장 */
 }
 
 .selectorButton:hover {
@@ -25,7 +27,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 0; /* 내부 콘텐츠가 부모를 넘어가지 않도록 */
+  min-width: 0;
 }
 
 .iconWrapper {
@@ -37,7 +39,7 @@
   justify-content: center;
   color: white;
   font-size: 0.9rem;
-  flex-shrink: 0; /* 아이콘 크기 고정 */
+  flex-shrink: 0;
 }
 
 .categoryName {
@@ -51,7 +53,7 @@
 .chevron {
   color: var(--text-secondary);
   transition: transform 0.2s;
-  flex-shrink: 0; /* 아이콘 크기 고정 */
+  flex-shrink: 0;
 }
 
 .chevron.open {
@@ -59,28 +61,21 @@
 }
 
 .gridContainer {
-  /* 아코디언이 펼쳐질 때 버튼 너비에 맞춰지도록 설정 */
-  position: absolute;
-  width: var(--selector-width, 250px); /* JS에서 버튼 너비를 변수로 전달 */
-  background: var(--bg-primary);
+  /* position: absolute 제거하여 아코디언으로 동작하도록 수정 */
+  width: 100%; /* 부모 너비에 맞춤 */
+  background: transparent; /* 배경 제거 */
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border-color);
-  padding: 10px;
-  z-index: 10; /* 다른 요소 위에 보이도록 */
+  padding: 0; /* 패딩 제거 */
 
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(80px, 1fr)
+  ); /* 반응형 그리드 */
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 12px;
   animation: slideDown 0.2s ease-out;
   overflow: hidden;
-}
-
-@media (min-width: 400px) {
-  .gridContainer {
-    grid-template-columns: repeat(4, 1fr);
-  }
 }
 
 .categoryItem {
