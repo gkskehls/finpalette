@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { supabase } from '../../lib/supabase';
 import type { Category } from '../../types/category';
 import { useAuth } from '../useAuth';
@@ -13,6 +14,16 @@ type UpdateCategoryPayload = {
   updates: Partial<Omit<Category, 'palette_id' | 'code'>>;
 };
 type DeleteCategoryPayload = { paletteId: string; code: string };
+
+// --- 공통 에러 핸들러 ---
+const handleMutationError = (error: Error) => {
+  if (error.message.includes('permission')) {
+    toast.error('이 작업을 수행할 권한이 없습니다.');
+  } else {
+    toast.error('작업에 실패했습니다. 다시 시도해주세요.');
+  }
+  console.error('Category Mutation Error:', error);
+};
 
 // --- API 함수들 ---
 
@@ -91,6 +102,7 @@ export function useAddCategoryMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
     },
+    onError: handleMutationError,
   });
 }
 
@@ -104,6 +116,7 @@ export function useUpdateCategoryMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
     },
+    onError: handleMutationError,
   });
 }
 
@@ -119,5 +132,6 @@ export function useDeleteCategoryMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
     },
+    onError: handleMutationError,
   });
 }

@@ -24,6 +24,7 @@ import {
   useUpdatePaletteMutation,
 } from '../../hooks/queries/usePaletteManagementMutation';
 import { useAuth } from '../../hooks/useAuth';
+import { useCurrentPaletteRole } from '../../hooks/useCurrentPaletteRole';
 import type { Palette, PaletteMember } from '../../types/palette';
 
 const THEME_COLORS = [
@@ -43,12 +44,12 @@ const THEME_COLORS = [
 const MemberItem = ({
   member,
   currentUserId,
-  isCurrentUserOwner,
+  currentUserRole,
   paletteId,
 }: {
   member: PaletteMember;
   currentUserId: string | undefined;
-  isCurrentUserOwner: boolean;
+  currentUserRole: string | null;
   paletteId: string;
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -58,6 +59,7 @@ const MemberItem = ({
 
   const isMe = member.user_id === currentUserId;
   const isOwner = member.role === 'owner';
+  const isCurrentUserOwner = currentUserRole === 'owner';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -187,12 +189,10 @@ const MemberItem = ({
 const MemberList = ({ paletteId }: { paletteId: string }) => {
   const { user } = useAuth();
   const { data: members, isLoading, error } = usePaletteMembersQuery(paletteId);
+  const { role: currentUserRole } = useCurrentPaletteRole();
 
   if (isLoading) return <div>멤버 목록을 불러오는 중...</div>;
   if (error) return <div>오류: {error.message}</div>;
-
-  const currentUserRole = members?.find((m) => m.user_id === user?.id)?.role;
-  const isCurrentUserOwner = currentUserRole === 'owner';
 
   return (
     <ul className={styles.memberList}>
@@ -201,7 +201,7 @@ const MemberList = ({ paletteId }: { paletteId: string }) => {
           key={member.id}
           member={member}
           currentUserId={user?.id}
-          isCurrentUserOwner={isCurrentUserOwner}
+          currentUserRole={currentUserRole}
           paletteId={paletteId}
         />
       ))}
@@ -220,11 +220,14 @@ export function PaletteSettingsModal({
   onClose,
   palette,
 }: PaletteSettingsModalProps) {
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'members' | 'settings'>('members');
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
+
+  const { role } = useCurrentPaletteRole();
+  const isAdmin = role === 'owner' || role === 'admin';
+  const isOwner = role === 'owner';
 
   // 설정 탭 상태
   const [paletteName, setPaletteName] = useState(palette.name);
@@ -236,7 +239,6 @@ export function PaletteSettingsModal({
 
   if (!isOpen) return null;
 
-  const isOwner = palette.owner_id === user?.id;
   const hasChanges =
     paletteName !== palette.name || themeColor !== palette.theme_color;
 
@@ -348,7 +350,7 @@ export function PaletteSettingsModal({
                   <button
                     className={styles.inviteButton}
                     onClick={handleCreateInvite}
-                    disabled={createInvitationMutation.isPending}
+                    disabled={createInvitationMutation.isPending || !isAdmin}
                   >
                     <UserPlus size={18} />
                     {createInvitationMutation.isPending
@@ -386,7 +388,7 @@ export function PaletteSettingsModal({
                   value={paletteName}
                   onChange={(e) => setPaletteName(e.target.value)}
                   className={styles.input}
-                  disabled={!isOwner}
+                  disabled={!isAdmin}
                 />
               </div>
 
@@ -400,12 +402,12 @@ export function PaletteSettingsModal({
                         themeColor === color ? styles.selected : ''
                       }`}
                       style={{ backgroundColor: color }}
-                      onClick={() => isOwner && setThemeColor(color)}
+                      onClick={() => isAdmin && setThemeColor(color)}
                     />
                   ))}
                   <div
                     className={styles.colorOption}
-                    onClick={() => isOwner && colorInputRef.current?.click()}
+                    onClick={() => isAdmin && colorInputRef.current?.click()}
                   >
                     <div
                       className={styles.customColorButton}
@@ -424,15 +426,15 @@ export function PaletteSettingsModal({
                       ref={colorInputRef}
                       type="color"
                       value={themeColor}
-                      onChange={(e) => isOwner && setThemeColor(e.target.value)}
+                      onChange={(e) => setThemeColor(e.target.value)}
                       className={styles.customColorInput}
-                      disabled={!isOwner}
+                      disabled={!isAdmin}
                     />
                   </div>
                 </div>
               </div>
 
-              {isOwner && (
+              {isAdmin && (
                 <button
                   className={styles.saveButton}
                   onClick={handleUpdatePalette}

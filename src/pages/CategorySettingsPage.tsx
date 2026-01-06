@@ -8,6 +8,7 @@ import {
   useUpdateCategoryMutation,
 } from '../hooks/queries/useCategoryMutation';
 import { usePalette } from '../context/PaletteContext';
+import { useCurrentPaletteRole } from '../hooks/useCurrentPaletteRole'; // 권한 훅 임포트
 import { Icon } from '../components/common/Icon';
 import {
   DEFAULT_ICONS,
@@ -46,6 +47,9 @@ function CategoryFormModal({
 }: CategoryFormModalProps) {
   const isEditMode = !!initialData;
   const { currentPalette } = usePalette();
+  const { role } = useCurrentPaletteRole(); // 역할 가져오기
+  const isAdmin = role === 'owner' || role === 'admin'; // 관리자 여부 확인
+
   const addMutation = useAddCategoryMutation();
   const updateMutation = useUpdateCategoryMutation();
   const colorInputRef = useRef<HTMLInputElement>(null);
@@ -60,6 +64,10 @@ function CategoryFormModal({
   const [iconLevel, setIconLevel] = useState(1);
 
   const handleSubmit = () => {
+    if (!isAdmin) {
+      toast.error('카테고리를 수정할 권한이 없습니다.');
+      return;
+    }
     if (!name.trim() || !currentPalette) return;
 
     if (isEditMode && initialData) {
@@ -179,6 +187,7 @@ function CategoryFormModal({
               onChange={(e) => setName(e.target.value)}
               placeholder="카테고리 이름 (예: 간식)"
               className={styles.input}
+              disabled={!isAdmin}
             />
           </div>
 
@@ -205,12 +214,12 @@ function CategoryFormModal({
                     selectedColor === color ? styles.selected : ''
                   }`}
                   style={{ backgroundColor: color }}
-                  onClick={() => setSelectedColor(color)}
+                  onClick={() => isAdmin && setSelectedColor(color)}
                 />
               ))}
               <div
                 className={styles.colorOption}
-                onClick={() => colorInputRef.current?.click()}
+                onClick={() => isAdmin && colorInputRef.current?.click()}
               >
                 <div
                   className={styles.customColorButton}
@@ -231,21 +240,24 @@ function CategoryFormModal({
                   value={selectedColor}
                   onChange={(e) => setSelectedColor(e.target.value)}
                   className={styles.customColorInput}
+                  disabled={!isAdmin}
                 />
               </div>
             </div>
           </div>
         </div>
 
-        <button
-          className={styles.submitButton}
-          onClick={handleSubmit}
-          disabled={
-            !name.trim() || addMutation.isPending || updateMutation.isPending
-          }
-        >
-          {isEditMode ? '수정 완료' : '추가하기'}
-        </button>
+        {isAdmin && (
+          <button
+            className={styles.submitButton}
+            onClick={handleSubmit}
+            disabled={
+              !name.trim() || addMutation.isPending || updateMutation.isPending
+            }
+          >
+            {isEditMode ? '수정 완료' : '추가하기'}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -254,6 +266,9 @@ function CategoryFormModal({
 // --- Main Page Component ---
 export function CategorySettingsPage() {
   const navigate = useNavigate();
+  const { role } = useCurrentPaletteRole(); // 역할 가져오기
+  const isAdmin = role === 'owner' || role === 'admin'; // 관리자 여부 확인
+
   const [activeTab, setActiveTab] = useState<'exp' | 'inc'>('exp');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>(
@@ -269,6 +284,10 @@ export function CategorySettingsPage() {
   }, [categories, activeTab]);
 
   const handleAddClick = () => {
+    if (!isAdmin) {
+      toast.error('카테고리를 추가할 권한이 없습니다.');
+      return;
+    }
     setEditingCategory(undefined);
     setIsModalOpen(true);
   };
@@ -289,9 +308,11 @@ export function CategorySettingsPage() {
           <ArrowLeft size={24} />
         </button>
         <h1 className={styles.title}>카테고리 관리</h1>
-        <button className={styles.addButton} onClick={handleAddClick}>
-          <Plus size={24} />
-        </button>
+        {isAdmin && (
+          <button className={styles.addButton} onClick={handleAddClick}>
+            <Plus size={24} />
+          </button>
+        )}
       </header>
 
       <div className={styles.tabContainer}>
@@ -323,12 +344,14 @@ export function CategorySettingsPage() {
                 <span className={styles.categoryName}>{category.name}</span>
               </div>
               <div style={{ display: 'flex', gap: '4px' }}>
-                <button
-                  className={styles.actionButton}
-                  onClick={() => handleEditClick(category)}
-                >
-                  <Edit2 size={18} />
-                </button>
+                {isAdmin && (
+                  <button
+                    className={styles.actionButton}
+                    onClick={() => handleEditClick(category)}
+                  >
+                    <Edit2 size={18} />
+                  </button>
+                )}
                 <button
                   className={styles.actionButton}
                   onClick={handleHideClick}

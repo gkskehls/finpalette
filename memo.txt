@@ -31,12 +31,13 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-docs: 카테고리 생성 로직 및 새 팔레트 기능 명세 구체화
+fix(auth): 역할 기반 접근 제어(RBAC) 및 권한 오류 처리 구현
 
-- 기본 카테고리 정의를 DB로 단일화하는 아키텍처 개선 계획 문서화
-- 모든 사용자가 개인 팔레트를 갖도록 하는 온보딩 경험 개선안 명시
-- 새 팔레트 생성 시, 기존 카테고리를 복사하는 옵션 제공 기능 상세 명세
-- APP_SPECIFICATION.md 및 PROJECT_PLAN.md 업데이트
+- useCurrentPaletteRole 훅을 신설하여 사용자의 현재 팔레트 역할을 파악하는 로직 구현
+- 카테고리 및 팔레트 설정 페이지에 역할 기반 UI 제어(버튼 숨김/비활성화) 적용
+- 모든 Mutation 훅에 onError 핸들러를 추가하여, 권한 없는 요청 시 명확한 에러 토스트 메시지를 표시하도록 개선
+- 존재하지 않는 타입 참조로 인한 빌드 오류 수정
+- 앱 버전 v1.1.19로 업데이트 및 관련 문서 최신화
 "
 git push origin main
 
