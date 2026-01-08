@@ -24,10 +24,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-style(profile): 앱 버전 표시 위치 고정 및 버전 업데이트
+fix(transaction): 리스트 뷰 스티키 헤더 위치 재조정
 
-- 앱 버전 표시를 position: fixed로 변경하여 스크롤 시에도 상단에 고정되도록 수정
-- 콘텐츠 영역을 차지하지 않도록 하여 레이아웃 밀림 현상 해결
+- viewToggleContainer의 sticky 속성 제거
+- dateHeader의 top 값을 60px로 수정하여 헤더 바로 아래에 붙도록 함
+- 앱 버전 v1.1.36 업데이트
 "
 git push origin main
 
