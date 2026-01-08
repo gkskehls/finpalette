@@ -24,11 +24,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-style(transaction): 리스트 뷰 스티키 헤더 위치 조정
+style(transaction): 리스트 뷰 스티키 헤더 동작 수정
 
-- viewToggleContainer에도 sticky 속성 추가 (top: 60px)
-- dateHeader의 top 위치를 116px로 조정하여 토글 버튼 아래에 붙도록 수정
-- 앱 버전 v1.1.31 업데이트
+- viewToggleContainer의 sticky 속성 제거 (스크롤 시 사라짐)
+- dateHeader가 상단 헤더 바로 아래(top: 60px)에 붙도록 수정
 "
 git push origin main
 

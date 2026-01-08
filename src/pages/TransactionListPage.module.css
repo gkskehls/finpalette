@@ -12,13 +12,13 @@
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
-  position: sticky;
-  top: 60px; /* 헤더 높이 */
-  z-index: 11; /* dateHeader보다 높게 */
-  background-color: var(--bg-primary);
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin-top: -16px; /* 컨테이너 패딩 상쇄 */
+  /* position: sticky; */ /* 토글 영역 스티키 제거 */
+  /* top: 60px; */
+  /* z-index: 11; */
+  /* background-color: var(--bg-primary); */
+  /* padding-top: 10px; */
+  /* padding-bottom: 10px; */
+  /* margin-top: -16px; */
 }
 
 .viewToggle {
@@ -65,7 +65,7 @@
 
 .dateHeader {
   position: sticky;
-  top: 116px; /* 헤더(60px) + 토글영역(약 56px) */
+  top: 60px; /* 헤더 높이(60px)에 맞춰 조정 */
   z-index: 10;
   background-color: var(--bg-primary); /* 배경색 지정 필수 */
   padding: 8px 0;
