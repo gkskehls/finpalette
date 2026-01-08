@@ -19,6 +19,7 @@ import { TransactionFormModal } from '../components/transaction/TransactionFormM
 import { useAuth } from '../hooks/useAuth';
 import { EmptyState } from '../components/common/EmptyState';
 import { Skeleton } from '../components/common/Skeleton';
+import { FloatingActionButton } from '../components/common/FloatingActionButton';
 
 // --- Helper Functions ---
 
@@ -573,6 +574,9 @@ const TransactionListPage = () => {
       {viewMode === 'list' && (
         <div style={{ height: '100px' }} aria-hidden="true" />
       )}
+
+      {/* FAB 추가 */}
+      <FloatingActionButton onClick={handleOpenAddModal} />
 
       {/* 내역 추가/수정 모달 */}
       {isModalOpen && (

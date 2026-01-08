@@ -58,6 +58,9 @@ function App() {
     location.pathname.startsWith('/invite') ||
     location.pathname.startsWith('/categories');
 
+  // TransactionListPage에서는 날짜 연동을 위해 자체 FAB를 사용하므로 App 레벨 FAB는 숨김
+  const isTransactionPage = location.pathname === '/transactions';
+
   // 페이지 이동 시 스크롤 최상단으로 이동
   useEffect(() => {
     // window 스크롤 초기화
@@ -89,11 +92,13 @@ function App() {
       {!isFullScreenPage && (
         <>
           <BottomNav />
-          <FloatingActionButton onClick={() => setIsModalOpen(true)} />
+          {!isTransactionPage && (
+            <FloatingActionButton onClick={() => setIsModalOpen(true)} />
+          )}
         </>
       )}
 
-      {isModalOpen && (
+      {isModalOpen && !isTransactionPage && (
         <TransactionFormModal onClose={() => setIsModalOpen(false)} />
       )}
 
