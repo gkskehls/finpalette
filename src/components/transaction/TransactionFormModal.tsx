@@ -45,11 +45,13 @@ const AutoResizingTextarea = (
 interface TransactionFormModalProps {
   onClose: () => void;
   transactionToEdit?: Transaction;
+  initialDate?: string; // 달력 뷰에서 선택된 날짜를 받기 위한 prop 추가
 }
 
 export function TransactionFormModal({
   onClose,
   transactionToEdit,
+  initialDate,
 }: TransactionFormModalProps) {
   const isEditMode = !!transactionToEdit;
   const { user } = useAuth();
@@ -86,8 +88,11 @@ export function TransactionFormModal({
   const [category, setCategory] = useState(
     transactionToEdit?.category_code || ''
   );
+  // 초기 날짜 설정 로직: 수정 모드이면 기존 날짜, 아니면 initialDate, 그것도 없으면 오늘 날짜
   const [date, setDate] = useState(
-    transactionToEdit?.date || new Date().toISOString().split('T')[0]
+    transactionToEdit?.date ||
+      initialDate ||
+      new Date().toISOString().split('T')[0]
   );
   const [description, setDescription] = useState(
     transactionToEdit?.description || ''

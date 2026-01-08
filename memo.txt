@@ -17,16 +17,14 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 이문서들을 읽어보고 이번엔 뭘할지 논의를 하고 나서 그 후에 개발을 진행하도록 할께.
 넌 최고의 기획자야. 지금은 소스 수정은 안할꺼야. 의견부터 나누고 싶어.
 
+지금 데이터베이스 접근이 불가능해. 테이블수정이나 정책수정을 할수 없어. 참고해줘.
+
 
 # GitHub 저장소를 원격(remote)으로 추가 (YOUR_USERNAME을 실제 GitHub 아이디로 변경)
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-docs: 카테고리 순서 변경 및 게스트 모드 동기화 기능 명세 구체화
-
-- 드래그 앤 드롭 방식의 카테고리 순서 변경 기능의 상세 구현 계획 문서화
-- 게스트 모드와 로그인 모드의 기능을 완전히 일치시키는 '저장소 추상화' 원칙 및 적용 방안 명시
-- APP_SPECIFICATION.md 및 PROJECT_PLAN.md 업데이트
+달력추가
 "
 git push origin main
 
