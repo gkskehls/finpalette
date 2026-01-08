@@ -186,20 +186,22 @@ export function ProfilePage() {
   };
 
   return (
-    <div className={styles.profileContainer} style={{ position: 'relative' }}>
-      {/* 앱 버전 표시 (우측 상단) */}
+    <div className={styles.profileContainer}>
+      {/* 앱 버전 표시 (우측 상단 고정) */}
       <div
         style={{
-          position: 'absolute',
-          top: '0',
-          right: '10px',
+          position: 'fixed',
+          top: '70px', // 헤더(60px) 아래에 위치
+          right: '16px',
           fontSize: '0.7rem',
           color: 'var(--text-secondary)',
           opacity: 0.7,
           fontFamily: 'monospace',
+          zIndex: 50,
+          pointerEvents: 'none', // 클릭 방해 방지
         }}
       >
-        v1.1.31
+        v1.1.34
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>

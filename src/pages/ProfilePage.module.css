@@ -4,6 +4,7 @@
   max-width: 600px;
   margin: 0 auto;
   color: var(--text-color); /* 전역 텍스트 색상 변수 사용 */
+  /* position: relative; */ /* 제거: 앱 버전 fixed 위치 기준을 뷰포트로 하기 위함 */
 }
 
 .sectionTitle {
@@ -12,6 +13,11 @@
   margin-top: 2rem;
   margin-bottom: 1rem;
   color: var(--text-color);
+}
+
+/* 첫 번째 섹션 타이틀의 상단 여백 제거 */
+.sectionTitle:first-of-type {
+  margin-top: 0;
 }
 
 .authSection {
