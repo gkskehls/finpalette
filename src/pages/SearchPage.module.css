@@ -1,0 +1,162 @@
+.container {
+  padding: 20px;
+  padding-bottom: 100px; /* 하단 네비게이션 공간 확보 */
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.searchHeader {
+  position: sticky;
+  top: 0;
+  background-color: var(--bg-primary);
+  z-index: 10;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.searchInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-secondary);
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 1rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+  border-color: var(--primary-color);
+  background-color: var(--bg-primary);
+}
+
+.clearButton {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resultCount {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.resultList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* TransactionItem 스타일 재사용을 위해 일부 스타일 복사/수정 */
+.transactionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.transactionItem:active {
+  transform: scale(0.98);
+}
+
+.leftContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0; /* 말줄임표 작동을 위해 필수 */
+}
+
+.categoryIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transactionDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.description {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dateAndMemo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.memoIcon {
+  flex-shrink: 0;
+}
+
+.rightContent {
+  text-align: right;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.amount {
+  font-size: 1rem;
+  font-weight: 600;
+  display: block;
+}
+
+.income {
+  color: var(--income-color);
+}
+
+.expense {
+  color: var(--expense-color);
+}
+
+.loadingText,
+.errorText {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--text-secondary);
+}

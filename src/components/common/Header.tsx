@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Sun, Moon, ChevronDown } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { Sun, Moon, ChevronDown, Search } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { usePalette } from '../../context/PaletteContext';
 import { PaletteListBottomSheet } from './PaletteListBottomSheet';
 import { PaletteFormModal } from '../palette/PaletteFormModal';
@@ -19,6 +19,7 @@ export function Header() {
   );
   const { currentPalette, isLoading } = usePalette();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // 테마 변경을 처리하는 useEffect
   useEffect(() => {
@@ -78,9 +79,22 @@ export function Header() {
           <h1 className={styles.title}>{getHeaderTitle()}</h1>
           <ChevronDown size={20} className={styles.chevronIcon} />
         </div>
-        <button onClick={toggleTheme} className={styles.themeToggleButton}>
-          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-        </button>
+        <div className={styles.rightActions}>
+          <button
+            onClick={() => navigate('/search')}
+            className={styles.iconButton}
+            aria-label="검색"
+          >
+            <Search size={20} />
+          </button>
+          <button
+            onClick={toggleTheme}
+            className={styles.iconButton}
+            aria-label="테마 변경"
+          >
+            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
+        </div>
       </header>
 
       {isSheetOpen && (

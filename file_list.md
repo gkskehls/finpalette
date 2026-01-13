@@ -135,6 +135,8 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 - **📄 InvitePage.module.css**: `InvitePage` 컴포넌트의 전용 CSS 모듈 파일입니다.
 - **📄 ProfilePage.tsx**: 마이페이지의 메인 컴포넌트입니다.
 - **📄 ProfilePage.module.css**: `ProfilePage` 컴포넌트의 전용 CSS 모듈 파일입니다.
+- **📄 SearchPage.tsx**: 거래 내역 검색 페이지의 메인 컴포넌트입니다.
+- **📄 SearchPage.module.css**: `SearchPage` 컴포넌트의 전용 CSS 모듈 파일입니다.
 - **📄 StatsPage.tsx**: 통계 페이지의 메인 컴포넌트입니다.
 - **📄 TransactionListPage.module.css**: `TransactionListPage` 컴포넌트의 전용 CSS 모듈 파일입니다.
 - **📄 TransactionListPage.tsx**: 전체 거래 내역을 조회, 수정, 삭제하는 페이지의 메인 컴포넌트입니다.

@@ -93,6 +93,52 @@ const getCalendarTransactionsFromLocal = async (
   return allTransactions.filter((tx) => tx.date.startsWith(targetPrefix));
 };
 
+// [서버] 검색용: 키워드로 데이터 조회
+const searchTransactionsFromServer = async (
+  paletteId: string,
+  keyword: string
+): Promise<Transaction[]> => {
+  // console.log(`Searching transactions for palette: ${paletteId}, keyword: ${keyword}`);
+
+  // description, public_memo, amount 컬럼 검색
+  // amount는 숫자지만 text로 캐스팅하여 검색 (Supabase PostgREST 기능 활용)
+  // 주의: private_memo는 별도 테이블이라 검색에서 제외 (추후 개선 가능)
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*, private_memos(content)')
+    .eq('palette_id', paletteId)
+    .or(`description.ilike.%${keyword}%,public_memo.ilike.%${keyword}%`)
+    .order('date', { ascending: false });
+
+  if (error) {
+    console.error('Error searching transactions:', error);
+    throw new Error(error.message);
+  }
+
+  return data.map((tx: any) => ({
+    ...tx,
+    localId: tx.id,
+    private_memo: tx.private_memos?.[0]?.content || '',
+  }));
+};
+
+// [로컬] 검색용: 키워드로 데이터 필터링
+const searchTransactionsFromLocal = async (
+  keyword: string
+): Promise<Transaction[]> => {
+  const allTransactions = await getTransactionsFromLocal();
+  const lowerKeyword = keyword.toLowerCase();
+
+  return allTransactions.filter(
+    (tx) =>
+      (tx.description && tx.description.toLowerCase().includes(lowerKeyword)) ||
+      (tx.public_memo && tx.public_memo.toLowerCase().includes(lowerKeyword)) ||
+      (tx.private_memo &&
+        tx.private_memo.toLowerCase().includes(lowerKeyword)) ||
+      String(tx.amount).includes(lowerKeyword)
+  );
+};
+
 // --- 커스텀 훅 ---
 
 // 1. 리스트 뷰용 (무한 스크롤)
@@ -160,5 +206,36 @@ export function useCalendarTransactionsQuery(
     },
     enabled: enabled && !isAuthLoading && (!user || !!currentPalette?.id),
     staleTime: 1000 * 60 * 5, // 5분간 캐시 유지 (월 이동 시 재호출 방지)
+  });
+}
+
+// 3. 검색용 (키워드 조회)
+export function useSearchTransactionsQuery(keyword: string) {
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { currentPalette } = usePalette();
+
+  return useQuery<Transaction[], Error>({
+    queryKey: [
+      'search-transactions',
+      user?.id ?? 'local',
+      currentPalette?.id,
+      keyword,
+    ],
+    queryFn: async () => {
+      if (!keyword.trim()) return [];
+
+      if (user) {
+        if (currentPalette?.id) {
+          return searchTransactionsFromServer(currentPalette.id, keyword);
+        }
+        return [];
+      } else {
+        return searchTransactionsFromLocal(keyword);
+      }
+    },
+    enabled:
+      !isAuthLoading &&
+      (!user || !!currentPalette?.id) &&
+      keyword.trim().length > 0,
   });
 }

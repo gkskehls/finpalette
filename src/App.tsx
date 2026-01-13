@@ -28,6 +28,11 @@ const CategorySettingsPage = lazy(() =>
     default: module.CategorySettingsPage,
   }))
 );
+const SearchPage = lazy(() =>
+  import('./pages/SearchPage').then((module) => ({
+    default: module.SearchPage,
+  }))
+);
 
 import { BottomNav } from './components/common/BottomNav';
 import { Header } from './components/common/Header';
@@ -56,7 +61,8 @@ function App() {
 
   const isFullScreenPage =
     location.pathname.startsWith('/invite') ||
-    location.pathname.startsWith('/categories');
+    location.pathname.startsWith('/categories') ||
+    location.pathname.startsWith('/search');
 
   // TransactionListPage에서는 날짜 연동을 위해 자체 FAB를 사용하므로 App 레벨 FAB는 숨김
   const isTransactionPage = location.pathname === '/transactions';
@@ -85,6 +91,7 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/invite" element={<InvitePage />} />
             <Route path="/categories" element={<CategorySettingsPage />} />
+            <Route path="/search" element={<SearchPage />} />
           </Routes>
         </Suspense>
       </main>
