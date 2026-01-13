@@ -24,9 +24,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-1.검색 기능 구현: useSearchTransactionsQuery, SearchPage, 라우팅, 헤더 버튼 추가.
-2.로딩 UX 개선: TransactionListPage의 로딩 상태 로직 강화.
-3.문서 최신화: PROJECT_PLAN.md, file_list.md 업데이트 및 앱 버전 v1.1.37 적용.
+fix(stats): 통계 페이지 월별 데이터 로딩 문제 수정
+
+- StatsPage에서 useTransactionsQuery 대신 useCalendarTransactionsQuery를 사용하여 월별 데이터를 독립적으로 로딩하도록 수정
+- 월 이동 시 자동으로 해당 월의 데이터를 불러오도록 개선
+- ProfilePage 앱 버전 업데이트 (v1.1.38)
+- 관련 문서(PROJECT_PLAN.md, APP_SPECIFICATION.md) 업데이트
 "
 git push origin main
 

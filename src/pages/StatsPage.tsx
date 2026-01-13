@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
+import { useCalendarTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import {
   PieChart,
@@ -26,13 +26,17 @@ interface MonthlySummary {
 }
 
 export function StatsPage() {
-  const { data: transactionsData } = useTransactionsQuery();
-  const { data: categories = [] } = useCategoriesQuery();
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const transactions = useMemo(() => {
-    return transactionsData?.pages.flatMap((page) => page) || [];
-  }, [transactionsData]);
+  // 기존 useTransactionsQuery 대신 useCalendarTransactionsQuery를 사용하여
+  // 선택된 월의 데이터를 독립적으로 불러오도록 수정
+  const { data: transactions = [] } = useCalendarTransactionsQuery(
+    selectedDate.getFullYear(),
+    selectedDate.getMonth() + 1,
+    true
+  );
+
+  const { data: categories = [] } = useCategoriesQuery();
 
   const expenseCategoryMap = useMemo(() => {
     return new Map(
@@ -96,6 +100,7 @@ export function StatsPage() {
     const currentYear = selectedDate.getFullYear();
     const currentMonth = selectedDate.getMonth();
 
+    // 현재 선택된 월을 포함하여 최근 6개월치 키 생성
     for (let i = 5; i >= 0; i--) {
       const date = new Date(currentYear, currentMonth - i, 1);
       const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1)
@@ -104,6 +109,9 @@ export function StatsPage() {
       summaryMap.set(monthKey, { income: 0, expense: 0 });
     }
 
+    // 불러온 데이터(transactions)를 바탕으로 집계
+    // 주의: useCalendarTransactionsQuery는 현재 선택된 월의 데이터만 반환하므로,
+    // 바 차트에는 선택된 월의 데이터만 표시될 수 있음.
     transactions.forEach((t: Transaction) => {
       const transactionDate = new Date(t.date);
       const year = transactionDate.getFullYear();
@@ -141,12 +149,30 @@ export function StatsPage() {
 
   if (transactions.length === 0) {
     return (
-      <div className={styles.container} style={{ justifyContent: 'center' }}>
-        <EmptyState
-          icon={PieChartIcon}
-          title="분석할 데이터가 충분하지 않아요"
-          description="내역이 쌓이면 멋진 차트를 보여드릴게요!"
-        />
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <button onClick={handlePrevMonth} className={styles.navButton}>
+            {'<'}
+          </button>
+          <h2 className={styles.monthTitle}>{formattedMonth}</h2>
+          <button onClick={handleNextMonth} className={styles.navButton}>
+            {'>'}
+          </button>
+        </div>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <EmptyState
+            icon={PieChartIcon}
+            title="분석할 데이터가 충분하지 않아요"
+            description="내역이 쌓이면 멋진 차트를 보여드릴게요!"
+          />
+        </div>
       </div>
     );
   }
