@@ -1,5 +1,8 @@
 import { useState, useMemo } from 'react';
-import { useTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
+import {
+  useTransactionsQuery,
+  useCalendarTransactionsQuery,
+} from '../hooks/queries/useTransactionsQuery';
 import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import type { Transaction } from '../types/transaction';
@@ -185,6 +188,7 @@ const TransactionListPage = () => {
   >(undefined);
 
   // 4. Data Fetching
+  // 4-1. 리스트 뷰용 데이터 (무한 스크롤)
   const {
     data: transactionsData,
     isLoading: isLoadingTransactions,
@@ -194,14 +198,30 @@ const TransactionListPage = () => {
     isFetchingNextPage,
   } = useTransactionsQuery();
 
+  // 4-2. 달력 뷰용 데이터 (월별 조회)
+  const {
+    data: calendarData = [],
+    isLoading: isLoadingCalendar,
+    error: calendarError,
+  } = useCalendarTransactionsQuery(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth() + 1,
+    viewMode === 'calendar' // 달력 뷰일 때만 활성화
+  );
+
   const {
     data: categories = [],
     isLoading: isLoadingCategories,
     error: categoriesError,
   } = useCategoriesQuery();
 
-  const isLoading = isLoadingTransactions || isLoadingCategories;
-  const error = transactionsError || categoriesError;
+  // 현재 뷰 모드에 따라 로딩 상태 결정
+  const isLoading =
+    isLoadingCategories ||
+    (viewMode === 'list' ? isLoadingTransactions : isLoadingCalendar);
+  const error =
+    categoriesError ||
+    (viewMode === 'list' ? transactionsError : calendarError);
 
   // 5. Infinite Scroll Observer
   const loadMoreRef = useIntersectionObserver({
@@ -382,13 +402,14 @@ const TransactionListPage = () => {
     const calendarDays = [];
     let currentDate = new Date(startDate);
 
-    // 날짜별 데이터 집계 (현재 월 데이터만 필터링하지 않고 전체 데이터 사용 - 성능 최적화 필요 시 수정)
+    // 날짜별 데이터 집계 (달력용 쿼리 데이터 사용)
     const dailyStats = new Map<
       string,
       { income: number; expense: number; transactions: Transaction[] }
     >();
 
-    allTransactions.forEach((tx) => {
+    // calendarData를 사용하여 집계
+    calendarData.forEach((tx) => {
       const dateStr = tx.date;
       if (!dailyStats.has(dateStr)) {
         dailyStats.set(dateStr, { income: 0, expense: 0, transactions: [] });
@@ -443,7 +464,6 @@ const TransactionListPage = () => {
         <div className={styles.calendarGrid}>
           {calendarDays.map((day) => {
             // 로컬 시간대 기준으로 날짜 문자열 생성 (YYYY-MM-DD)
-            // 주의: toISOString()은 UTC 기준이므로 사용하면 안됨
             const year = day.getFullYear();
             const month = String(day.getMonth() + 1).padStart(2, '0');
             const date = String(day.getDate()).padStart(2, '0');

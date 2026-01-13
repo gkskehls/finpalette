@@ -24,11 +24,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(transaction): 리스트 뷰 스티키 헤더 위치 재조정
+fix(transaction): 달력 뷰 데이터 조회 로직 개선 및 누락 문제 해결
 
-- viewToggleContainer의 sticky 속성 제거
-- dateHeader의 top 값을 60px로 수정하여 헤더 바로 아래에 붙도록 함
-- 앱 버전 v1.1.36 업데이트
+- 월별 전체 데이터를 별도로 조회하는 useCalendarTransactionsQuery 훅 구현
+- 달력 뷰에서 리스트 뷰의 데이터가 아닌 전용 데이터를 사용하도록 수정
+- 월 이동 시 해당 기간의 내역을 자동으로 불러오도록 처리
+- 앱 버전 v1.1.35 업데이트 및 관련 문서 수정
 "
 git push origin main
 

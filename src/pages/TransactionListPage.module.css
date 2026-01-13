@@ -65,7 +65,7 @@
 
 .dateHeader {
   position: sticky;
-  top: 60px; /* 헤더 높이(60px)에 맞춰 조정 */
+  top: 0px; /* 헤더 높이(60px)에 맞춰 조정 */
   z-index: 10;
   background-color: var(--bg-primary); /* 배경색 지정 필수 */
   padding: 8px 0;
