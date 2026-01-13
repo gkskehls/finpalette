@@ -23,6 +23,7 @@ import { useAuth } from '../hooks/useAuth';
 import { EmptyState } from '../components/common/EmptyState';
 import { Skeleton } from '../components/common/Skeleton';
 import { FloatingActionButton } from '../components/common/FloatingActionButton';
+import { usePalette } from '../context/PaletteContext';
 
 // --- Helper Functions ---
 
@@ -188,6 +189,9 @@ const TransactionListPage = () => {
   >(undefined);
 
   // 4. Data Fetching
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { currentPalette } = usePalette();
+
   // 4-1. 리스트 뷰용 데이터 (무한 스크롤)
   const {
     data: transactionsData,
@@ -216,9 +220,16 @@ const TransactionListPage = () => {
   } = useCategoriesQuery();
 
   // 현재 뷰 모드에 따라 로딩 상태 결정
+  // 1. 인증 로딩 중이거나
+  // 2. 로그인 상태인데 팔레트 정보가 아직 없거나
+  // 3. 카테고리 로딩 중이거나
+  // 4. 트랜잭션 데이터 로딩 중일 때
   const isLoading =
+    isAuthLoading ||
+    (user && !currentPalette) ||
     isLoadingCategories ||
     (viewMode === 'list' ? isLoadingTransactions : isLoadingCalendar);
+
   const error =
     categoriesError ||
     (viewMode === 'list' ? transactionsError : calendarError);
