@@ -203,6 +203,9 @@ export function StatsPage() {
                 dataKey="value"
                 nameKey="name"
                 label={(entry) => `${entry.name}`}
+                animationDuration={800}
+                animationBegin={0}
+                animationEasing="ease-out"
               >
                 {monthlyExpenseData.map((entry) => (
                   <Cell key={`cell-${entry.name}`} fill={entry.color} />
