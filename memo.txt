@@ -24,13 +24,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-style(stats): 파이 차트 애니메이션 속도 및 이징 조절
+fix(calendar): 달력 뷰 레이아웃 깨짐 및 가로 스크롤 문제 수정
 
-- StatsPage 파이 차트 애니메이션 지속 시간을 800ms로 설정하여 쾌적한 속도감 제공
-- animationBegin을 0으로 설정하여 즉시 시작되도록 함
-- animationEasing을 'ease-out'으로 설정하여 부드러운 감속 효과 적용
-- ProfilePage 앱 버전 업데이트 (v1.1.39)
-
+- .calendarGrid에 width: 100% 및 box-sizing 적용하여 컨테이너 이탈 방지
+- .calendarCell에 min-width: 0 및 overflow: hidden 적용하여 내부 콘텐츠에 의한 너비 확장 방지
+- .weekDaysHeader에 gap: 4px 추가하여 날짜 그리드와 정렬 일치시킴
 "
 git push origin main
 

@@ -23,6 +23,7 @@
   --bg-color: var(--background-primary); /* Fallback */
   --text-primary: var(--text-color);
   --text-secondary: var(--secondary-text-color);
+  --text-tertiary: #999999; /* Added tertiary text color */
   --primary-light: #e0e7ff; /* Light primary for backgrounds */
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -64,6 +65,7 @@ html.dark {
   --bg-color: var(--background-primary);
   --text-primary: var(--text-color);
   --text-secondary: var(--secondary-text-color);
+  --text-tertiary: #777777; /* Added tertiary text color for dark mode */
   --primary-light: rgba(116, 123, 255, 0.2);
 
   color-scheme: dark;
