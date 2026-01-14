@@ -24,11 +24,12 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(calendar): 달력 뷰 레이아웃 깨짐 및 가로 스크롤 문제 수정
+feat(search): 검색 페이지에 뒤로가기 버튼 추가
 
-- .calendarGrid에 width: 100% 및 box-sizing 적용하여 컨테이너 이탈 방지
-- .calendarCell에 min-width: 0 및 overflow: hidden 적용하여 내부 콘텐츠에 의한 너비 확장 방지
-- .weekDaysHeader에 gap: 4px 추가하여 날짜 그리드와 정렬 일치시킴
+- SearchPage 상단에 뒤로가기 버튼을 추가하여 페이지 이동 편의성 개선
+- useNavigate 훅을 사용하여 이전 페이지로 이동하는 기능 구현
+- 관련 CSS 스타일 추가 및 레이아웃 조정
+- ProfilePage 앱 버전 업데이트 (v1.1.41)
 "
 git push origin main
 

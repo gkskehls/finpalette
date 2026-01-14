@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Search, X, MessageSquareText, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, X, MessageSquareText, Lock, ChevronLeft } from 'lucide-react';
 import { useSearchTransactionsQuery } from '../hooks/queries/useTransactionsQuery';
 import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import { useAuth } from '../hooks/useAuth';
@@ -86,6 +87,7 @@ const SearchResultItem = ({
 // --- Main Component ---
 
 export function SearchPage() {
+  const navigate = useNavigate();
   const [keyword, setKeyword] = useState('');
   const [selectedTransaction, setSelectedTransaction] = useState<
     Transaction | undefined
@@ -123,20 +125,28 @@ export function SearchPage() {
     <div className={styles.container}>
       <div className={styles.searchHeader}>
         <div className={styles.searchInputWrapper}>
-          <Search className={styles.searchIcon} size={20} />
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="내용, 메모, 금액으로 검색"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            autoFocus
-          />
-          {keyword && (
-            <button className={styles.clearButton} onClick={handleClear}>
-              <X size={16} />
-            </button>
-          )}
+          <button
+            className={styles.backButton}
+            onClick={() => navigate(-1)}
+            aria-label="뒤로 가기"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <div className={styles.inputContainer}>
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="내용, 메모, 금액으로 검색"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              autoFocus
+            />
+            {keyword && (
+              <button className={styles.clearButton} onClick={handleClear}>
+                <X size={16} />
+              </button>
+            )}
+          </div>
         </div>
         {keyword && !isLoading && (
           <div className={styles.resultCount}>
