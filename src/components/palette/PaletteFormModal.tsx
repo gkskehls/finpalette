@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { X, LogIn } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAddPaletteMutation } from '../../hooks/queries/useAddPaletteMutation';
+import { usePalettesQuery } from '../../hooks/queries/usePalettesQuery';
 import { usePalette } from '../../context/PaletteContext';
 import { useAuth } from '../../hooks/useAuth';
 import styles from './PaletteFormModal.module.css';
@@ -25,8 +26,17 @@ const THEME_COLORS = [
 
 export function PaletteFormModal({ onClose }: PaletteFormModalProps) {
   const { user, signInWithGoogle } = useAuth();
+  const { data: palettes = [] } = usePalettesQuery();
+  const { currentPalette } = usePalette();
+
   const [name, setName] = useState('');
   const [selectedColor, setSelectedColor] = useState(THEME_COLORS[0]);
+  const [categoryOption, setCategoryOption] = useState<'default' | 'copy'>(
+    'default'
+  );
+  const [sourcePaletteId, setSourcePaletteId] = useState<string | null>(
+    currentPalette?.id || null
+  );
 
   const { mutateAsync: addPalette, isPending } = useAddPaletteMutation();
   const { changePalette } = usePalette();
@@ -35,7 +45,13 @@ export function PaletteFormModal({ onClose }: PaletteFormModalProps) {
     e.preventDefault();
     if (!name.trim()) return;
 
-    const promise = addPalette({ name, theme_color: selectedColor });
+    const payload = {
+      name,
+      theme_color: selectedColor,
+      source_palette_id: categoryOption === 'copy' ? sourcePaletteId : null,
+    };
+
+    const promise = addPalette(payload);
 
     toast.promise(promise, {
       loading: '새 팔레트를 만드는 중...',
@@ -103,6 +119,45 @@ export function PaletteFormModal({ onClose }: PaletteFormModalProps) {
                   />
                 ))}
               </div>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>카테고리 설정</label>
+              <div className={styles.radioGroup}>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name="categoryOption"
+                    value="default"
+                    checked={categoryOption === 'default'}
+                    onChange={() => setCategoryOption('default')}
+                  />
+                  기본 카테고리로 시작
+                </label>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name="categoryOption"
+                    value="copy"
+                    checked={categoryOption === 'copy'}
+                    onChange={() => setCategoryOption('copy')}
+                  />
+                  기존 팔레트에서 복사
+                </label>
+              </div>
+              {categoryOption === 'copy' && (
+                <select
+                  className={styles.select}
+                  value={sourcePaletteId || ''}
+                  onChange={(e) => setSourcePaletteId(e.target.value)}
+                >
+                  {palettes.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <button

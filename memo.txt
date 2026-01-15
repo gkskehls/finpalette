@@ -24,8 +24,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-chore: 앱 버전 업데이트 (v1.1.50)
-•Firebase rewrite 규칙 수정에 대한 버전 업데이트입니다.
+feat(palette): 새 팔레트 생성 시 카테고리 복사 기능 추가
+•create_palette DB 함수를 수정하여 source_palette_id를 인자로 받아 카테고리를 복사할 수 있도록 변경했습니다.
+•PaletteFormModal에 카테고리 복사 옵션 UI(라디오 버튼, 드롭다운)를 추가했습니다.
+•useAddPaletteMutation 훅을 수정하여 선택된 복사 소스 ID를 DB 함수에 전달하도록 변경했습니다.
 "
 git push origin main
 

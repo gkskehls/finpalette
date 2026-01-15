@@ -5,15 +5,18 @@ import { useAuth } from '../useAuth';
 interface AddPaletteVariables {
   name: string;
   theme_color: string;
+  source_palette_id?: string | null;
 }
 
 const addPalette = async ({
   name,
   theme_color,
+  source_palette_id,
 }: AddPaletteVariables): Promise<string> => {
   const { data, error } = await supabase.rpc('create_palette', {
-    name,
-    theme_color,
+    p_name: name,
+    p_theme_color: theme_color,
+    p_source_palette_id: source_palette_id,
   });
 
   if (error) {

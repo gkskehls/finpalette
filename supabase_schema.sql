@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Finpalette v3.2 Schema
+-- Finpalette v3.3 Schema
 --
 -- 구조:
 -- 1. Tables
@@ -226,34 +226,63 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 팔레트 생성 함수 (v3.2 수정)
+-- 팔레트 생성 함수 (v3.3 수정)
 CREATE OR REPLACE FUNCTION create_palette(
   p_name TEXT,
   p_theme_color TEXT,
-  p_owner_id UUID DEFAULT auth.uid() -- 트리거에서 호출 시 owner_id를 받기 위함
+  p_owner_id UUID DEFAULT auth.uid(), -- 트리거에서 호출 시 owner_id를 받기 위함
+  p_source_palette_id UUID DEFAULT NULL -- 카테고리 복사 원본 팔레트 ID
 )
 RETURNS UUID AS $$
 DECLARE
   new_palette_id UUID;
+  v_user_role TEXT;
 BEGIN
+  -- 팔레트 생성
   INSERT INTO public.palettes (name, theme_color, owner_id)
   VALUES (p_name, p_theme_color, p_owner_id)
   RETURNING id INTO new_palette_id;
 
+  -- 팔레트 멤버로 소유자 추가
   INSERT INTO public.palette_members (palette_id, user_id, role)
   VALUES (new_palette_id, p_owner_id, 'owner');
 
-  -- 기본 카테고리 삽입
-  INSERT INTO public.categories (palette_id, code, name, color, icon, user_id, sort_order)
-  SELECT
-    new_palette_id,
-    dc.code,
-    dc.name,
-    dc.color,
-    dc.icon,
-    p_owner_id,
-    dc.sort_order
-  FROM get_default_categories() AS dc;
+  -- 카테고리 생성 로직 분기
+  IF p_source_palette_id IS NOT NULL THEN
+    -- 권한 확인: source_palette_id에 대한 멤버인지 확인
+    SELECT role INTO v_user_role
+    FROM public.palette_members
+    WHERE palette_id = p_source_palette_id AND user_id = p_owner_id;
+
+    IF v_user_role IS NULL THEN
+        RAISE EXCEPTION 'Permission denied to copy categories from source palette';
+    END IF;
+
+    -- 기존 팔레트에서 카테고리 복사
+    INSERT INTO public.categories (palette_id, code, name, color, icon, user_id, sort_order)
+    SELECT
+      new_palette_id,
+      code,
+      name,
+      color,
+      icon,
+      p_owner_id, -- 새 카테고리의 user_id는 새 팔레트 소유자로 설정
+      sort_order
+    FROM public.categories
+    WHERE palette_id = p_source_palette_id;
+  ELSE
+    -- 기본 카테고리 삽입
+    INSERT INTO public.categories (palette_id, code, name, color, icon, user_id, sort_order)
+    SELECT
+      new_palette_id,
+      dc.code,
+      dc.name,
+      dc.color,
+      dc.icon,
+      p_owner_id,
+      dc.sort_order
+    FROM get_default_categories() AS dc;
+  END IF;
 
   RETURN new_palette_id;
 END;
