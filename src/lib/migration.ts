@@ -1,15 +1,16 @@
 import { supabase } from './supabase';
 import type { User } from '@supabase/supabase-js';
 import type { Transaction } from '../types/transaction';
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants';
+// import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '../config/constants'; // 더 이상 필요 없음
 
 // 로컬 스토리지의 거래 내역 타입 (서버 ID가 없음)
 type LocalTransaction = Omit<Transaction, 'id'> & { id: null };
 
 /**
  * 팔레트에 기본 카테고리들을 생성합니다. (멱등성 보장)
- * @param paletteId - 카테고리를 추가할 팔레트의 ID
+ * 이제 create_palette RPC가 담당하므로 이 함수는 더 이상 필요 없습니다.
  */
+/*
 async function ensureDefaultCategories(paletteId: string): Promise<void> {
   const allCategories = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
   const categoriesToInsert = allCategories.map((category) => ({
@@ -32,6 +33,7 @@ async function ensureDefaultCategories(paletteId: string): Promise<void> {
     console.log('Default categories are ensured for the palette.');
   }
 }
+*/
 
 /**
  * 사용자를 위한 개인 팔레트를 찾거나 생성하고, 멤버와 카테고리를 보장합니다.
@@ -56,8 +58,8 @@ async function getOrCreatePersonalPalette(user: User): Promise<string> {
     const paletteId = existingPalettes[0].id;
     console.log(`Existing palette found: ${paletteId}`);
 
-    // 기존 팔레트라면 카테고리가 없을 수 있으므로 보장
-    await ensureDefaultCategories(paletteId);
+    // 기존 팔레트라면 카테고리가 없을 수 있으므로 보장 (이제 create_palette RPC가 담당하므로 제거)
+    // await ensureDefaultCategories(paletteId);
     return paletteId;
   }
 
@@ -66,8 +68,9 @@ async function getOrCreatePersonalPalette(user: User): Promise<string> {
   const { data: newPaletteId, error: rpcError } = await supabase.rpc(
     'create_palette',
     {
-      name: '나의 가계부',
-      theme_color: '#6366F1',
+      p_name: '나의 가계부', // RPC 함수 시그니처에 맞게 변경
+      p_theme_color: '#6366F1', // RPC 함수 시그니처에 맞게 변경
+      p_owner_id: user.id, // RPC 함수 시그니처에 맞게 owner_id 전달
     }
   );
 

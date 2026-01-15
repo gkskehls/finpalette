@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Finpalette v3 Schema
+-- Finpalette v3.2 Schema
 --
 -- 구조:
 -- 1. Tables
@@ -90,9 +90,11 @@ CREATE TABLE IF NOT EXISTS public.private_memos (
 -- 2. Helper Functions & Triggers
 -- ==============================================================================
 
+-- 신규 가입 시 프로필 생성 및 개인 팔레트 생성 트리거 함수
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- 프로필 정보 삽입
   INSERT INTO public.profiles (id, email, full_name, avatar_url)
   VALUES (
     new.id,
@@ -100,6 +102,11 @@ BEGIN
     new.raw_user_meta_data->>'full_name',
     new.raw_user_meta_data->>'avatar_url'
   );
+
+  -- 개인 팔레트 생성 (v3.2 추가)
+  -- security definer 함수이므로, new.id를 owner_id로 전달
+  PERFORM create_palette('마이 팔레트', '#6366F1', new.id);
+
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -195,6 +202,64 @@ CREATE POLICY "Members can create invitations" ON public.palette_invitations FOR
 -- 4. RPC Functions
 -- ==============================================================================
 
+-- 기본 카테고리 목록 반환 함수 (v3.2 추가)
+CREATE OR REPLACE FUNCTION get_default_categories()
+RETURNS TABLE(code text, name text, color text, icon text, sort_order integer) AS $$
+BEGIN
+  RETURN QUERY VALUES
+    ('i01', '월급', '#4CAF50', 'Briefcase', 1),
+    ('i02', '용돈', '#81C784', 'Coins', 2),
+    ('i03', '금융소득', '#66BB6A', 'Landmark', 3),
+    ('i04', '사업소득', '#A5D6A7', 'Store', 4),
+    ('i99', '기타', '#C8E6C9', 'PlusSquare', 99),
+    ('c01', '식비', '#FF7043', 'Utensils', 1),
+    ('c02', '교통', '#5C6BC0', 'Bus', 2),
+    ('c03', '통신', '#26A69A', 'Smartphone', 3),
+    ('c04', '쇼핑', '#FFCA28', 'ShoppingBag', 4),
+    ('c05', '주거', '#78909C', 'Home', 5),
+    ('c06', '의료/건강', '#EF5350', 'HeartPulse', 6),
+    ('c07', '여가/문화', '#AB47BC', 'Film', 7),
+    ('c08', '교육', '#42A5F5', 'GraduationCap', 8),
+    ('c09', '경조사', '#8D6E63', 'Users', 9),
+    ('c10', '저축/투자', '#66BB6A', 'PiggyBank', 10),
+    ('c99', '기타', '#BDBDBD', 'PlusSquare', 99);
+END;
+$$ LANGUAGE plpgsql;
+
+-- 팔레트 생성 함수 (v3.2 수정)
+CREATE OR REPLACE FUNCTION create_palette(
+  p_name TEXT,
+  p_theme_color TEXT,
+  p_owner_id UUID DEFAULT auth.uid() -- 트리거에서 호출 시 owner_id를 받기 위함
+)
+RETURNS UUID AS $$
+DECLARE
+  new_palette_id UUID;
+BEGIN
+  INSERT INTO public.palettes (name, theme_color, owner_id)
+  VALUES (p_name, p_theme_color, p_owner_id)
+  RETURNING id INTO new_palette_id;
+
+  INSERT INTO public.palette_members (palette_id, user_id, role)
+  VALUES (new_palette_id, p_owner_id, 'owner');
+
+  -- 기본 카테고리 삽입
+  INSERT INTO public.categories (palette_id, code, name, color, icon, user_id, sort_order)
+  SELECT
+    new_palette_id,
+    dc.code,
+    dc.name,
+    dc.color,
+    dc.icon,
+    p_owner_id,
+    dc.sort_order
+  FROM get_default_categories() AS dc;
+
+  RETURN new_palette_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
 CREATE OR REPLACE FUNCTION upsert_transaction_with_memos(
     p_id uuid, -- 내역 ID (수정 시 사용, 추가 시 NULL)
     p_palette_id uuid,
@@ -244,42 +309,6 @@ BEGIN
     END IF;
 
     RETURN v_transaction_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-
-CREATE OR REPLACE FUNCTION create_palette(name TEXT, theme_color TEXT)
-RETURNS UUID AS $$
-DECLARE
-  new_palette_id UUID;
-BEGIN
-  INSERT INTO public.palettes (name, theme_color, owner_id)
-  VALUES (create_palette.name, create_palette.theme_color, auth.uid())
-  RETURNING id INTO new_palette_id;
-
-  INSERT INTO public.palette_members (palette_id, user_id, role)
-  VALUES (new_palette_id, auth.uid(), 'owner');
-
-  INSERT INTO public.categories (palette_id, code, name, color, icon, user_id, sort_order)
-  VALUES
-    (new_palette_id, 'i01', '월급', '#4CAF50', 'Briefcase', auth.uid(), 1),
-    (new_palette_id, 'i02', '용돈', '#81C784', 'Coins', auth.uid(), 2),
-    (new_palette_id, 'i03', '금융소득', '#66BB6A', 'Landmark', auth.uid(), 3),
-    (new_palette_id, 'i04', '사업소득', '#A5D6A7', 'Store', auth.uid(), 4),
-    (new_palette_id, 'i99', '기타', '#C8E6C9', 'PlusSquare', auth.uid(), 5),
-    (new_palette_id, 'c01', '식비', '#FF7043', 'Utensils', auth.uid(), 6),
-    (new_palette_id, 'c02', '교통', '#5C6BC0', 'Bus', auth.uid(), 7),
-    (new_palette_id, 'c03', '통신', '#26A69A', 'Smartphone', auth.uid(), 8),
-    (new_palette_id, 'c04', '쇼핑', '#FFCA28', 'ShoppingBag', auth.uid(), 9),
-    (new_palette_id, 'c05', '주거', '#78909C', 'Home', auth.uid(), 10),
-    (new_palette_id, 'c06', '의료/건강', '#EF5350', 'HeartPulse', auth.uid(), 11),
-    (new_palette_id, 'c07', '여가/문화', '#AB47BC', 'Film', auth.uid(), 12),
-    (new_palette_id, 'c08', '교육', '#42A5F5', 'GraduationCap', auth.uid(), 13),
-    (new_palette_id, 'c09', '경조사', '#8D6E63', 'Users', auth.uid(), 14),
-    (new_palette_id, 'c10', '저축/투자', '#66BB6A', 'PiggyBank', auth.uid(), 15),
-    (new_palette_id, 'c99', '기타', '#BDBDBD', 'PlusSquare', auth.uid(), 16);
-
-  RETURN new_palette_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
