@@ -242,7 +242,11 @@ export function StatsPage() {
                 dataKey="value"
                 nameKey="name"
                 label={(entry) => `${entry.name}`}
-                animationDuration={800}
+                // [애니메이션 속도 조절]
+                // animationDuration: 애니메이션 지속 시간 (ms) - 값을 줄이면 빨라지고, 늘리면 느려집니다.
+                // animationBegin: 애니메이션 시작 지연 시간 (ms)
+                // animationEasing: 가속도 함수 ('ease', 'ease-in', 'ease-out', 'ease-in-out', 'linear')
+                animationDuration={300}
                 animationBegin={0}
                 animationEasing="ease-out"
               >
@@ -292,8 +296,24 @@ export function StatsPage() {
               ]}
             />
             <Legend />
-            <Bar dataKey="income" fill="#82ca9d" name="수입" />
-            <Bar dataKey="expense" fill="#ff7300" name="지출" />
+            <Bar
+              dataKey="income"
+              fill="#82ca9d"
+              name="수입"
+              // [애니메이션 속도 조절]
+              animationDuration={1000}
+              animationBegin={0}
+              animationEasing="ease-out"
+            />
+            <Bar
+              dataKey="expense"
+              fill="#ff7300"
+              name="지출"
+              // [애니메이션 속도 조절]
+              animationDuration={1000}
+              animationBegin={200} // 수입 바가 올라간 뒤 약간의 시차를 두고 올라가도록 설정
+              animationEasing="ease-out"
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
