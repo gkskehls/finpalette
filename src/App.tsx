@@ -59,7 +59,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const mainContentRef = useRef<HTMLDivElement>(null);
-  const nodeRef = useRef(null);
+  // nodeRef 제거: 동적 라우팅 환경에서 단일 ref 사용 시 문제 발생 가능성 있음
 
   const isFullScreenPage =
     location.pathname.startsWith('/invite') ||
@@ -86,14 +86,14 @@ function App() {
 
       <main className="mainContent" ref={mainContentRef}>
         <Suspense fallback={<LoadingIndicator />}>
-          <TransitionGroup>
+          <TransitionGroup component={null}>
             <CSSTransition
               key={location.key}
-              nodeRef={nodeRef}
-              timeout={300}
+              timeout={200}
               classNames="page-transition"
+              unmountOnExit
             >
-              <div ref={nodeRef} className="page">
+              <div className="page">
                 <Routes location={location}>
                   <Route path="/" element={<DashboardPage />} />
                   <Route

@@ -133,22 +133,20 @@ button:focus-visible {
   transform: scale(0.98);
 }
 
-/* 페이지 전환 애니메이션을 위한 클래스 (추후 적용 예정) */
+/* 페이지 전환 애니메이션: 단순 페이드 효과 */
 .page-transition-enter {
   opacity: 0;
-  transform: translateY(10px);
+  z-index: 1;
 }
 .page-transition-enter-active {
   opacity: 1;
-  transform: translateY(0);
-  transition:
-    opacity 300ms,
-    transform 300ms;
+  transition: opacity 200ms ease-in;
 }
 .page-transition-exit {
   opacity: 1;
+  z-index: 0;
 }
 .page-transition-exit-active {
   opacity: 0;
-  transition: opacity 300ms;
+  transition: opacity 200ms ease-out;
 }

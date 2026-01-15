@@ -24,10 +24,9 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(ui): 모바일 터치 피드백 및 페이지 전환 애니메이션 추가
-•버튼 및 리스트 아이템에 :active 스타일을 추가하여 터치 반응성을 개선했습니다.
-•react-transition-group을 사용하여 페이지 이동 시 부드러운 전환 효과를 적용했습니다.
-•앱 버전을 v1.1.42로 업데이트했습니다.
+1.index.css: transform 효과 제거, 단순 opacity 페이드 효과로 변경.
+2.App.css: .page 클래스에 overflow-y: auto, padding: inherit 추가하여 레이아웃 안정화.
+3.App.tsx: nodeRef 제거, TransitionGroup 설정 최적화.
 "
 git push origin main
 
