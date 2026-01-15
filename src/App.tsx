@@ -1,4 +1,12 @@
-import { useState, Suspense, lazy, useEffect, useRef } from 'react';
+import {
+  useState,
+  Suspense,
+  lazy,
+  useEffect,
+  useRef,
+  createRef,
+  useMemo,
+} from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -59,7 +67,12 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const mainContentRef = useRef<HTMLDivElement>(null);
-  // nodeRef 제거: 동적 라우팅 환경에서 단일 ref 사용 시 문제 발생 가능성 있음
+
+  const currentKey = location.key;
+
+  // 각 페이지 전환(location.key)마다 고유한 nodeRef를 생성
+  // useMemo를 사용하여 렌더링 중에 안전하게 ref 객체 생성
+  const nodeRef = useMemo(() => createRef<HTMLDivElement>(), [currentKey]);
 
   const isFullScreenPage =
     location.pathname.startsWith('/invite') ||
@@ -88,12 +101,13 @@ function App() {
         <Suspense fallback={<LoadingIndicator />}>
           <TransitionGroup component={null}>
             <CSSTransition
-              key={location.key}
+              key={currentKey}
+              nodeRef={nodeRef}
               timeout={200}
               classNames="page-transition"
               unmountOnExit
             >
-              <div className="page">
+              <div ref={nodeRef} className="page">
                 <Routes location={location}>
                   <Route path="/" element={<DashboardPage />} />
                   <Route
