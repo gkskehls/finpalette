@@ -61,7 +61,7 @@ export function PaletteFormModal({ onClose }: PaletteFormModalProps) {
         onClose();
         return '팔레트가 생성되었습니다!';
       },
-      error: '팔레트 생성에 실패했습니다.',
+      error: (err) => err.message || '팔레트 생성에 실패했습니다.',
     });
   };
 

@@ -21,6 +21,10 @@ const addPalette = async ({
 
   if (error) {
     console.error('Error creating palette:', error);
+    // DB 함수에서 발생한 특정 에러 메시지를 파싱하여 사용자에게 친화적인 메시지로 변환
+    if (error.message.includes('Permission denied')) {
+      throw new Error('선택한 팔레트의 카테고리를 복사할 권한이 없습니다.');
+    }
     throw new Error(error.message);
   }
 

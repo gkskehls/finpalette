@@ -201,7 +201,7 @@ export function ProfilePage() {
           pointerEvents: 'none', // 클릭 방해 방지
         }}
       >
-        v1.1.50
+        v1.1.52
       </div>
 
       <h2 className={styles.sectionTitle}>계정 정보</h2>
