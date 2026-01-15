@@ -24,12 +24,8 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(category): 카테고리 생성 로직 개선 및 사용자 경험 일원화
-•DB에 get_default_categories RPC 함수를 추가하여 기본 카테고리 목록을 중앙 관리하도록 했습니다.
-•create_palette 함수를 수정하여 기본 카테고리 생성 시 get_default_categories를 사용하도록 변경했습니다.
-•handle_new_user 트리거를 수정하여 신규 가입 시 자동으로 '마이 팔레트'를 생성하도록 했습니다.
-•클라이언트 useCategoriesQuery 훅에서 게스트 모드 초기화 시 get_default_categories RPC를 호출하도록 변경했습니다.
-•constants.ts에서 더 이상 사용되지 않는 하드코딩된 카테고리 상수를 제거했습니다.
+chore: 앱 버전 업데이트 (v1.1.50)
+•Firebase rewrite 규칙 수정에 대한 버전 업데이트입니다.
 "
 git push origin main
 
