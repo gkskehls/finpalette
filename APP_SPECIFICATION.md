@@ -229,40 +229,23 @@
       - **목표:** 신규 가입 시 모든 사용자에게 개인 팔레트를 자동으로 생성.
       - **로직:** `profiles` 테이블에 유저 정보를 `INSERT`한 후, `create_palette` 함수를 호출하여 해당 유저 ID로 개인 팔레트를 생성하도록 수정.
 
-### 5.2. 새 팔레트 생성 시 카테고리 복사 기능
-
-- **현황 및 문제점:**
-  - 현재 새 팔레트를 생성하면 항상 시스템 기본 카테고리로만 시작됩니다. 사용자가 기존 팔레트에서 직접 설정한 카테고리(예: '반려동물')를 재사용하려면 수동으로 다시 만들어야 하는 불편함이 있습니다.
+### 5.2. [완료] 새 팔레트 생성 시 카테고리 복사 기능
 
 - **개선 목표:**
-  - 사용자가 새 팔레트를 만들 때, ①깨끗한 기본 카테고리로 시작할지, ②기존에 사용하던 다른 팔레트의 카테고리 구성을 그대로 복사해올지 직접 선택할 수 있는 옵션을 제공하여 편의성을 극대화합니다.
+  - 사용자가 새 팔레트를 만들 때, ①깨끗한 기본 카테고리로 시작할지, ②기존에 사용하던 다른 팔레트의 카테고리 구성을 그대로 복사해올지 직접 선택할 수 있는 옵션을 제공하여 편의성을 극대화.
 
 - **상세 구현 계획 (단계별):**
-  1.  **[Client] `PaletteFormModal.tsx` UI/상태 수정:**
-      - **UI 추가:** '팔레트 이름', '테마 색상' 입력 필드 아래에 '카테고리 설정' 섹션을 추가합니다.
-        - `◎ 기본 카테고리로 시작하기` 라디오 버튼 (기본값으로 선택)
-        - `◉ 기존 팔레트에서 복사하기` 라디오 버튼
-      - **조건부 UI:** '복사하기' 선택 시에만, 사용자가 속한 팔레트 목록을 보여주는 드롭다운 메뉴가 활성화됩니다.
-      - **상태 추가:** `useState`를 사용하여 선택된 옵션(`'default'` 또는 `'copy'`)과 복사할 팔레트 ID(`sourcePaletteId`)를 관리합니다.
-        ```tsx
-        const [categoryOption, setCategoryOption] = useState('default');
-        const [sourcePaletteId, setSourcePaletteId] = useState<string | null>(
-          null
-        );
-        ```
+  1.  **[O] [Client] `PaletteFormModal.tsx` UI/상태 수정:**
+      - **UI 추가:** '카테고리 설정' 섹션에 '기본 카테고리로 시작'과 '기존 팔레트에서 복사' 라디오 버튼 및 드롭다운 메뉴를 추가.
 
-  2.  **[DB] `create_palette` 함수 시그니처 변경:**
-      - **목표:** 카테고리 복사 기능을 처리할 수 있도록 함수가 받는 인자를 확장합니다.
-      - **변경 전:** `create_palette(name TEXT, theme_color TEXT)`
-      - **변경 후:** `create_palette(name TEXT, theme_color TEXT, source_palette_id UUID DEFAULT NULL)`
-      - `source_palette_id`가 `NULL`이면 기존처럼 기본 카테고리를 생성하고, `UUID` 값이 있으면 해당 팔레트의 카테고리를 복사해옵니다.
+  2.  **[O] [DB] `create_palette` 함수 시그니처 변경:**
+      - 카테고리 복사 기능을 처리할 수 있도록 `p_source_palette_id` 인자를 추가.
 
-  3.  **[DB] `create_palette` 함수 로직 수정:**
-      - 함수 상단에 `IF source_palette_id IS NOT NULL THEN ... ELSE ... END IF;` 분기문을 추가합니다.
-      - `source_palette_id`가 있으면, `categories` 테이블에서 해당 ID의 카테고리들을 `SELECT`하여 새 팔레트 ID로 `INSERT`하는 로직을 구현합니다.
+  3.  **[O] [DB] `create_palette` 함수 로직 수정:**
+      - `p_source_palette_id` 값의 유무에 따라 기본 카테고리를 생성하거나, 기존 팔레트의 카테고리를 복사하도록 분기 처리.
 
-  4.  **[Client] `useAddPaletteMutation` 훅 수정:**
-      - `PaletteFormModal`에서 관리하는 새로운 상태(`categoryOption`, `sourcePaletteId`)를 `create_palette` RPC 호출 시 인자로 전달하도록 수정합니다.
+  4.  **[O] [Client] `useAddPaletteMutation` 훅 수정:**
+      - 모달에서 선택된 `source_palette_id`를 RPC 호출 시 인자로 전달하도록 수정.
 
 ### 5.3. [완료] 카테고리 순서 변경 기능 (드래그 앤 드롭)
 
@@ -295,13 +278,12 @@
   5.  **[O] [Client] 데이터 마이그레이션 로직 강화:**
       - 게스트가 로그인할 때, `localStorage`의 카테고리 목록을 `sort_order` 순으로 정렬하여 서버에 전달하고, 서버는 그 순서대로 `INSERT` 하도록 마이그레이션 스크립트를 수정했다.
 
-### 5.4. 게스트 모드 기능 확장 및 로그인 경험 완전 동기화
+### 5.4. [완료] 게스트 모드 기능 확장 및 로그인 경험 완전 동기화
 
 - **핵심 원칙:** 데이터가 저장되는 위치(DB 또는 Local Storage)를 제외한 **모든 애플리케이션 로직과 UI는 게스트와 로그인 사용자를 구분하지 않는다.** 사용자는 게스트 모드에서 로그인 모드의 모든 기능(공유 제외)을 동일하게 경험할 수 있어야 하며, 로그인 시 모든 상태(카테고리 순서 등)가 100% 마이그레이션되어야 한다.
 - **적용 방안:**
-  - **저장소 추상화 (Repository Pattern):** 모든 데이터 관련 훅(`use...Mutation`, `use...Query`) 내부에서 사용자 로그인 상태(`user`)를 확인한다.
-  - `if (user)` 분기문을 통해, 로그인 상태이면 Supabase API를, 게스트 상태이면 `localStorage`를 조작하는 함수를 각각 호출하도록 로직을 분기한다.
-  - **결과:** UI 컴포넌트에서는 데이터가 어디에 저장되는지 전혀 신경 쓸 필요 없이, 동일한 훅을 호출하여 일관된 방식으로 데이터를 다룰 수 있다.
+  - **[O] 저장소 추상화 (Repository Pattern):** 모든 데이터 관련 훅(`use...Mutation`, `use...Query`) 내부에서 사용자 로그인 상태(`user`)를 확인하여, 로그인 상태이면 Supabase API를, 게스트 상태이면 `localStorage`를 조작하도록 로직을 분기했다.
+  - **[O] 카테고리 중앙화:** 게스트 모드에서도 DB의 `get_default_categories` RPC를 호출하여 기본 카테고리를 생성하도록 변경하여 데이터 일관성을 확보했다.
 
 ### 5.5. 알려진 이슈 (Known Issues)
 

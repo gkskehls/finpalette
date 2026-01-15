@@ -24,8 +24,7 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(db): create_palette 함수 재생성
-•create_palette 함수를 찾을 수 없다는 오류를 해결하기 위해, 해당 함수를 최신 버전으로 다시 생성하는 스크립트를 적용했습니다.
+문서업데이트
 "
 git push origin main
 

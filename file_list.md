@@ -119,11 +119,20 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
   - **📄 useTransactionsQuery.ts**: 거래 내역을 조회하는(fetch) 커스텀 훅입니다.
   - **📄 useTransactionsMutation.ts**: 거래 내역을 생성, 수정, 삭제하는 커스텀 훅입니다.
   - **📄 usePalettesQuery.ts**: 팔레트 목록을 조회하는 커스텀 훅입니다.
+  - **📄 useCategoriesQuery.ts**: 카테고리 목록을 조회하는 커스텀 훅입니다.
+  - **📄 useCategoryMutation.ts**: 카테고리 생성, 수정, 삭제, 순서 변경을 위한 커스텀 훅입니다.
   - **📄 useProfileQuery.ts**: 사용자 프로필 정보를 조회하는 커스텀 훅입니다.
   - **📄 useProfileMutation.ts**: 사용자 프로필 정보를 수정하는 커스텀 훅입니다.
   - **📄 useAddPaletteMutation.ts**: 새 팔레트를 생성하는 커스텀 훅입니다.
   - **📄 useCreateInvitationMutation.ts**: 팔레트 초대 링크를 생성하는 커스텀 훅입니다.
   - **📄 useAcceptInvitationMutation.ts**: 팔레트 초대를 수락하는 커스텀 훅입니다.
+
+#### 📁 lib/
+
+외부 라이브러리 설정 및 마이그레이션 등 핵심 로직을 담는 폴더입니다.
+
+- **📄 migration.ts**: 게스트 데이터를 서버로 이전하는 마이그레이션 로직을 처리하는 파일입니다.
+- **📄 supabase.ts**: Supabase 클라이언트를 초기화하고 내보내는 파일입니다.
 
 #### 📁 pages/
 
@@ -140,6 +149,8 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 - **📄 StatsPage.tsx**: 통계 페이지의 메인 컴포넌트입니다.
 - **📄 TransactionListPage.module.css**: `TransactionListPage` 컴포넌트의 전용 CSS 모듈 파일입니다.
 - **📄 TransactionListPage.tsx**: 전체 거래 내역을 조회, 수정, 삭제하는 페이지의 메인 컴포넌트입니다.
+- **📄 CategorySettingsPage.tsx**: 카테고리 관리 페이지의 메인 컴포넌트입니다.
+- **📄 CategorySettingsPage.module.css**: `CategorySettingsPage` 컴포넌트의 전용 CSS 모듈 파일입니다.
 
 #### 📁 types/
 
