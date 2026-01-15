@@ -18,6 +18,7 @@ import type { Transaction } from '../types/transaction';
 import styles from './StatsPage.module.css';
 import { EmptyState } from '../components/common/EmptyState';
 import { PieChart as PieChartIcon } from 'lucide-react';
+import { Skeleton } from '../components/common/Skeleton';
 
 interface MonthlySummary {
   month: string;
@@ -28,15 +29,24 @@ interface MonthlySummary {
 export function StatsPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // 기존 useTransactionsQuery 대신 useCalendarTransactionsQuery를 사용하여
-  // 선택된 월의 데이터를 독립적으로 불러오도록 수정
-  const { data: transactions = [] } = useCalendarTransactionsQuery(
-    selectedDate.getFullYear(),
-    selectedDate.getMonth() + 1,
-    true
-  );
+  const formattedMonth = `${selectedDate.getFullYear()}.${(
+    selectedDate.getMonth() + 1
+  )
+    .toString()
+    .padStart(2, '0')}`;
 
-  const { data: categories = [] } = useCategoriesQuery();
+  // 1. 쿼리에서 로딩 상태(isLoading)를 함께 가져옵니다.
+  const { data: transactions = [], isLoading: isLoadingTransactions } =
+    useCalendarTransactionsQuery(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth() + 1,
+      true
+    );
+
+  const { data: categories = [], isLoading: isLoadingCategories } =
+    useCategoriesQuery();
+
+  const isLoading = isLoadingTransactions || isLoadingCategories;
 
   const expenseCategoryMap = useMemo(() => {
     return new Map(
@@ -141,12 +151,41 @@ export function StatsPage() {
       });
   }, [transactions, selectedDate]);
 
-  const formattedMonth = `${selectedDate.getFullYear()}.${(
-    selectedDate.getMonth() + 1
-  )
-    .toString()
-    .padStart(2, '0')}`;
+  // 2. 로딩 중일 때 스켈레톤 UI를 먼저 보여줍니다.
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <button
+            onClick={handlePrevMonth}
+            className={styles.navButton}
+            disabled
+          >
+            {'<'}
+          </button>
+          <h2 className={styles.monthTitle}>{formattedMonth}</h2>
+          <button
+            onClick={handleNextMonth}
+            className={styles.navButton}
+            disabled
+          >
+            {'>'}
+          </button>
+        </div>
+        <h3 className={styles.sectionTitle}>카테고리별 지출</h3>
+        <div className={styles.chartContainer}>
+          <Skeleton height={250} />
+        </div>
 
+        <h3 className={styles.sectionTitle}>월별 수입/지출</h3>
+        <div className={styles.chartContainer}>
+          <Skeleton height={250} />
+        </div>
+      </div>
+    );
+  }
+
+  // 3. 로딩이 끝난 후 데이터가 없으면 EmptyState를 보여줍니다.
   if (transactions.length === 0) {
     return (
       <div className={styles.container}>

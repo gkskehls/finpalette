@@ -24,9 +24,9 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-커밋 메시지: fix(ui): 페이지 전환 시 findDOMNode 오류 해결
-•React 18 StrictMode에서 발생하는 findDOMNode is not a function 오류를 해결했습니다.
-•location.key를 기반으로 각 페이지에 고유한 nodeRef를 생성하여 CSSTransition에 전달하는 방식으로 수정했습니다.
+fix(ui): 통계 페이지 로딩 상태 처리 개선
+•데이터 로딩 중 EmptyState가 잠시 노출되는 현상을 수정했습니다.
+•로딩 중에는 Skeleton UI를 표시하고, 로딩 완료 후에만 데이터 유무를 판단하도록 로직을 변경했습니다.
 "
 git push origin main
 
