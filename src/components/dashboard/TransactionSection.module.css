@@ -28,13 +28,25 @@
 .itemList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px; /* 간격 조정 */
 }
 
 .item {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 8px; /* 터치 영역 확보 및 피드백 영역 */
+  border-radius: 8px; /* 둥근 모서리 */
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.item:active {
+  background-color: var(--hover-background);
+  transform: scale(0.98);
 }
 
 .itemInfo {

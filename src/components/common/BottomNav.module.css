@@ -27,11 +27,20 @@
   font-size: 0.75rem;
   gap: 4px;
   height: 100%; /* 부모 높이 꽉 채우기 */
-  transition: color 0.2s;
+  transition:
+    color 0.2s,
+    background-color 0.2s,
+    transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent; /* 모바일 터치 하이라이트 제거 */
 }
 
 .navItem:hover {
   background-color: var(--bg-hover); /* 호버 효과 */
+}
+
+.navItem:active {
+  transform: scale(0.95);
+  background-color: var(--bg-hover);
 }
 
 .navItem.active {

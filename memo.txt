@@ -24,12 +24,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(search): 검색 페이지에 뒤로가기 버튼 추가
-
-- SearchPage 상단에 뒤로가기 버튼을 추가하여 페이지 이동 편의성 개선
-- useNavigate 훅을 사용하여 이전 페이지로 이동하는 기능 구현
-- 관련 CSS 스타일 추가 및 레이아웃 조정
-- ProfilePage 앱 버전 업데이트 (v1.1.41)
+feat(ui): 모바일 터치 피드백 및 페이지 전환 애니메이션 추가
+•버튼 및 리스트 아이템에 :active 스타일을 추가하여 터치 반응성을 개선했습니다.
+•react-transition-group을 사용하여 페이지 이동 시 부드러운 전환 효과를 적용했습니다.
+•앱 버전을 v1.1.42로 업데이트했습니다.
 "
 git push origin main
 

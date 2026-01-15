@@ -1,6 +1,7 @@
 import { useState, Suspense, lazy, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 // Dynamic Imports for Code Splitting with Named Exports
 const DashboardPage = lazy(() =>
@@ -58,6 +59,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const mainContentRef = useRef<HTMLDivElement>(null);
+  const nodeRef = useRef(null);
 
   const isFullScreenPage =
     location.pathname.startsWith('/invite') ||
@@ -84,15 +86,32 @@ function App() {
 
       <main className="mainContent" ref={mainContentRef}>
         <Suspense fallback={<LoadingIndicator />}>
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/transactions" element={<TransactionListPage />} />
-            <Route path="/stats" element={<StatsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/invite" element={<InvitePage />} />
-            <Route path="/categories" element={<CategorySettingsPage />} />
-            <Route path="/search" element={<SearchPage />} />
-          </Routes>
+          <TransitionGroup>
+            <CSSTransition
+              key={location.key}
+              nodeRef={nodeRef}
+              timeout={300}
+              classNames="page-transition"
+            >
+              <div ref={nodeRef} className="page">
+                <Routes location={location}>
+                  <Route path="/" element={<DashboardPage />} />
+                  <Route
+                    path="/transactions"
+                    element={<TransactionListPage />}
+                  />
+                  <Route path="/stats" element={<StatsPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/invite" element={<InvitePage />} />
+                  <Route
+                    path="/categories"
+                    element={<CategorySettingsPage />}
+                  />
+                  <Route path="/search" element={<SearchPage />} />
+                </Routes>
+              </div>
+            </CSSTransition>
+          </TransitionGroup>
         </Suspense>
       </main>
 

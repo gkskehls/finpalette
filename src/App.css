@@ -6,6 +6,7 @@
   margin: 0 auto;
   background-color: var(--bg-primary);
   position: relative;
+  overflow: hidden; /* 페이지 전환 애니메이션을 위해 추가 */
 }
 
 .mainContent {
@@ -13,6 +14,15 @@
   overflow-y: auto;
   padding-bottom: 80px; /* 하단 네비게이션 높이(64px) + 여유 공간 */
   box-sizing: border-box;
+  position: relative; /* TransitionGroup을 위해 추가 */
+}
+
+.page {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
 }
 
 #root {

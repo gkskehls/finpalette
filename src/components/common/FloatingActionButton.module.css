@@ -17,6 +17,7 @@
     transform 0.2s ease,
     background-color 0.2s ease;
   z-index: 1000;
+  -webkit-tap-highlight-color: transparent; /* 모바일 터치 하이라이트 제거 */
 }
 
 .fab:hover {
@@ -26,4 +27,5 @@
 
 .fab:active {
   transform: scale(0.95);
+  background-color: var(--primary-color-dark);
 }
