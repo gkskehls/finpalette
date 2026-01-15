@@ -81,6 +81,39 @@
   background-color: var(--bg-secondary);
   border-radius: 12px;
   gap: 12px;
+  /* touch-action: none; 제거하여 기본 스크롤 허용 */
+}
+
+/* 드래그 중인 원본 아이템 스타일 */
+.categoryItem.dragging {
+  opacity: 0.3;
+  background-color: var(--bg-hover);
+  box-shadow: none;
+}
+
+/* 드래그 중인 아이템 미리보기 (Overlay) 스타일 */
+.categoryItem.draggingOverlay {
+  background-color: var(--bg-secondary);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+  cursor: grabbing;
+  z-index: 9999;
+  opacity: 0.9;
+  border: 1px solid var(--primary-color);
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  cursor: grab;
+  color: var(--text-secondary);
+  touch-action: none; /* 핸들에서만 드래그 동작 (스크롤 방지) */
+}
+
+.dragHandle:active {
+  cursor: grabbing;
 }
 
 .iconWrapper {

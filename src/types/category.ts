@@ -6,4 +6,5 @@ export interface Category {
   color: string;
   icon: IconName; // lucide-react 아이콘 이름
   palette_id: string; // 이 카테고리가 속한 팔레트의 ID
+  sort_order?: number; // 카테고리 정렬 순서 (v3.1 추가)
 }

@@ -14,6 +14,10 @@ type UpdateCategoryPayload = {
   updates: Partial<Omit<Category, 'palette_id' | 'code'>>;
 };
 type DeleteCategoryPayload = { paletteId: string; code: string };
+type UpdateCategoryOrderPayload = {
+  paletteId: string;
+  categoryCodes: string[];
+};
 
 // --- 공통 에러 핸들러 ---
 const handleMutationError = (error: Error) => {
@@ -90,6 +94,45 @@ const deleteCategoryFromLocal = async (payload: DeleteCategoryPayload) => {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
 };
 
+// [서버] 카테고리 순서 변경
+const updateCategoryOrderOnServer = async (
+  payload: UpdateCategoryOrderPayload
+) => {
+  const { paletteId, categoryCodes } = payload;
+  const { error } = await supabase.rpc('update_category_order', {
+    p_palette_id: paletteId,
+    p_category_codes: categoryCodes,
+  });
+  if (error) throw error;
+};
+
+// [로컬] 카테고리 순서 변경
+const updateCategoryOrderInLocal = async (
+  payload: UpdateCategoryOrderPayload
+) => {
+  const { categoryCodes } = payload;
+  const current: Category[] = JSON.parse(
+    localStorage.getItem(LOCAL_STORAGE_KEY) || '[]'
+  );
+
+  // categoryCodes 순서대로 정렬하고 sort_order 업데이트
+  const updated = categoryCodes
+    .map((code, index) => {
+      const category = current.find((c) => c.code === code);
+      if (category) {
+        return { ...category, sort_order: index + 1 };
+      }
+      return null;
+    })
+    .filter((c) => c !== null) as Category[];
+
+  // 누락된 카테고리가 있다면 뒤에 붙임 (안전장치)
+  const missing = current.filter((c) => !categoryCodes.includes(c.code));
+  const finalUpdated = [...updated, ...missing];
+
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(finalUpdated));
+};
+
 // --- 커스텀 훅 ---
 
 export function useAddCategoryMutation() {
@@ -130,6 +173,24 @@ export function useDeleteCategoryMutation() {
         ? deleteCategoryFromServer(payload)
         : deleteCategoryFromLocal(payload),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+    onError: handleMutationError,
+  });
+}
+
+export function useCategoryOrderMutation() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation<void, Error, UpdateCategoryOrderPayload>({
+    mutationFn: (payload) =>
+      user
+        ? updateCategoryOrderOnServer(payload)
+        : updateCategoryOrderInLocal(payload),
+    onSuccess: () => {
+      // 낙관적 업데이트를 위해 쿼리 무효화 전 딜레이를 주거나,
+      // setQueryData를 사용하는 것이 좋지만, 여기서는 단순 무효화 처리
       queryClient.invalidateQueries({ queryKey: ['categories'] });
     },
     onError: handleMutationError,

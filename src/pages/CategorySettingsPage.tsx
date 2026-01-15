@@ -1,11 +1,46 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X, Edit2, EyeOff, Pipette } from 'lucide-react';
+import {
+  ArrowLeft,
+  Plus,
+  X,
+  Edit2,
+  EyeOff,
+  Pipette,
+  GripVertical,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+  defaultDropAnimationSideEffects,
+  TouchSensor,
+  MouseSensor,
+} from '@dnd-kit/core';
+import type {
+  DragEndEvent,
+  DragStartEvent,
+  DropAnimation,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
 import { useCategoriesQuery } from '../hooks/queries/useCategoriesQuery';
 import {
   useAddCategoryMutation,
   useUpdateCategoryMutation,
+  useCategoryOrderMutation,
 } from '../hooks/queries/useCategoryMutation';
 import { usePalette } from '../context/PaletteContext';
 import { useAuth } from '../hooks/useAuth';
@@ -33,6 +68,82 @@ const PRESET_COLORS = [
   '#EC4899', // Pink
   '#64748B', // Slate
 ];
+
+// --- SortableItem Component ---
+interface SortableItemProps {
+  category: Category;
+  isAdmin: boolean;
+  // eslint-disable-next-line no-unused-vars
+  onEdit: (category: Category) => void;
+  onHide: () => void;
+}
+
+function SortableItem({
+  category,
+  isAdmin,
+  onEdit,
+  onHide,
+}: SortableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.code });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1 : 0,
+    position: 'relative' as const,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`${styles.categoryItem} ${isDragging ? styles.dragging : ''}`}
+    >
+      {/* 드래그 핸들 (관리자만 가능) */}
+      {isAdmin && (
+        <div
+          className={styles.dragHandle}
+          {...attributes}
+          {...listeners}
+          style={{ touchAction: 'none' }} // 모바일 스크롤 방지
+        >
+          <GripVertical size={20} color="#ccc" />
+        </div>
+      )}
+
+      <div
+        className={styles.iconWrapper}
+        style={{ backgroundColor: category.color }}
+      >
+        <Icon name={category.icon as IconName} size={20} color="#fff" />
+      </div>
+      <div className={styles.categoryInfo}>
+        <span className={styles.categoryName}>{category.name}</span>
+      </div>
+      <div style={{ display: 'flex', gap: '4px' }}>
+        {isAdmin && (
+          <button
+            className={styles.actionButton}
+            onClick={() => onEdit(category)}
+          >
+            <Edit2 size={18} />
+          </button>
+        )}
+        <button className={styles.actionButton} onClick={onHide}>
+          <EyeOff size={18} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 // --- CategoryFormModal Component ---
 interface CategoryFormModalProps {
@@ -269,6 +380,7 @@ function CategoryFormModal({
 export function CategorySettingsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { currentPalette } = usePalette();
   const { role } = useCurrentPaletteRole();
   const isAdmin = !user || role === 'owner' || role === 'admin';
 
@@ -277,14 +389,73 @@ export function CategorySettingsPage() {
   const [editingCategory, setEditingCategory] = useState<Category | undefined>(
     undefined
   );
+  const [activeId, setActiveId] = useState<string | null>(null); // 드래그 중인 아이템 ID
 
   const { data: categories = [] } = useCategoriesQuery();
+  const orderMutation = useCategoryOrderMutation();
 
-  const filteredCategories = useMemo(() => {
-    return categories.filter((c) =>
+  // 로컬 상태로 카테고리 목록 관리 (드래그 중 즉각적인 UI 업데이트를 위해)
+  const [items, setItems] = useState<Category[]>([]);
+
+  // 쿼리 데이터가 변경되면 로컬 상태 동기화
+  useEffect(() => {
+    const filtered = categories.filter((c) =>
       activeTab === 'inc' ? c.code.startsWith('i') : !c.code.startsWith('i')
     );
+    // sort_order 기준으로 정렬 (이미 쿼리에서 정렬되어 올 수 있지만 안전하게)
+    const sorted = [...filtered].sort(
+      (a, b) => (a.sort_order || 0) - (b.sort_order || 0)
+    );
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setItems(sorted);
   }, [categories, activeTab]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+    useSensor(TouchSensor, {
+      // 터치 센서 설정: 드래그 핸들을 정확히 터치해야 드래그 시작 (스크롤 방해 방지)
+      activationConstraint: {
+        delay: 250, // 250ms 길게 누르면 드래그 시작
+        tolerance: 5,
+      },
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10, // 10px 이동해야 드래그 시작
+      },
+    })
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (over && active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.findIndex((item) => item.code === active.id);
+        const newIndex = items.findIndex((item) => item.code === over.id);
+
+        const newItems = arrayMove(items, oldIndex, newIndex);
+
+        // 서버에 순서 변경 요청
+        if (currentPalette) {
+          orderMutation.mutate({
+            paletteId: currentPalette.id,
+            categoryCodes: newItems.map((item) => item.code),
+          });
+        }
+
+        return newItems;
+      });
+    }
+  };
 
   const handleAddClick = () => {
     if (!isAdmin) {
@@ -302,6 +473,16 @@ export function CategorySettingsPage() {
 
   const handleHideClick = () => {
     toast('숨김 기능은 준비 중입니다.', { icon: '🚧' });
+  };
+
+  const dropAnimation: DropAnimation = {
+    sideEffects: defaultDropAnimationSideEffects({
+      styles: {
+        active: {
+          opacity: '0.5',
+        },
+      },
+    }),
   };
 
   return (
@@ -334,37 +515,65 @@ export function CategorySettingsPage() {
       </div>
 
       <div className={styles.content}>
-        <div className={styles.categoryList}>
-          {filteredCategories.map((category) => (
-            <div key={category.code} className={styles.categoryItem}>
-              <div
-                className={styles.iconWrapper}
-                style={{ backgroundColor: category.color }}
-              >
-                <Icon name={category.icon as IconName} size={20} color="#fff" />
-              </div>
-              <div className={styles.categoryInfo}>
-                <span className={styles.categoryName}>{category.name}</span>
-              </div>
-              <div style={{ display: 'flex', gap: '4px' }}>
-                {isAdmin && (
-                  <button
-                    className={styles.actionButton}
-                    onClick={() => handleEditClick(category)}
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                )}
-                <button
-                  className={styles.actionButton}
-                  onClick={handleHideClick}
-                >
-                  <EyeOff size={18} />
-                </button>
-              </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={items.map((item) => item.code)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className={styles.categoryList}>
+              {items.map((category) => (
+                <SortableItem
+                  key={category.code}
+                  category={category}
+                  isAdmin={isAdmin}
+                  onEdit={handleEditClick}
+                  onHide={handleHideClick}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+
+          {/* 드래그 중인 아이템의 미리보기 (Overlay) */}
+          <DragOverlay dropAnimation={dropAnimation}>
+            {activeId ? (
+              <div
+                className={`${styles.categoryItem} ${styles.draggingOverlay}`}
+              >
+                {isAdmin && (
+                  <div className={styles.dragHandle}>
+                    <GripVertical size={20} color="#ccc" />
+                  </div>
+                )}
+                <div
+                  className={styles.iconWrapper}
+                  style={{
+                    backgroundColor:
+                      items.find((i) => i.code === activeId)?.color || '#ccc',
+                  }}
+                >
+                  <Icon
+                    name={
+                      (items.find((i) => i.code === activeId)
+                        ?.icon as IconName) || 'Utensils'
+                    }
+                    size={20}
+                    color="#fff"
+                  />
+                </div>
+                <div className={styles.categoryInfo}>
+                  <span className={styles.categoryName}>
+                    {items.find((i) => i.code === activeId)?.name}
+                  </span>
+                </div>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       </div>
 
       {isModalOpen && (

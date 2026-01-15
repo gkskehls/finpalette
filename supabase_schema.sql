@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
     color TEXT NOT NULL,
     icon TEXT NOT NULL,
     user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    sort_order INTEGER DEFAULT 0, -- 카테고리 순서 (v3.1 추가)
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
     PRIMARY KEY (palette_id, code)
 );
@@ -259,24 +260,24 @@ BEGIN
   INSERT INTO public.palette_members (palette_id, user_id, role)
   VALUES (new_palette_id, auth.uid(), 'owner');
 
-  INSERT INTO public.categories (palette_id, code, name, color, icon, user_id)
+  INSERT INTO public.categories (palette_id, code, name, color, icon, user_id, sort_order)
   VALUES
-    (new_palette_id, 'i01', '월급', '#4CAF50', 'Briefcase', auth.uid()),
-    (new_palette_id, 'i02', '용돈', '#81C784', 'Coins', auth.uid()),
-    (new_palette_id, 'i03', '금융소득', '#66BB6A', 'Landmark', auth.uid()),
-    (new_palette_id, 'i04', '사업소득', '#A5D6A7', 'Store', auth.uid()),
-    (new_palette_id, 'i99', '기타', '#C8E6C9', 'PlusSquare', auth.uid()),
-    (new_palette_id, 'c01', '식비', '#FF7043', 'Utensils', auth.uid()),
-    (new_palette_id, 'c02', '교통', '#5C6BC0', 'Bus', auth.uid()),
-    (new_palette_id, 'c03', '통신', '#26A69A', 'Smartphone', auth.uid()),
-    (new_palette_id, 'c04', '쇼핑', '#FFCA28', 'ShoppingBag', auth.uid()),
-    (new_palette_id, 'c05', '주거', '#78909C', 'Home', auth.uid()),
-    (new_palette_id, 'c06', '의료/건강', '#EF5350', 'HeartPulse', auth.uid()),
-    (new_palette_id, 'c07', '여가/문화', '#AB47BC', 'Film', auth.uid()),
-    (new_palette_id, 'c08', '교육', '#42A5F5', 'GraduationCap', auth.uid()),
-    (new_palette_id, 'c09', '경조사', '#8D6E63', 'Users', auth.uid()),
-    (new_palette_id, 'c10', '저축/투자', '#66BB6A', 'PiggyBank', auth.uid()),
-    (new_palette_id, 'c99', '기타', '#BDBDBD', 'PlusSquare', auth.uid());
+    (new_palette_id, 'i01', '월급', '#4CAF50', 'Briefcase', auth.uid(), 1),
+    (new_palette_id, 'i02', '용돈', '#81C784', 'Coins', auth.uid(), 2),
+    (new_palette_id, 'i03', '금융소득', '#66BB6A', 'Landmark', auth.uid(), 3),
+    (new_palette_id, 'i04', '사업소득', '#A5D6A7', 'Store', auth.uid(), 4),
+    (new_palette_id, 'i99', '기타', '#C8E6C9', 'PlusSquare', auth.uid(), 5),
+    (new_palette_id, 'c01', '식비', '#FF7043', 'Utensils', auth.uid(), 6),
+    (new_palette_id, 'c02', '교통', '#5C6BC0', 'Bus', auth.uid(), 7),
+    (new_palette_id, 'c03', '통신', '#26A69A', 'Smartphone', auth.uid(), 8),
+    (new_palette_id, 'c04', '쇼핑', '#FFCA28', 'ShoppingBag', auth.uid(), 9),
+    (new_palette_id, 'c05', '주거', '#78909C', 'Home', auth.uid(), 10),
+    (new_palette_id, 'c06', '의료/건강', '#EF5350', 'HeartPulse', auth.uid(), 11),
+    (new_palette_id, 'c07', '여가/문화', '#AB47BC', 'Film', auth.uid(), 12),
+    (new_palette_id, 'c08', '교육', '#42A5F5', 'GraduationCap', auth.uid(), 13),
+    (new_palette_id, 'c09', '경조사', '#8D6E63', 'Users', auth.uid(), 14),
+    (new_palette_id, 'c10', '저축/투자', '#66BB6A', 'PiggyBank', auth.uid(), 15),
+    (new_palette_id, 'c99', '기타', '#BDBDBD', 'PlusSquare', auth.uid(), 16);
 
   RETURN new_palette_id;
 END;
@@ -345,6 +346,37 @@ BEGIN
       pm.palette_id = p_palette_id;
 END;
 $$ LANGUAGE plpgsql;
+
+-- 카테고리 순서 변경 함수 (v3.1 추가)
+CREATE OR REPLACE FUNCTION update_category_order(
+    p_palette_id UUID,
+    p_category_codes TEXT[]
+)
+RETURNS VOID AS $$
+DECLARE
+    v_code TEXT;
+    v_order INTEGER := 1;
+    v_user_role TEXT;
+BEGIN
+    -- 권한 확인 (Owner 또는 Admin만 가능)
+    SELECT role INTO v_user_role
+    FROM public.palette_members
+    WHERE palette_id = p_palette_id AND user_id = auth.uid();
+
+    IF v_user_role IS NULL OR v_user_role NOT IN ('owner', 'admin') THEN
+        RAISE EXCEPTION 'Permission denied';
+    END IF;
+
+    -- 배열 순서대로 sort_order 업데이트
+    FOREACH v_code IN ARRAY p_category_codes
+    LOOP
+        UPDATE public.categories
+        SET sort_order = v_order
+        WHERE palette_id = p_palette_id AND code = v_code;
+        v_order := v_order + 1;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Force schema cache reload
 NOTIFY pgrst, 'reload config';
