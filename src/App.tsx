@@ -8,8 +8,9 @@ import {
   useMemo,
 } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { useRegisterSW } from 'virtual:pwa-register/react';
 
 // Dynamic Imports for Code Splitting with Named Exports
 const DashboardPage = lazy(() =>
@@ -73,6 +74,75 @@ function App() {
   // 각 페이지 전환(location.key)마다 고유한 nodeRef를 생성
   // useMemo를 사용하여 렌더링 중에 안전하게 ref 객체 생성
   const nodeRef = useMemo(() => createRef<HTMLDivElement>(), [currentKey]);
+
+  // PWA 업데이트 감지 및 알림
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegisterError(error) {
+      console.log('SW registration error', error);
+    },
+  });
+
+  useEffect(() => {
+    if (needRefresh) {
+      toast(
+        (t) => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <span>새로운 버전이 출시되었습니다!</span>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => {
+                  updateServiceWorker(true);
+                  toast.dismiss(t.id);
+                  setNeedRefresh(false);
+                }}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: '#6366F1',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                }}
+              >
+                업데이트
+              </button>
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  setNeedRefresh(false);
+                }}
+                style={{
+                  padding: '6px 12px',
+                  backgroundColor: '#E5E7EB',
+                  color: '#374151',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                }}
+              >
+                나중에
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          duration: Infinity, // 사용자가 닫을 때까지 유지
+          position: 'bottom-center',
+          style: {
+            background: '#fff',
+            color: '#333',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            border: '1px solid #E5E7EB',
+          },
+        }
+      );
+    }
+  }, [needRefresh, updateServiceWorker, setNeedRefresh]);
 
   const isFullScreenPage =
     location.pathname.startsWith('/invite') ||

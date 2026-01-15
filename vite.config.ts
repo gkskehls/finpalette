@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt', // 'autoUpdate'에서 'prompt'로 변경
       includeAssets: ['icon.svg'],
       manifest: {
         name: 'Finpalette',

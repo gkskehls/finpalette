@@ -303,7 +303,8 @@
 }
 
 .calendarCell.today {
-  background-color: rgba(99, 102, 241, 0.1); /* 테마 컬러의 연한 버전 */
+  background-color: var(--primary-light); /* 테마 컬러의 연한 버전 */
+  border-color: var(--primary-color); /* 테두리 추가 */
 }
 
 .dateNumber {
