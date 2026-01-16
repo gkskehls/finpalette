@@ -24,7 +24,13 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-문서업데이트
+feat: HSL 기반 동적 테마 시스템 구현
+
+- 사용자가 선택한 팔레트 색상을 기반으로 앱의 주요 UI 요소(헤더, FAB)에 동적 테마를 적용했습니다.
+- HEX 색상 코드를 HSL로 변환하는 유틸리티 함수를 추가하고, 이를 App.tsx에서 활용하여 CSS 변수를 동적으로 업데이트하도록 구현했습니다.
+- 라이트/다크 모드에 따라 적절한 밝기와 채도를 유지하여 디자인 일관성을 확보했습니다.
+- ProfilePage.tsx의 앱 버전을 v1.1.53으로 업데이트했습니다.
+- PROJECT_PLAN.md 및 file_list.md 문서를 업데이트했습니다.
 "
 git push origin main
 

@@ -5,27 +5,28 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background-color: var(--primary-color); /* 테마 색상 사용 */
-  color: white;
+  background-color: var(--palette-color); /* 변경: 동적 팔레트 색상 적용 */
+  color: var(--button-text-color); /* 변경: 하드코딩된 'white' 대신 변수 사용 */
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 조금 더 진하게 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition:
     transform 0.2s ease,
-    background-color 0.2s ease;
+    background-color 0.3s ease,
+    /* 변경: 부드러운 색상 전환 효과 추가 */ filter 0.2s ease;
   z-index: 1000;
-  -webkit-tap-highlight-color: transparent; /* 모바일 터치 하이라이트 제거 */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .fab:hover {
-  background-color: var(--primary-color-dark);
-  transform: scale(1.05); /* 호버 시 살짝 커지는 효과 */
+  transform: scale(1.05);
+  filter: brightness(95%); /* 변경: 색상을 살짝 어둡게 */
 }
 
 .fab:active {
   transform: scale(0.95);
-  background-color: var(--primary-color-dark);
+  filter: brightness(90%); /* 변경: 색상을 좀 더 어둡게 */
 }

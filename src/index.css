@@ -1,4 +1,5 @@
 :root {
+  /* 기존 색상 시스템 */
   --background-primary: #ffffff;
   --background-secondary: #f9f9f9;
   --text-color: #213547;
@@ -15,6 +16,22 @@
   --income-color: #28a745;
   --expense-color: #dc3545;
   --border-color: #eee;
+
+  /* 동적 팔레트 색상 시스템 (HSL 기반) */
+  --palette-hue: 237; /* 기본값: 기존 primary-color(#646cff)의 HUE */
+  --palette-saturation: 100%;
+  --palette-primary-lightness: 70%;
+  --palette-light-lightness: 96%;
+  --palette-color: hsl(
+    var(--palette-hue),
+    var(--palette-saturation),
+    var(--palette-primary-lightness)
+  );
+  --palette-color-light: hsl(
+    var(--palette-hue),
+    var(--palette-saturation),
+    var(--palette-light-lightness)
+  );
 
   /* Alias for compatibility */
   --bg-primary: var(--background-primary);
@@ -41,6 +58,7 @@
 }
 
 html.dark {
+  /* 기존 다크모드 색상 시스템 */
   --background-primary: #242424;
   --background-secondary: #1a1a1a;
   --text-color: rgba(255, 255, 255, 0.87);
@@ -57,6 +75,10 @@ html.dark {
   --income-color: #28a745;
   --expense-color: #dc3545;
   --border-color: #333;
+
+  /* 동적 팔레트 색상 시스템 (HSL 기반) - 다크모드 */
+  --palette-primary-lightness: 50%;
+  --palette-light-lightness: 20%;
 
   /* Alias for compatibility */
   --bg-primary: var(--background-primary);

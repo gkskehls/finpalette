@@ -4,15 +4,18 @@
   align-items: center;
   padding: 0 1.5rem;
   height: 60px;
-  background-color: var(--bg-primary);
+  background-color: var(
+    --palette-color-light
+  ); /* 변경: 동적 팔레트 색상 적용 */
   border-bottom: 1px solid var(--border-color);
-  position: sticky; /* 수정: fixed -> sticky */
-  top: 0; /* 수정: 최상단에 고정 */
+  position: sticky;
+  top: 0;
   width: 100%;
   z-index: 100;
   margin: 0 auto;
   max-width: 600px;
   box-sizing: border-box;
+  transition: background-color 0.3s ease; /* 부드러운 색상 전환 효과 */
 }
 
 .titleContainer {
@@ -32,13 +35,17 @@
 .title {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--palette-color); /* 변경: 동적 팔레트 색상 적용 */
   margin: 0;
+  transition: color 0.3s ease; /* 부드러운 색상 전환 효과 */
 }
 
 .chevronIcon {
-  color: var(--text-secondary);
-  transition: transform 0.2s;
+  color: var(--palette-color); /* 변경: 동적 팔레트 색상 적용 */
+  opacity: 0.7; /* 아이콘이 너무 튀지 않도록 투명도 조절 */
+  transition:
+    transform 0.2s,
+    color 0.3s ease;
 }
 
 .titleContainer:hover .chevronIcon {
@@ -55,15 +62,19 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--text-secondary);
+  color: var(--palette-color); /* 변경: 동적 팔레트 색상 적용 */
+  opacity: 0.8; /* 아이콘이 너무 튀지 않도록 투명도 조절 */
   padding: 0.5rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.3s ease;
 }
 
 .iconButton:hover {
   background-color: var(--bg-hover);
+  opacity: 1;
 }

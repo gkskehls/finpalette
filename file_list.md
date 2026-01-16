@@ -115,6 +115,11 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 재사용 가능한 커스텀 React 훅을 모아두는 폴더입니다.
 
 - **📄 useAuth.ts**: 인증 관련 로직을 처리하는 커스텀 훅입니다.
+- **📄 useAvatarUpload.ts**: 프로필 아바타 이미지 업로드 관련 로직을 처리하는 커스텀 훅입니다.
+- **📄 useCurrentPalette.ts**: 현재 선택된 팔레트 정보를 가져오는 커스텀 훅입니다.
+- **📄 useCurrentPaletteRole.ts**: 현재 팔레트 내에서 사용자의 역할을 계산하는 커스텀 훅입니다.
+- **📄 useIntersectionObserver.ts**: 무한 스크롤 등을 위해 요소의 화면 노출 여부를 감지하는 커스텀 훅입니다.
+- **📄 useScrollRestoration.ts**: 페이지 이동 시 스크롤 위치를 복원하는 커스텀 훅입니다.
 - **📁 queries/**: 데이터 페칭 및 상태 관리를 위한 React Query 관련 훅을 담는 폴더입니다.
   - **📄 useTransactionsQuery.ts**: 거래 내역을 조회하는(fetch) 커스텀 훅입니다.
   - **📄 useTransactionsMutation.ts**: 거래 내역을 생성, 수정, 삭제하는 커스텀 훅입니다.
@@ -166,4 +171,5 @@ TypeScript에서 사용되는 타입 정의들을 모아두는 폴더입니다.
 
 애플리케이션 전반에서 사용되는 유틸리티 함수들을 모아두는 폴더입니다.
 
+- **📄 colorUtils.ts**: HEX 색상 코드를 HSL로 변환하는 등 색상 관련 유틸리티 함수들을 정의하는 파일입니다.
 - **📄 storage.ts**: 로컬 스토리지 관련 유틸리티 함수들을 정의하는 파일입니다.

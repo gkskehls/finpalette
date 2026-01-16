@@ -12,6 +12,12 @@ import { Toaster, toast } from 'react-hot-toast';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
+// Utils
+import { hexToHsl } from './utils/colorUtils';
+
+// Hooks
+import { useCurrentPalette } from './hooks/useCurrentPalette';
+
 // Dynamic Imports for Code Splitting with Named Exports
 const DashboardPage = lazy(() =>
   import('./pages/DashboardPage').then((module) => ({
@@ -68,6 +74,24 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const mainContentRef = useRef<HTMLDivElement>(null);
+  const { currentPalette } = useCurrentPalette();
+
+  // 동적 테마 적용 로직
+  useEffect(() => {
+    const themeColor = currentPalette?.theme_color || '#646cff'; // 기본 색상
+    const hsl = hexToHsl(themeColor);
+
+    if (hsl) {
+      document.documentElement.style.setProperty(
+        '--palette-hue',
+        String(hsl.h)
+      );
+      document.documentElement.style.setProperty(
+        '--palette-saturation',
+        `${hsl.s}%`
+      );
+    }
+  }, [currentPalette]);
 
   const currentKey = location.key;
 
