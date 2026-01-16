@@ -13,7 +13,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 // Utils
-import { hexToHsl } from './utils/colorUtils';
+import { hexToHsl, getContrastColor } from './utils/colorUtils';
 
 // Hooks
 import { useCurrentPalette } from './hooks/useCurrentPalette';
@@ -82,14 +82,22 @@ function App() {
     const hsl = hexToHsl(themeColor);
 
     if (hsl) {
-      document.documentElement.style.setProperty(
-        '--palette-hue',
-        String(hsl.h)
+      const root = document.documentElement;
+
+      // HSL 색상 변수 설정
+      root.style.setProperty('--palette-hue', String(hsl.h));
+      root.style.setProperty('--palette-saturation', `${hsl.s}%`);
+
+      // 주 색상의 밝기(Lightness) 가져오기
+      const primaryLightnessValue = parseFloat(
+        getComputedStyle(root)
+          .getPropertyValue('--palette-primary-lightness')
+          .trim()
       );
-      document.documentElement.style.setProperty(
-        '--palette-saturation',
-        `${hsl.s}%`
-      );
+
+      // 대비 색상 계산 및 설정
+      const contrastColor = getContrastColor(primaryLightnessValue);
+      root.style.setProperty('--palette-contrast-text', contrastColor);
     }
   }, [currentPalette]);
 

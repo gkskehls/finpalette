@@ -32,6 +32,8 @@
     var(--palette-saturation),
     var(--palette-light-lightness)
   );
+  /* 대비 색상 변수 추가 */
+  --palette-contrast-text: var(--button-text-color);
 
   /* Alias for compatibility */
   --bg-primary: var(--background-primary);

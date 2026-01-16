@@ -5,8 +5,8 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background-color: var(--palette-color); /* 변경: 동적 팔레트 색상 적용 */
-  color: var(--button-text-color); /* 변경: 하드코딩된 'white' 대신 변수 사용 */
+  background-color: var(--palette-color);
+  color: var(--palette-contrast-text); /* 변경: 동적 대비 색상 적용 */
   border: none;
   display: flex;
   align-items: center;
@@ -16,17 +16,18 @@
   transition:
     transform 0.2s ease,
     background-color 0.3s ease,
-    /* 변경: 부드러운 색상 전환 효과 추가 */ filter 0.2s ease;
+    color 0.3s ease,
+    filter 0.2s ease;
   z-index: 1000;
   -webkit-tap-highlight-color: transparent;
 }
 
 .fab:hover {
   transform: scale(1.05);
-  filter: brightness(95%); /* 변경: 색상을 살짝 어둡게 */
+  filter: brightness(95%);
 }
 
 .fab:active {
   transform: scale(0.95);
-  filter: brightness(90%); /* 변경: 색상을 좀 더 어둡게 */
+  filter: brightness(90%);
 }

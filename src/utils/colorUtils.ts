@@ -56,3 +56,18 @@ export function hexToHsl(
     l: Math.round(l * 100),
   };
 }
+
+/**
+ * 주어진 밝기(lightness) 값에 따라 최적의 대비 텍스트 색상(검은색 또는 흰색)을 반환합니다.
+ * @param lightness - HSL 색상 모델의 밝기 값 (0-100)
+ * @returns 'var(--text-primary)' (어두운 색) 또는 '#FFFFFF' (밝은 색)
+ */
+export function getContrastColor(lightness: number): string {
+  // 밝기 임계값. 이 값보다 밝으면 어두운 텍스트, 어두우면 밝은 텍스트를 사용합니다.
+  // 65 정도로 설정하면 대부분의 색상에 대해 좋은 가독성을 제공합니다.
+  const LUMINANCE_THRESHOLD = 65;
+
+  return lightness > LUMINANCE_THRESHOLD
+    ? 'var(--text-primary)' // 배경이 밝으므로 어두운 텍스트
+    : '#FFFFFF'; // 배경이 어두우므로 밝은 텍스트
+}
