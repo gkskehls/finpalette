@@ -24,10 +24,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(transaction): 내역 입력 모달에 카테고리 관리 버튼 추가
+style(transaction): 카테고리 선택 영역 레이아웃 최종 개선
 
-- 내역 입력 중 카테고리 수정이 필요할 때 바로 이동할 수 있도록 설정 버튼 추가
-- Settings2 아이콘을 사용하여 직관적이고 깔끔한 UI 제공
+- 라벨, 콤보박스, 관리 버튼을 한 줄에 배치하여 공간 효율성 증대
+- 아코디언(그리드)을 하단 전체 너비로 배치하여 가독성 개선
 "
 git push origin main
 

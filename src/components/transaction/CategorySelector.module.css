@@ -2,10 +2,16 @@
   /* flex: 1; 부모의 공간을 모두 차지하지 않도록 제거 */
   width: 100%; /* 너비를 100%로 설정하여 부모에 맞춤 */
   min-width: 0;
+  box-sizing: border-box; /* 패딩과 보더를 너비에 포함 */
+}
+
+/* 모든 자식 요소에도 box-sizing 적용 */
+.container * {
+  box-sizing: border-box;
 }
 
 .selectorButton {
-  width: fit-content; /* 버튼 자체는 내용물 크기에 맞춤 */
+  width: 100%; /* 버튼 너비를 꽉 채우도록 수정 */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -16,7 +22,7 @@
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s;
-  min-width: 150px; /* 최소 너비 보장 */
+  min-width: 0; /* flex item 내에서 줄어들 수 있도록 설정 */
 }
 
 .selectorButton:hover {
@@ -28,6 +34,7 @@
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex: 1; /* 남은 공간 차지 */
 }
 
 .iconWrapper {
@@ -48,12 +55,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1; /* 텍스트가 길어지면 말줄임표 처리 */
+  text-align: left;
 }
 
 .chevron {
   color: var(--text-secondary);
   transition: transform 0.2s;
   flex-shrink: 0;
+  margin-left: 8px;
 }
 
 .chevron.open {
@@ -68,11 +78,9 @@
   padding: 0; /* 패딩 제거 */
 
   display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(80px, 1fr)
-  ); /* 반응형 그리드 */
-  gap: 10px;
+  /* 최소 너비를 80px -> 68px로 줄여서 좁은 공간에서도 3열이 나오도록 조정 */
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  gap: 8px; /* 간격도 10px -> 8px로 살짝 줄임 */
   margin-top: 12px;
   animation: slideDown 0.2s ease-out;
   overflow: hidden;
@@ -83,8 +91,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 8px;
+  gap: 6px; /* 간격 미세 조정 */
+  padding: 10px 4px; /* 패딩 미세 조정 */
   border-radius: 12px;
   border: 1px solid transparent;
   background-color: var(--bg-secondary);
@@ -103,7 +111,7 @@
 }
 
 .categoryItemName {
-  font-size: 0.85rem;
+  font-size: 0.8rem; /* 폰트 사이즈 살짝 줄임 */
   color: var(--text-secondary);
   text-align: center;
   white-space: nowrap;

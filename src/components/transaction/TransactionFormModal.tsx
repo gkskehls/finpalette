@@ -23,7 +23,7 @@ import type {
 } from '../../hooks/queries/useTransactionsMutation';
 import { useAuth } from '../../hooks/useAuth';
 import { useCurrentPaletteRole } from '../../hooks/useCurrentPaletteRole';
-import { CategorySelector } from './CategorySelector';
+import { CategorySelector, CategoryGrid } from './CategorySelector';
 import { ConfirmModal } from '../common/ConfirmModal';
 
 // --- Auto-resizing Textarea 컴포넌트 ---
@@ -67,6 +67,7 @@ export function TransactionFormModal({
   const { user } = useAuth();
   const { role } = useCurrentPaletteRole();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false); // 카테고리 아코디언 상태
 
   // --- 권한 제어 로직 ---
   const canEdit = useMemo(() => {
@@ -373,22 +374,32 @@ export function TransactionFormModal({
 
             <div
               className={styles.formGroup}
-              style={{ alignItems: 'flex-start' }}
+              style={{
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                gap: '0',
+              }}
             >
-              <label style={{ marginTop: '12px' }}>카테고리</label>
+              {/* 상단 행: 라벨 + 콤보박스 + 버튼 */}
               <div
                 style={{
-                  flex: 1,
                   display: 'flex',
-                  gap: '8px',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
+                  gap: '12px',
+                  width: '100%',
                 }}
               >
+                <label
+                  style={{ flexBasis: '80px', flexShrink: 0, marginBottom: 0 }}
+                >
+                  카테고리
+                </label>
                 <div style={{ flex: 1 }}>
                   <CategorySelector
                     categories={currentCategories}
                     selectedCode={category}
-                    onSelect={setCategory}
+                    isOpen={isCategoryOpen}
+                    onToggle={() => setIsCategoryOpen(!isCategoryOpen)}
                     disabled={isLoadingCategories || !canSubmit}
                   />
                 </div>
@@ -416,6 +427,20 @@ export function TransactionFormModal({
                   </button>
                 )}
               </div>
+
+              {/* 하단 행: 아코디언 (전체 너비) */}
+              {isCategoryOpen && (
+                <div style={{ marginTop: '12px' }}>
+                  <CategoryGrid
+                    categories={currentCategories}
+                    selectedCode={category}
+                    onSelect={(code) => {
+                      setCategory(code);
+                      setIsCategoryOpen(false);
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>

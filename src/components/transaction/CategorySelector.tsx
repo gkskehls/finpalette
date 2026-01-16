@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Icon } from '../common/Icon';
 import type { Category } from '../../types/category';
@@ -8,30 +7,19 @@ import styles from './CategorySelector.module.css';
 interface CategorySelectorProps {
   categories: Category[];
   selectedCode: string;
-  // eslint-disable-next-line no-unused-vars
-  onSelect: (code: string) => void;
+  isOpen: boolean;
+  onToggle: () => void;
   disabled?: boolean;
 }
 
 export function CategorySelector({
   categories,
   selectedCode,
-  onSelect,
+  isOpen,
+  onToggle,
   disabled = false,
 }: CategorySelectorProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const selectedCategory = categories.find((c) => c.code === selectedCode);
-
-  const handleToggle = () => {
-    if (!disabled) {
-      setIsOpen(!isOpen);
-    }
-  };
-
-  const handleSelect = (code: string) => {
-    onSelect(code);
-    setIsOpen(false);
-  };
 
   if (!selectedCategory && categories.length > 0) {
     return null;
@@ -41,7 +29,7 @@ export function CategorySelector({
     <div className={styles.container}>
       <div
         className={styles.selectorButton}
-        onClick={handleToggle}
+        onClick={() => !disabled && onToggle()}
         role="button"
         tabIndex={0}
       >
@@ -63,31 +51,44 @@ export function CategorySelector({
           className={`${styles.chevron} ${isOpen ? styles.open : ''}`}
         />
       </div>
+    </div>
+  );
+}
 
-      {isOpen && (
-        <div className={styles.gridContainer}>
-          {categories.map((category) => (
-            <div
-              key={category.code}
-              className={`${styles.categoryItem} ${
-                category.code === selectedCode ? styles.selected : ''
-              }`}
-              onClick={() => handleSelect(category.code)}
-            >
-              <div
-                className={styles.iconWrapper}
-                style={{
-                  backgroundColor: category.color,
-                  opacity: category.code === selectedCode ? 1 : 0.7,
-                }}
-              >
-                <Icon name={category.icon as IconName} size={18} />
-              </div>
-              <span className={styles.categoryItemName}>{category.name}</span>
-            </div>
-          ))}
+interface CategoryGridProps {
+  categories: Category[];
+  selectedCode: string;
+  // eslint-disable-next-line no-unused-vars
+  onSelect: (code: string) => void;
+}
+
+export function CategoryGrid({
+  categories,
+  selectedCode,
+  onSelect,
+}: CategoryGridProps) {
+  return (
+    <div className={styles.gridContainer}>
+      {categories.map((category) => (
+        <div
+          key={category.code}
+          className={`${styles.categoryItem} ${
+            category.code === selectedCode ? styles.selected : ''
+          }`}
+          onClick={() => onSelect(category.code)}
+        >
+          <div
+            className={styles.iconWrapper}
+            style={{
+              backgroundColor: category.color,
+              opacity: category.code === selectedCode ? 1 : 0.7,
+            }}
+          >
+            <Icon name={category.icon as IconName} size={18} />
+          </div>
+          <span className={styles.categoryItemName}>{category.name}</span>
         </div>
-      )}
+      ))}
     </div>
   );
 }
