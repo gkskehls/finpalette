@@ -87,9 +87,8 @@
 
 .colorGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  margin-top: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 10px;
 }
 
 .colorOption {
@@ -98,19 +97,12 @@
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
-  transition:
-    transform 0.2s,
-    border-color 0.2s;
+  transition: border-color 0.2s;
   position: relative;
-}
-
-.colorOption:hover {
-  transform: scale(1.1);
 }
 
 .colorOption.selected {
   border-color: var(--text-primary);
-  transform: scale(1.1);
 }
 
 .radioGroup {
