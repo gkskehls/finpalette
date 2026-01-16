@@ -88,19 +88,23 @@ function App() {
       root.style.setProperty('--palette-hue', String(hsl.h));
       root.style.setProperty('--palette-saturation', `${hsl.s}%`);
 
-      // 라이트/다크 모드 각각의 밝기(Lightness) 값 가져오기
-      const lightModeLightness = 70; // --palette-primary-lightness in light mode
-      const darkModeLightness = 50; // --palette-primary-lightness in dark mode
+      // 라이트/다크 모드 각각의 밝기(Lightness) 및 채도(Saturation) 값 정의
+      // index.css와 값을 일치시켜야 함
+      const lightModeLightness = 70;
+      const lightModeSaturation = hsl.s;
+
+      const darkModeLightness = 60; // 다크 모드에서는 밝기를 60%로 조정
+      const darkModeSaturation = hsl.s * 0.9; // 다크 모드에서는 채도를 10% 감소
 
       // 각 모드에 대한 대비 색상 계산 및 설정
       const contrastForLight = getContrastColorByHSL(
         hsl.h,
-        hsl.s,
+        lightModeSaturation,
         lightModeLightness
       );
       const contrastForDark = getContrastColorByHSL(
         hsl.h,
-        hsl.s,
+        darkModeSaturation,
         darkModeLightness
       );
 

@@ -18,14 +18,18 @@
   --border-color: #eee;
 
   /* 동적 팔레트 색상 시스템 (HSL 기반) */
-  --palette-hue: 237; /* 기본값: 기존 primary-color(#646cff)의 HUE */
+  --palette-hue: 237;
   --palette-saturation: 100%;
-  --palette-primary-lightness: 70%;
+
+  /* 라이트 모드 전용 밝기 */
+  --palette-primary-lightness-light: 70%;
   --palette-light-lightness: 96%;
+
+  /* 최종 색상 변수 (라이트 모드) */
   --palette-color: hsl(
     var(--palette-hue),
     var(--palette-saturation),
-    var(--palette-primary-lightness)
+    var(--palette-primary-lightness-light)
   );
   --palette-color-light: hsl(
     var(--palette-hue),
@@ -34,23 +38,19 @@
   );
 
   /* 대비 색상 변수 (모드별로 정의) */
-  --palette-contrast-text-light: var(
-    --text-color
-  ); /* 라이트 모드용 대비 색상 */
-  --palette-contrast-text-dark: #ffffff; /* 다크 모드용 대비 색상 */
-  --palette-contrast-text: var(
-    --palette-contrast-text-light
-  ); /* 현재 모드에 따라 자동으로 선택될 변수 */
+  --palette-contrast-text-light: var(--text-color);
+  --palette-contrast-text-dark: #ffffff;
+  --palette-contrast-text: var(--palette-contrast-text-light);
 
   /* Alias for compatibility */
   --bg-primary: var(--background-primary);
   --bg-secondary: var(--background-secondary);
   --bg-hover: var(--hover-background);
-  --bg-color: var(--background-primary); /* Fallback */
+  --bg-color: var(--background-primary);
   --text-primary: var(--text-color);
   --text-secondary: var(--secondary-text-color);
-  --text-tertiary: #999999; /* Added tertiary text color */
-  --primary-light: #e0e7ff; /* Light primary for backgrounds */
+  --text-tertiary: #999999;
+  --primary-light: #e0e7ff;
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -85,9 +85,19 @@ html.dark {
   --expense-color: #dc3545;
   --border-color: #333;
 
-  /* 동적 팔레트 색상 시스템 (HSL 기반) - 다크모드 */
-  --palette-primary-lightness: 50%;
+  /* 다크 모드 전용 채도 및 밝기 조정 */
+  --palette-saturation-dark: calc(
+    var(--palette-saturation) * 0.9
+  ); /* 채도 10% 감소 */
+  --palette-primary-lightness-dark: 60%; /* 밝기 60%로 조정 */
   --palette-light-lightness: 20%;
+
+  /* 최종 색상 변수 (다크 모드) */
+  --palette-color: hsl(
+    var(--palette-hue),
+    var(--palette-saturation-dark),
+    var(--palette-primary-lightness-dark)
+  );
 
   /* 다크 모드일 때 대비 색상 변수 재정의 */
   --palette-contrast-text: var(--palette-contrast-text-dark);
@@ -99,7 +109,7 @@ html.dark {
   --bg-color: var(--background-primary);
   --text-primary: var(--text-color);
   --text-secondary: var(--secondary-text-color);
-  --text-tertiary: #777777; /* Added tertiary text color for dark mode */
+  --text-tertiary: #777777;
   --primary-light: rgba(116, 123, 255, 0.2);
 
   color-scheme: dark;
