@@ -24,12 +24,13 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat: 명암 대비 기반 동적 텍스트 색상 구현
-
-- 사용자가 선택한 팔레트 색상의 밝기에 따라 텍스트 색상(검은색/흰색)을 자동으로 결정하는 로직을 추가했습니다.
-- colorUtils.ts에 getContrastColor 함수를 추가하고, App.tsx에서 이를 활용하여 --palette-contrast-text CSS 변수를 동적으로 설정합니다.
-- FloatingActionButton에 이 새로운 변수를 적용하여, 어떤 배경색에서도 아이콘이 잘 보이도록 가독성을 개선했습니다.
-- ProfilePage.tsx의 앱 버전을 v1.1.54로 업데이트했습니다.
+refactor: 인지 휘도 계산으로 동적 테마 가독성 개선
+•단순 밝기 기반의 대비 색상 로직을 인지 휘도 계산 방식으로 변경했습니다
+•이를 통해 다크 모드와 특정 색상에서의 텍스트 가독성을 크게 향상시켰습니다
+•colorUtils.ts에 휘도 계산 및 HSL-RGB 변환 함수를 추가했습니다
+•App.tsx에서 라이트/다크 모드별 대비 색상을 각각 계산하도록 수정했습니다
+•CSS 변수 구조를 개선하여 테마 색상이 모드에 따라 자동 전환되게 했습니다
+•ProfilePage.tsx의 앱 버전을 v1.1.55로 업데이트했습니다
 "
 git push origin main
 

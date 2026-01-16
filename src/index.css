@@ -32,8 +32,15 @@
     var(--palette-saturation),
     var(--palette-light-lightness)
   );
-  /* 대비 색상 변수 추가 */
-  --palette-contrast-text: var(--button-text-color);
+
+  /* 대비 색상 변수 (모드별로 정의) */
+  --palette-contrast-text-light: var(
+    --text-color
+  ); /* 라이트 모드용 대비 색상 */
+  --palette-contrast-text-dark: #ffffff; /* 다크 모드용 대비 색상 */
+  --palette-contrast-text: var(
+    --palette-contrast-text-light
+  ); /* 현재 모드에 따라 자동으로 선택될 변수 */
 
   /* Alias for compatibility */
   --bg-primary: var(--background-primary);
@@ -81,6 +88,9 @@ html.dark {
   /* 동적 팔레트 색상 시스템 (HSL 기반) - 다크모드 */
   --palette-primary-lightness: 50%;
   --palette-light-lightness: 20%;
+
+  /* 다크 모드일 때 대비 색상 변수 재정의 */
+  --palette-contrast-text: var(--palette-contrast-text-dark);
 
   /* Alias for compatibility */
   --bg-primary: var(--background-primary);

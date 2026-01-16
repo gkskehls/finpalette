@@ -13,7 +13,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 // Utils
-import { hexToHsl, getContrastColor } from './utils/colorUtils';
+import { hexToHsl, getContrastColorByHSL } from './utils/colorUtils';
 
 // Hooks
 import { useCurrentPalette } from './hooks/useCurrentPalette';
@@ -88,16 +88,24 @@ function App() {
       root.style.setProperty('--palette-hue', String(hsl.h));
       root.style.setProperty('--palette-saturation', `${hsl.s}%`);
 
-      // 주 색상의 밝기(Lightness) 가져오기
-      const primaryLightnessValue = parseFloat(
-        getComputedStyle(root)
-          .getPropertyValue('--palette-primary-lightness')
-          .trim()
+      // 라이트/다크 모드 각각의 밝기(Lightness) 값 가져오기
+      const lightModeLightness = 70; // --palette-primary-lightness in light mode
+      const darkModeLightness = 50; // --palette-primary-lightness in dark mode
+
+      // 각 모드에 대한 대비 색상 계산 및 설정
+      const contrastForLight = getContrastColorByHSL(
+        hsl.h,
+        hsl.s,
+        lightModeLightness
+      );
+      const contrastForDark = getContrastColorByHSL(
+        hsl.h,
+        hsl.s,
+        darkModeLightness
       );
 
-      // 대비 색상 계산 및 설정
-      const contrastColor = getContrastColor(primaryLightnessValue);
-      root.style.setProperty('--palette-contrast-text', contrastColor);
+      root.style.setProperty('--palette-contrast-text-light', contrastForLight);
+      root.style.setProperty('--palette-contrast-text-dark', contrastForDark);
     }
   }, [currentPalette]);
 
