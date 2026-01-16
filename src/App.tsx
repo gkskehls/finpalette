@@ -74,11 +74,16 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const mainContentRef = useRef<HTMLDivElement>(null);
-  const { currentPalette } = useCurrentPalette();
+  const { currentPalette, isLoading } = useCurrentPalette();
 
   // 동적 테마 적용 로직
   useEffect(() => {
-    const themeColor = currentPalette?.theme_color || '#646cff'; // 기본 색상
+    // 로딩 중이거나 팔레트 정보가 없으면 아무것도 하지 않음 (기본값인 회색 유지)
+    if (isLoading || !currentPalette) {
+      return;
+    }
+
+    const themeColor = currentPalette.theme_color || '#646cff'; // 기본 색상
     const hsl = hexToHsl(themeColor);
 
     if (hsl) {
@@ -111,7 +116,7 @@ function App() {
       root.style.setProperty('--palette-contrast-text-light', contrastForLight);
       root.style.setProperty('--palette-contrast-text-dark', contrastForDark);
     }
-  }, [currentPalette]);
+  }, [currentPalette, isLoading]);
 
   const currentKey = location.key;
 

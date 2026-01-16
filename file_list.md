@@ -70,6 +70,8 @@ Git hooks를 관리하기 위한 폴더입니다. 특정 Git 이벤트(예: comm
 - **📁 common/**: 여러 페이지에서 공통적으로 사용되는 범용 컴포넌트 폴더입니다.
   - **📄 BottomNav.tsx**: 하단 네비게이션 바 컴포넌트입니다.
   - **📄 BottomNav.module.css**: `BottomNav` 컴포넌트의 전용 CSS 모듈 파일입니다.
+  - **📄 ConfirmModal.tsx**: 사용자 확인을 위한 모달 컴포넌트입니다.
+  - **📄 ConfirmModal.module.css**: `ConfirmModal` 컴포넌트의 전용 CSS 모듈 파일입니다.
   - **📄 FloatingActionButton.tsx**: 화면 위에 떠 있는 플로팅 액션 버튼 컴포넌트입니다.
   - **📄 FloatingActionButton.module.css**: `FloatingActionButton` 컴포넌트의 전용 CSS 모듈 파일입니다.
   - **📄 Header.tsx**: 페이지 상단의 헤더 컴포넌트입니다.

@@ -6,7 +6,7 @@
   --secondary-text-color: #888;
   --card-background: #ffffff;
   --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --primary-color: #646cff;
+  /* --primary-color: #646cff; <-- 이 부분을 동적 변수로 대체 */
   --primary-color-dark: #535bf2;
   --button-text-color: #ffffff;
   --progress-bar-bg: #e0e0e0;
@@ -18,8 +18,9 @@
   --border-color: #eee;
 
   /* 동적 팔레트 색상 시스템 (HSL 기반) */
-  --palette-hue: 237;
-  --palette-saturation: 100%;
+  /* 초기값: 스켈레톤 스타일 (회색) - JS 로딩 전 깜빡임 방지 */
+  --palette-hue: 220;
+  --palette-saturation: 10%;
 
   /* 라이트 모드 전용 밝기 */
   --palette-primary-lightness-light: 70%;
@@ -36,6 +37,9 @@
     var(--palette-saturation),
     var(--palette-light-lightness)
   );
+
+  /* --primary-color를 동적 변수인 --palette-color로 연결 */
+  --primary-color: var(--palette-color);
 
   /* 대비 색상 변수 (모드별로 정의) */
   --palette-contrast-text-light: var(--text-color);
@@ -74,7 +78,7 @@ html.dark {
   --secondary-text-color: #aaaaaa;
   --card-background: #333333;
   --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --primary-color: #747bff;
+  /* --primary-color: #747bff; <-- 이 부분을 동적 변수로 대체 */
   --primary-color-dark: #646cff;
   --button-text-color: #ffffff;
   --progress-bar-bg: #555555;
@@ -98,6 +102,9 @@ html.dark {
     var(--palette-saturation-dark),
     var(--palette-primary-lightness-dark)
   );
+
+  /* --primary-color를 동적 변수인 --palette-color로 연결 */
+  --primary-color: var(--palette-color);
 
   /* 다크 모드일 때 대비 색상 변수 재정의 */
   --palette-contrast-text: var(--palette-contrast-text-dark);

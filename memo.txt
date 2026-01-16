@@ -24,11 +24,10 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-style(palette): 팔레트 생성 모달 색상 선택 UI 개선
+feat(transaction): 내역 입력 모달에 카테고리 관리 버튼 추가
 
-- 팔레트 생성 모달의 색상 선택 그리드 스타일을 카테고리 설정 페이지와 통일
-- 반응형 그리드(auto-fill) 적용으로 모바일 화면 공간 효율성 개선
-- 불필요한 호버 효과 제거하여 일관된 사용자 경험 제공
+- 내역 입력 중 카테고리 수정이 필요할 때 바로 이동할 수 있도록 설정 버튼 추가
+- Settings2 아이콘을 사용하여 직관적이고 깔끔한 UI 제공
 "
 git push origin main
 

@@ -29,16 +29,22 @@ interface PaletteContextType {
 const PaletteContext = createContext<PaletteContextType | undefined>(undefined);
 
 export const PaletteProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const { data: palettes = [], isLoading: isQueryLoading } = usePalettesQuery();
 
   const [selectedPaletteId, setSelectedPaletteId] = useState<string | null>(
     () => localStorage.getItem('lastUsedPaletteId')
   );
 
-  const isLoading = user ? isQueryLoading : false;
+  // 인증 확인 중이거나, (로그인 상태인데) 쿼리 로딩 중이면 로딩 상태로 간주
+  const isLoading = isAuthLoading || (user ? isQueryLoading : false);
 
   const currentPalette = useMemo(() => {
+    // 0. 인증 확인 중이면 null (스켈레톤 표시)
+    if (isAuthLoading) {
+      return null;
+    }
+
     // 1. 게스트 모드일 경우, 항상 가상 팔레트 반환
     if (!user) {
       return GUEST_PALETTE;
@@ -57,7 +63,7 @@ export const PaletteProvider = ({ children }: { children: ReactNode }) => {
 
     // 4. 선택된 게 없거나 유효하지 않다면 첫 번째 팔레트를 기본값으로 반환
     return palettes[0];
-  }, [user, isLoading, palettes, selectedPaletteId]);
+  }, [user, isLoading, palettes, selectedPaletteId, isAuthLoading]);
 
   useEffect(() => {
     if (currentPalette && user) {

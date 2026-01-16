@@ -1,6 +1,14 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './TransactionFormModal.module.css';
-import { X, Lock, Trash2, MessageSquareText, Check } from 'lucide-react';
+import {
+  X,
+  Lock,
+  Trash2,
+  MessageSquareText,
+  Check,
+  Settings2,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCategoriesQuery } from '../../hooks/queries/useCategoriesQuery';
 import type { Transaction } from '../../types/transaction';
@@ -16,6 +24,7 @@ import type {
 import { useAuth } from '../../hooks/useAuth';
 import { useCurrentPaletteRole } from '../../hooks/useCurrentPaletteRole';
 import { CategorySelector } from './CategorySelector';
+import { ConfirmModal } from '../common/ConfirmModal';
 
 // --- Auto-resizing Textarea 컴포넌트 ---
 const AutoResizingTextarea = (
@@ -53,9 +62,11 @@ export function TransactionFormModal({
   transactionToEdit,
   initialDate,
 }: TransactionFormModalProps) {
+  const navigate = useNavigate();
   const isEditMode = !!transactionToEdit;
   const { user } = useAuth();
   const { role } = useCurrentPaletteRole();
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // --- 권한 제어 로직 ---
   const canEdit = useMemo(() => {
@@ -104,6 +115,40 @@ export function TransactionFormModal({
     transactionToEdit?.private_memo || ''
   );
 
+  // 변경 사항이 있는지 확인하는 로직
+  const isDirty = useMemo(() => {
+    if (isEditMode && transactionToEdit) {
+      // 수정 모드: 기존 데이터와 비교
+      return (
+        type !== transactionToEdit.type ||
+        amount !== transactionToEdit.amount.toString() ||
+        category !== transactionToEdit.category_code ||
+        date !== transactionToEdit.date ||
+        description !== (transactionToEdit.description || '') ||
+        publicMemo !== (transactionToEdit.public_memo || '') ||
+        privateMemo !== (transactionToEdit.private_memo || '')
+      );
+    } else {
+      // 신규 모드: 입력 필드에 값이 있는지 확인 (날짜, 타입, 카테고리는 기본값이 있으므로 제외)
+      return (
+        amount !== '' ||
+        description !== '' ||
+        publicMemo !== '' ||
+        privateMemo !== ''
+      );
+    }
+  }, [
+    isEditMode,
+    transactionToEdit,
+    type,
+    amount,
+    category,
+    date,
+    description,
+    publicMemo,
+    privateMemo,
+  ]);
+
   const addMutation = useAddTransactionMutation();
   const updateMutation = useUpdateTransactionMutation();
   const deleteMutation = useDeleteTransactionMutation();
@@ -138,6 +183,16 @@ export function TransactionFormModal({
       setCategory(targetCategories[0].code);
     } else {
       setCategory('');
+    }
+  };
+
+  const handleCategorySettingClick = () => {
+    if (isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      navigate('/categories');
+      // 페이지 전환이 시작된 후 모달을 닫기 위해 약간의 지연을 줌
+      setTimeout(() => onClose(), 100);
     }
   };
 
@@ -321,12 +376,46 @@ export function TransactionFormModal({
               style={{ alignItems: 'flex-start' }}
             >
               <label style={{ marginTop: '12px' }}>카테고리</label>
-              <CategorySelector
-                categories={currentCategories}
-                selectedCode={category}
-                onSelect={setCategory}
-                disabled={isLoadingCategories || !canSubmit}
-              />
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  gap: '8px',
+                  alignItems: 'flex-start',
+                }}
+              >
+                <div style={{ flex: 1 }}>
+                  <CategorySelector
+                    categories={currentCategories}
+                    selectedCode={category}
+                    onSelect={setCategory}
+                    disabled={isLoadingCategories || !canSubmit}
+                  />
+                </div>
+                {canSubmit && (
+                  <button
+                    type="button"
+                    onClick={handleCategorySettingClick}
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      padding: '10px',
+                      cursor: 'pointer',
+                      color: 'var(--text-secondary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '12px',
+                      height: '58px',
+                      width: '58px',
+                      flexShrink: 0,
+                    }}
+                    aria-label="카테고리 관리"
+                  >
+                    <Settings2 size={24} />
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className={styles.formGroup}>
@@ -430,6 +519,19 @@ export function TransactionFormModal({
           </div>
         </form>
       </div>
+
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title="카테고리 관리로 이동"
+        message={`작성 중인 내용이 모두 사라집니다.\n이동하시겠습니까?`}
+        confirmText="이동"
+        onConfirm={() => {
+          navigate('/categories');
+          // 페이지 전환 효과가 발생한 뒤 모달을 닫기 위해 지연 추가
+          setTimeout(() => onClose(), 100);
+        }}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
     </div>
   );
 }

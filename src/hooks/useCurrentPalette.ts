@@ -5,7 +5,8 @@ import { usePalette } from '../context/PaletteContext';
  * 이 훅은 PaletteContext의 값을 직접 반환합니다.
  * @returns {{
  *   currentPalette: Palette | null;
- *   setCurrentPaletteId: (id: string | null) => void;
+ *   changePalette: (id: string) => void;
+ *   isLoading: boolean;
  * }}
  */
 export const useCurrentPalette = () => {
