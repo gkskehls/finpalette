@@ -8,6 +8,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useProfileQuery } from '../hooks/queries/useProfileQuery';
 import { useUpdateProfileMutation } from '../hooks/queries/useProfileMutation';
 import { useAvatarUpload } from '../hooks/useAvatarUpload';
+import { usePushNotification } from '../hooks/usePushNotification';
 import {
   getLocalStorageUsage,
   formatBytes,
@@ -27,6 +28,14 @@ export function ProfilePage() {
   const { uploadAvatar, isUploading } = useAvatarUpload();
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState('');
+
+  // 푸시 알림 훅 사용
+  const {
+    isSubscribed,
+    loading: isPushLoading,
+    subscribeToPush,
+    unsubscribeFromPush,
+  } = usePushNotification();
 
   // 세션 메타데이터와 DB 프로필 데이터 동기화 (Self-Healing)
   useEffect(() => {
@@ -143,6 +152,14 @@ export function ProfilePage() {
       success: '프로필 사진이 변경되었습니다!',
       error: '사진 업로드에 실패했습니다.',
     });
+  };
+
+  const handlePushToggle = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      await subscribeToPush();
+    } else {
+      await unsubscribeFromPush();
+    }
   };
 
   if (isLoading) {
@@ -301,6 +318,31 @@ export function ProfilePage() {
             Google로 로그인
           </button>
         </div>
+      )}
+
+      {/* 알림 설정 섹션 (로그인한 사용자만 표시) */}
+      {user && (
+        <>
+          <h2 className={styles.sectionTitle}>알림 설정</h2>
+          <div className={styles.notificationSection}>
+            <div className={styles.notificationInfo}>
+              <span className={styles.notificationTitle}>푸시 알림</span>
+              <span className={styles.notificationDesc}>
+                공유 가계부의 새로운 소식을 알림으로 받습니다.
+              </span>
+            </div>
+            <label className={styles.toggleSwitch}>
+              <input
+                type="checkbox"
+                className={styles.toggleInput}
+                checked={isSubscribed}
+                onChange={handlePushToggle}
+                disabled={isPushLoading}
+              />
+              <span className={styles.toggleSlider}></span>
+            </label>
+          </div>
+        </>
       )}
 
       {!user && ( // 게스트 모드일 때만 저장 공간 관리 섹션 표시

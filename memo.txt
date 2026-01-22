@@ -24,11 +24,13 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-docs(plan): 공유 가계부 알림 시스템 기획 추가
+feat(notification): 공유 가계부 알림 시스템 구축 (클라이언트 및 서버 코드)
 
-- PROJECT_PLAN.md: Phase 5 알림 시스템 구축 계획 추가
-- APP_SPECIFICATION.md: 공유 가계부 알림 시스템 상세 명세(PWA, FCM, Edge Function) 추가
-- ProfilePage.tsx: 앱 버전 v1.1.75로 업데이트
+- PWA 설정: vite.config.ts 수정, sw.js 추가
+- 클라이언트: usePushNotification 훅 구현, ProfilePage 알림 설정 UI 추가
+- 서버: notify-transaction-change Edge Function 코드 작성
+- DB: push_subscriptions 테이블 스키마 추가
+- 문서: NOTIFICATION_SYSTEM_GUIDE.md 작성, PROJECT_PLAN.md 업데이트
 "
 git push origin main
 

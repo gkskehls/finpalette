@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Finpalette v3.3 Schema
+-- Finpalette v3.4 Schema (Notification System Added)
 --
 -- 구조:
 -- 1. Tables
@@ -86,6 +86,17 @@ CREATE TABLE IF NOT EXISTS public.private_memos (
     UNIQUE(transaction_id, user_id)
 );
 
+-- [v3.4] 푸시 알림 구독 테이블
+CREATE TABLE IF NOT EXISTS public.push_subscriptions (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    endpoint TEXT NOT NULL,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    UNIQUE(user_id, endpoint) -- 한 유저가 동일한 기기(endpoint) 중복 등록 방지
+);
+
 -- ==============================================================================
 -- 2. Helper Functions & Triggers
 -- ==============================================================================
@@ -128,6 +139,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- [v3.4] 알림 발송 트리거 함수 (Edge Function 호출용)
+-- 실제 Edge Function URL과 Authorization 헤더는 Supabase 대시보드에서 설정해야 함
+-- 여기서는 개념적인 트리거 함수 정의만 포함 (실제 구현은 net extension 필요)
+-- NOTE: Supabase 무료 플랜에서는 pg_net을 이용한 직접 호출보다 Database Webhooks 사용을 권장함.
+-- 따라서 아래 트리거는 'Database Webhooks' 설정으로 대체 가능하지만, 스키마 문서화를 위해 남겨둠.
 
 -- ==============================================================================
 -- 3. Row Level Security (RLS) Policies
@@ -140,6 +156,7 @@ ALTER TABLE public.palette_invitations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.private_memos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY; -- [v3.4]
 
 -- Profiles
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON public.profiles;
@@ -196,6 +213,10 @@ DROP POLICY IF EXISTS "Members can view invitations" ON public.palette_invitatio
 CREATE POLICY "Members can view invitations" ON public.palette_invitations FOR SELECT USING (get_user_role(palette_id, auth.uid()) IS NOT NULL);
 DROP POLICY IF EXISTS "Members can create invitations" ON public.palette_invitations;
 CREATE POLICY "Members can create invitations" ON public.palette_invitations FOR INSERT WITH CHECK (get_user_role(palette_id, auth.uid()) IN ('owner', 'admin'));
+
+-- [v3.4] Push Subscriptions
+DROP POLICY IF EXISTS "Users can manage their own subscriptions" ON public.push_subscriptions;
+CREATE POLICY "Users can manage their own subscriptions" ON public.push_subscriptions FOR ALL USING (user_id = auth.uid());
 
 
 -- ==============================================================================

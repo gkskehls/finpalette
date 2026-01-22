@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate', // 'autoUpdate'에서 'prompt'로 변경
+      registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
       manifest: {
         name: 'Finpalette',
@@ -26,6 +26,21 @@ export default defineConfig({
             type: 'image/svg+xml',
           },
         ],
+      },
+      // PWA 푸시 알림 설정을 위한 추가 옵션
+      strategies: 'injectManifest', // 커스텀 서비스 워커 파일 사용
+      srcDir: 'src', // 서비스 워커 파일이 위치할 디렉토리
+      filename: 'sw.js', // 서비스 워커 파일 이름
+      // VAPID 키 설정 (나중에 Firebase에서 발급받아 여기에 추가)
+      // push: {
+      //   vapidKey: 'YOUR_VAPID_PUBLIC_KEY_HERE',
+      // },
+      devOptions: {
+        enabled: true, // 개발 환경에서 PWA 활성화
+      },
+      workbox: {
+        clientsClaim: true, // 새 서비스 워커가 즉시 활성화되도록 함
+        skipWaiting: true, // 새 서비스 워커가 이전 서비스 워커를 기다리지 않고 활성화되도록 함
       },
     }),
   ],

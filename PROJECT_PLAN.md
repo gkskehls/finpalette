@@ -203,13 +203,17 @@
 
 - **목표:** 사용자 간의 상호작용을 강화하고, 앱의 활용도를 극대화하는 고급 기능을 도입한다.
 - **세부 작업:**
-  1.  **[ ] 공유 가계부 알림 시스템 구축**
+  1.  **[진행중] 공유 가계부 알림 시스템 구축**
       - **목표:** 팔레트 내 변경 사항(내역 추가, 멤버 초대 등)을 실시간 푸시 알림으로 전달.
       - **기술:** PWA Push API, Service Worker, Supabase Edge Functions, FCM.
+      - **진행 상황:** `NOTIFICATION_SYSTEM_GUIDE.md` 참조.
       - **작업:**
-        - [ ] 클라이언트: Service Worker 설정 및 알림 권한 요청 로직 구현.
-        - [ ] 서버: `push_subscriptions` 테이블 생성 및 DB 트리거 설정.
-        - [ ] 서버: 알림 발송용 Edge Function 구현.
+        - [O] 클라이언트: Service Worker 설정 및 알림 권한 요청 로직 구현.
+        - [O] 클라이언트: 알림 설정 UI 구현.
+        - [O] 서버: `push_subscriptions` 테이블 생성 쿼리 작성.
+        - [O] 서버: 알림 발송용 Edge Function 코드 작성.
+        - [ ] 서버: Supabase CLI 설치 및 Edge Function 배포.
+        - [ ] 서버: DB Webhook 트리거 설정.
 
 ---
 
