@@ -24,10 +24,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-style(transaction): 카테고리 선택 영역 레이아웃 최종 개선
+docs(plan): 공유 가계부 알림 시스템 기획 추가
 
-- 라벨, 콤보박스, 관리 버튼을 한 줄에 배치하여 공간 효율성 증대
-- 아코디언(그리드)을 하단 전체 너비로 배치하여 가독성 개선
+- PROJECT_PLAN.md: Phase 5 알림 시스템 구축 계획 추가
+- APP_SPECIFICATION.md: 공유 가계부 알림 시스템 상세 명세(PWA, FCM, Edge Function) 추가
+- ProfilePage.tsx: 앱 버전 v1.1.75로 업데이트
 "
 git push origin main
 

@@ -181,12 +181,52 @@
 
 ##### 4. 알림 시스템 (Notifications)
 
-- **기술:** Firebase Cloud Messaging (FCM)과 Supabase Edge Functions를 연동하여 구현합니다.
-- **비용:** FCM 발송 및 Supabase Edge Function의 무료 제공량 내에서 운영되므로, 초기 비용은 발생하지 않습니다.
-- **알림 시나리오:**
-  - 다른 멤버가 내역을 추가/수정했을 때
-  - 새로운 멤버가 팔레트에 참여했을 때
-- **PWA 제약사항:** iOS 사용자는 홈 화면에 앱을 추가해야만 푸시 알림을 수신할 수 있습니다. 이를 유도하는 안내 UI가 필요합니다. (예: 최초 팔레트 참여 시 팝업 안내)
+**5.1. 목표:**
+공유 팔레트 내에서 발생하는 주요 활동(거래 내역 등록/수정, 멤버 초대/참여 등)에 대해 실시간 푸시 알림을 제공하여, 멤버 간의 정보 공유 및 협업 효율성을 높인다.
+
+**5.2. 기술 구현 상세:**
+
+- **클라이언트 (PWA):**
+  - **Service Worker 등록:** 앱 로드 시 `service-worker.js`를 등록하여 백그라운드에서 푸시 이벤트를 수신할 준비를 한다.
+  - **알림 권한 요청:** 사용자가 앱에 접속하거나 특정 설정 페이지에서 '알림 켜기' 버튼을 클릭할 때 `Notification.requestPermission()`을 통해 알림 권한을 요청한다.
+  - **푸시 구독 (Push Subscription):** 권한 획득 시 `ServiceWorkerRegistration.pushManager.subscribe()`를 호출하여 `PushSubscription` 객체를 생성한다. 이 객체에는 알림을 보낼 수 있는 `endpoint` 및 인증 정보가 포함된다.
+  - **구독 정보 서버 전송:** 생성된 `PushSubscription` 객체를 Supabase 서버의 `push_subscriptions` 테이블에 저장한다. (이 단계는 DB 접근 가능 시 구현)
+  - **알림 수신 및 표시:** Service Worker의 `push` 이벤트 리스너에서 서버로부터 전송된 알림 데이터를 받아 `self.registration.showNotification()`을 사용하여 사용자에게 알림을 표시한다.
+  - **알림 클릭 액션:** 알림 클릭 시 특정 페이지(예: 해당 거래 내역 상세 페이지)로 이동하거나 앱을 포그라운드로 가져오는 로직을 구현한다.
+
+- **백엔드 (Supabase & FCM):**
+  - **`push_subscriptions` 테이블 (DB 접근 가능 시 생성):**
+    - `id`: UUID (PK)
+    - `user_id`: UUID (FK, `auth.users.id` 참조) - 어떤 사용자의 구독인지
+    - `endpoint`: TEXT - 푸시 서비스 엔드포인트
+    - `p256dh`: TEXT - 인증 키
+    - `auth`: TEXT - 인증 토큰
+    - `created_at`: TIMESTAMPTZ
+  - **데이터베이스 트리거 (DB 접근 가능 시 생성):**
+    - `transactions` 테이블의 `INSERT` 또는 `UPDATE` 이벤트 발생 시 `notify_transaction_change`와 같은 Supabase Edge Function을 호출한다.
+    - `palette_members` 테이블의 `INSERT` 이벤트 발생 시 `notify_new_member`와 같은 Edge Function을 호출한다.
+  - **Supabase Edge Function (DB 접근 가능 시 구현):**
+    - 트리거로부터 변경된 데이터와 `palette_id`를 인자로 받는다.
+    - `palette_id`에 속한 모든 `palette_members`를 조회한다.
+    - 각 멤버의 `user_id`를 사용하여 `push_subscriptions` 테이블에서 해당 사용자의 모든 디바이스 구독 정보를 가져온다.
+    - Firebase Admin SDK를 사용하여 각 `PushSubscription` 엔드포인트로 알림 메시지(제목, 본문, 아이콘, 클릭 액션 URL 등)를 전송한다.
+  - **Firebase Cloud Messaging (FCM):**
+    - Supabase Edge Function에서 FCM API를 호출하여 실제 푸시 알림을 사용자 디바이스로 전송한다.
+
+**5.3. 알림 시나리오:**
+
+- **거래 내역 등록/수정:**
+  - **조건:** 공유 팔레트 내에서 다른 멤버가 거래 내역을 추가하거나 수정했을 때.
+  - **메시지 예시:** "[{팔레트명}] {사용자명}님이 {금액}원 지출 내역을 등록했어요."
+- **새 멤버 참여:**
+  - **조건:** 새로운 멤버가 초대 링크를 통해 팔레트에 참여했을 때.
+  - **메시지 예시:** "[{팔레트명}] {새로운 멤버명}님이 팔레트에 참여했어요!"
+
+**5.4. UI/UX 고려사항:**
+
+- **설치 유도 UI:** iOS PWA의 경우 홈 화면에 추가해야만 푸시 알림을 받을 수 있으므로, 최초 알림 권한 요청 시 또는 설정 페이지에서 홈 화면 추가를 유도하는 안내 UI를 제공한다.
+- **알림 설정:** 마이페이지에서 사용자가 알림을 켜고 끌 수 있는 토글 스위치를 제공한다.
+- **알림 메시지 내용:** 간결하고 명확하게 정보를 전달하며, 클릭 시 관련 페이지로 이동하도록 설정한다.
 
 ---
 
