@@ -24,13 +24,7 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-feat(notification): 공유 가계부 알림 시스템 구축 (클라이언트 및 서버 코드)
-
-- PWA 설정: vite.config.ts 수정, sw.js 추가
-- 클라이언트: usePushNotification 훅 구현, ProfilePage 알림 설정 UI 추가
-- 서버: notify-transaction-change Edge Function 코드 작성
-- DB: push_subscriptions 테이블 스키마 추가
-- 문서: NOTIFICATION_SYSTEM_GUIDE.md 작성, PROJECT_PLAN.md 업데이트
+fix(hosting): SPA 라우팅을 위한 Firebase Hosting rewrite 규칙 수정
 "
 git push origin main
 

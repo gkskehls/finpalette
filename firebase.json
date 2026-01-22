@@ -4,7 +4,7 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "/!(__/.*|*.{js,css,png,jpg,gif,svg,ico,json,html})",
+        "source": "**",
         "destination": "/index.html"
       }
     ]
