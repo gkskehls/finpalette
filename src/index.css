@@ -89,18 +89,17 @@ html.dark {
   --expense-color: #dc3545;
   --border-color: #333;
 
-  /* 다크 모드 전용 채도 및 밝기 조정 */
-  --palette-saturation-dark: calc(
-    var(--palette-saturation) * 0.9
-  ); /* 채도 10% 감소 */
-  --palette-primary-lightness-dark: 60%; /* 밝기 60%로 조정 */
-  --palette-light-lightness: 20%;
+  /* 다크 모드 전용 채도 및 밝기 조정 (JS에서 계산된 값 사용) */
+  /* 초기값 설정 (JS 로딩 전) */
+  --palette-hue-dark: var(--palette-hue);
+  --palette-saturation-dark: 50%;
+  --palette-lightness-dark: 60%;
 
   /* 최종 색상 변수 (다크 모드) */
   --palette-color: hsl(
-    var(--palette-hue),
+    var(--palette-hue-dark),
     var(--palette-saturation-dark),
-    var(--palette-primary-lightness-dark)
+    var(--palette-lightness-dark)
   );
 
   /* --primary-color를 동적 변수인 --palette-color로 연결 */

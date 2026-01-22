@@ -130,3 +130,26 @@ export function getContrastColor(lightness: number): string {
   const LUMINANCE_THRESHOLD = 65;
   return lightness > LUMINANCE_THRESHOLD ? 'var(--text-primary)' : '#FFFFFF';
 }
+
+/**
+ * 다크 모드에 적합하도록 HSL 색상을 조정합니다.
+ * @param h Hue (0-360)
+ * @param s Saturation (0-100)
+ * @param l Lightness (0-100)
+ * @returns 조정된 HSL 값
+ */
+export function adjustHslForDarkMode(
+  h: number,
+  s: number,
+  l: number
+): { h: number; s: number; l: number } {
+  // 다크 모드에서 채도를 낮추고 명도를 높입니다.
+  const newSaturation = Math.max(0, s - 20); // 채도를 최소 0까지 감소
+  const newLightness = Math.min(100, l + 20); // 명도를 최대 100까지 증가
+
+  return {
+    h: h,
+    s: newSaturation,
+    l: newLightness,
+  };
+}

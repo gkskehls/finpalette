@@ -13,7 +13,11 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 // Utils
-import { hexToHsl, getContrastColorByHSL } from './utils/colorUtils';
+import {
+  hexToHsl,
+  getContrastColorByHSL,
+  adjustHslForDarkMode,
+} from './utils/colorUtils';
 
 // Hooks
 import { useCurrentPalette } from './hooks/useCurrentPalette';
@@ -89,28 +93,31 @@ function App() {
     if (hsl) {
       const root = document.documentElement;
 
-      // HSL 색상 변수 설정
+      // 1. 라이트 모드용 HSL 설정 (기본값)
       root.style.setProperty('--palette-hue', String(hsl.h));
       root.style.setProperty('--palette-saturation', `${hsl.s}%`);
+      // 라이트 모드 밝기는 CSS에서 --palette-lightness로 정의됨 (보통 50%~60%)
 
-      // 라이트/다크 모드 각각의 밝기(Lightness) 및 채도(Saturation) 값 정의
-      // index.css와 값을 일치시켜야 함
+      // 2. 다크 모드용 HSL 계산 및 설정
+      const darkHsl = adjustHslForDarkMode(hsl.h, hsl.s, hsl.l);
+      root.style.setProperty('--palette-hue-dark', String(darkHsl.h));
+      root.style.setProperty('--palette-saturation-dark', `${darkHsl.s}%`);
+      root.style.setProperty('--palette-lightness-dark', `${darkHsl.l}%`);
+
+      // 3. 대비 색상(Contrast Text) 계산
+      // 라이트 모드: 밝기 70% 기준 (index.css의 --primary-color 정의 참조)
       const lightModeLightness = 70;
-      const lightModeSaturation = hsl.s;
-
-      const darkModeLightness = 60; // 다크 모드에서는 밝기를 60%로 조정
-      const darkModeSaturation = hsl.s * 0.9; // 다크 모드에서는 채도를 10% 감소
-
-      // 각 모드에 대한 대비 색상 계산 및 설정
       const contrastForLight = getContrastColorByHSL(
         hsl.h,
-        lightModeSaturation,
+        hsl.s,
         lightModeLightness
       );
+
+      // 다크 모드: 계산된 darkHsl.l 기준
       const contrastForDark = getContrastColorByHSL(
-        hsl.h,
-        darkModeSaturation,
-        darkModeLightness
+        darkHsl.h,
+        darkHsl.s,
+        darkHsl.l
       );
 
       root.style.setProperty('--palette-contrast-text-light', contrastForLight);

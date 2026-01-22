@@ -24,7 +24,11 @@ supabase_schema.sql 만들때는 기존 데이터가 사라지지 않게 조심�
 # git remote add origin https://github.com/gkskehls/finpalette.git
 git add .
 git commit -m "
-fix(hosting): SPA 라우팅을 위한 Firebase Hosting rewrite 규칙 수정
+fix(theme): 다크 모드 팔레트 색상 시인성 개선
+
+- colorUtils.ts: adjustHslForDarkMode 함수 추가 (채도 감소, 명도 증가)
+- App.tsx: 다크 모드 전용 HSL CSS 변수 계산 및 설정 로직 추가
+- index.css: 다크 모드에서 JS로 계산된 HSL 변수 사용하도록 수정
 "
 git push origin main
 
